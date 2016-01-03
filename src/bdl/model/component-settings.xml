@@ -44,7 +44,8 @@
             </property>
         </properties>
         <listeners>
-            <listener>
+		 <listener>
+                <isActive>true</isActive>
                 <name>onAction</name>
                 <method>setOnAction</method>
                 <event>ActionEvent</event>
@@ -79,6 +80,7 @@
         </properties>
         <listeners>
             <listener>
+			<isActive>true</isActive>
                 <name>keyTyped</name>
                 <method>setOnKeyTyped</method>
                 <event>KeyEvent</event>
@@ -113,6 +115,7 @@
         </properties>
         <listeners>
             <listener>
+			<isActive>true</isActive>
                 <name>keyTyped</name>
                 <method>setOnKeyTyped</method>
                 <event>KeyEvent</event>
@@ -212,6 +215,7 @@
         </properties>
         <listeners>
             <listener>
+			<isActive>true</isActive>
                 <name>onAction</name>
                 <method>setOnAction</method>
                 <event>ActionEvent</event>
@@ -264,6 +268,7 @@
         </properties>
         <listeners>
             <listener>
+			<isActive>true</isActive>
                 <name>onAction</name>
                 <method>setOnAction</method>
                 <event>ActionEvent</event>
@@ -541,6 +546,7 @@
         </properties>
         <listeners>
             <listener>
+			<isActive>true</isActive>
                 <name>onAction</name>
                 <method>setOnAction</method>
                 <event>ActionEvent</event>
@@ -593,6 +599,7 @@
         </properties>
         <listeners>
             <listener>
+			<isActive>true</isActive>
                 <name>onAction</name>
                 <method>setOnAction</method>
                 <event>ActionEvent</event>
@@ -645,9 +652,44 @@
         </properties>
         <listeners>
             <listener>
+			<isActive>true</isActive>
                 <name>onAction</name>
                 <method>setOnAction</method>
                 <event>ActionEvent</event>
+            </listener>
+        </listeners>
+    </component>
+	<component>
+        <type>Canvas</type>
+        <enabled>true</enabled>
+        <package>javafx.scene.canvas</package>
+        <layouttype>ControlLayout</layouttype>
+        <icon>Canvas.png</icon>
+        <properties>
+            <property>
+                
+                <name>Layout</name><enabled>true</enabled>
+                <pseudotype>Layout</pseudotype>
+                <default></default>
+                <setter></setter>
+                <getter></getter>
+                <fxml></fxml>
+            </property><property>
+                <name>CanvasSize</name>
+                <enabled>true</enabled>
+                <pseudotype>CanvasSize</pseudotype>
+                <default></default>
+                <setter></setter>
+                <getter></getter>
+                <fxml></fxml>
+            </property>
+        </properties>
+        <listeners>
+            <listener>
+			<isActive>false</isActive>
+                <name>onMouseDragged</name>
+                <method>setonMouseDragged</method>
+                <event>MouseEvent</event>
             </listener>
         </listeners>
     </component>

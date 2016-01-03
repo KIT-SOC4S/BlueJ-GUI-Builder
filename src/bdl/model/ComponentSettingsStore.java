@@ -130,15 +130,13 @@ public class ComponentSettingsStore {
     
     private void parseListeners(ComponentSettings componentSettings, Element listenerElement) {
         NodeList listeners = listenerElement.getElementsByTagName("listener");
-
         for (int i = 0; i < listeners.getLength(); i++) {
             Element listener = (Element)listeners.item(i);
-
             String name = listener.getElementsByTagName("name").item(0).getTextContent();
             String method = listener.getElementsByTagName("method").item(0).getTextContent();
             String event = listener.getElementsByTagName("event").item(0).getTextContent();
-
-            componentSettings.addListenerHint(name, method, event);
+            String isActive = listener.getElementsByTagName("isActive").item(0).getTextContent();
+            componentSettings.addListenerHint(name, method, event, isActive);
         }
     }
 }

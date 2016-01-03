@@ -96,8 +96,8 @@ public class ComponentSettings {
         properties.add(new Property(name, enabled, type, defaultValue, getter, setter, fxml));
     }
 
-    public void addListenerHint(String name, String method, String event) {
-        listenerHints.add(new ListenerHint(name, method, event));
+    public void addListenerHint(String name, String method, String event,String defaultValue) {
+        listenerHints.add(new ListenerHint(name, method, event,defaultValue));
     }
 
 }

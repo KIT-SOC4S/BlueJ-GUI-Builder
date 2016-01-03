@@ -4,6 +4,9 @@ import bdl.controller.Controller;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettingsStore;
 import bdl.view.View;
+import blueJLink.BlueJInterface;
+import blueJLink.BlueJProjektVerwalter;
+import bluej.extensions.BlueJ;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -25,7 +28,8 @@ public class Main extends Application implements Runnable {
 //    }
 
     public Interface blueJInterface;
-
+    private BlueJ blueJ;
+	private BlueJInterface blueJInterface2;
     public void run() {
         launch();
     }
@@ -51,8 +55,8 @@ public class Main extends Application implements Runnable {
             //System.exit(1); - We don't want to kill BlueJ! The user might lose all their work!
             throw new Exception("GUI Builder: Problem with component settings");
         }
-        final View view = new View(stage, blueJInterface != null);
-        Controller controller = new Controller(view, model, blueJInterface);
+        final View view = new View(stage, blueJInterface2 != null);
+        Controller controller = new Controller(view, model, blueJInterface,blueJInterface2);
         if (blueJInterface != null) {
             blueJInterface.setGUIBuilderController(controller);
             Platform.setImplicitExit(false);
@@ -82,4 +86,8 @@ public class Main extends Application implements Runnable {
     public static void main(String[] args) {
         launch(args);
     }
+    public void setBlueJ(BlueJ bluej) {
+		this.blueJ = bluej;
+		blueJInterface2 = new BlueJProjektVerwalter(bluej);
+	}
 }

@@ -5,6 +5,7 @@ import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import bdl.model.selection.SelectionManager;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseEvent;
 
 public class ViewListeners {
@@ -29,11 +30,26 @@ public class ViewListeners {
     }
 
     public void onMouseDragged(Node node, MouseEvent mouseEvent) {
-        if (isMousePressed && selectionManager.getCurrentlySelected() == node) {
+        if (isMousePressed && selectionManager.getCurrentlySelected() == node
+        		&& mouseEvent.isPrimaryButtonDown()) {
+//        	System.out.println("MD");
             double x = node.getLayoutX() + (mouseEvent.getX() - curX);
             double y = node.getLayoutY() + (mouseEvent.getY() - curY);
             node.setLayoutX(x);
             node.setLayoutY(y);
+        } else
+        if (isMousePressed && selectionManager.getCurrentlySelected() == node
+        		&& mouseEvent.isSecondaryButtonDown()) {
+        	if (node instanceof Canvas){
+        	Canvas c=	(Canvas)node;
+//        	System.out.println("MD");
+            double x = c.getWidth() + (mouseEvent.getX() - curX);
+            double y = c.getHeight() + (mouseEvent.getY() - curY);
+            curX=mouseEvent.getX();
+            curY=mouseEvent.getY();
+            c.setHeight(y);
+            c.setWidth(x);
+        	}
         }
     }
 

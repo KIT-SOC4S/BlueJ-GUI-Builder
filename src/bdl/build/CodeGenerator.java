@@ -159,8 +159,8 @@ public class CodeGenerator {
                 .append("<?import javafx.scene.control.*?>\n")
                 .append("<?import javafx.scene.layout.*?>\n")
                 .append("<?import javafx.scene.paint.*?>\n")
-                .append("<?import javafx.scene.shape.*?>\n");
-
+                .append("<?import javafx.scene.shape.*?>\n")
+                .append("<?import javafx.scene.canvas.*?>\n");
         return importsString.toString();
     }
 

@@ -29,8 +29,16 @@ public class TopPanel extends MenuBar {
     public Menu menuHelp;
     public MenuItem mItmAbout;
     public MenuItem mItmClearAll;
-
-    public TopPanel(boolean isBlueJAttached) {
+    public Menu menuBluej;
+	public MenuItem mntmNeuesProjekt;
+	public MenuItem mntmProjektffnen;
+	public Menu mnClassInProjekt;
+	public Menu mnModellAusProjekt;
+	public Menu mnModellInProjekt;
+   
+	
+	
+	public TopPanel(boolean isBlueJAttached) {
         menuFile = new Menu(LabelGrabber.getLabel("menu.file"));
         mItmLoadFile = new MenuItem(LabelGrabber.getLabel("menu.file.open"));
         mItmSaveFile = new MenuItem(LabelGrabber.getLabel("menu.file.save"));
@@ -59,8 +67,18 @@ public class TopPanel extends MenuBar {
         menuHelp = new Menu(LabelGrabber.getLabel("menu.help"));
         mItmAbout = new MenuItem(LabelGrabber.getLabel("menu.help.about"));
 
-        if (isBlueJAttached) {
+        
+        menuBluej = new Menu("BlueJ");
+    	mntmNeuesProjekt = new MenuItem("Neues Projekt");
+    	mntmProjektffnen = new MenuItem("Projekt öffnen");
+    	mnClassInProjekt = new Menu("Quelltext generieren und speichern");
+		mnModellInProjekt = new Menu("GUI_Beschreibung in Projektordner exportieren");
+		mnModellAusProjekt = new Menu("GUI_Beschreibung aus Projektordner importieren");
+        if (isBlueJAttached) {        	
+    		menuBluej.getItems().addAll(mntmNeuesProjekt,mntmProjektffnen);    		
+    		menuBluej.getItems().addAll(mnClassInProjekt,mnModellInProjekt,mnModellAusProjekt);        	
             menuFile.getItems().addAll(mItmSaveFile, mItmFullScreen, mItmClose);
+            
         } else {
             menuFile.getItems().addAll(mItmLoadFile, mItmSaveFile, mItmFullScreen, mItmClose);
         }
@@ -69,6 +87,7 @@ public class TopPanel extends MenuBar {
         menuHelp.getItems().addAll(mItmAbout);
 
         getMenus().addAll(menuFile, menuEdit, menuView);
+        if (isBlueJAttached) { getMenus().addAll(menuBluej);}
         getMenus().addAll(menuHelp);
     }
 }

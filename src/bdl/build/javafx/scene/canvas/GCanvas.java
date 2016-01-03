@@ -1,22 +1,24 @@
-package bdl.build.javafx.scene.layout;
-
-import bdl.build.GObject;
-import bdl.view.right.PropertyEditPane;
-import bdl.build.properties.PanelProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.scene.layout.AnchorPane;
+package bdl.build.javafx.scene.canvas;
 
 import java.util.List;
 
-public class GAnchorPane extends AnchorPane implements GObject {
+import bdl.build.GObject;
+import bdl.build.properties.PanelProperty;
+import bdl.view.right.PropertyEditPane;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.scene.canvas.Canvas;
+
+public class GCanvas extends Canvas implements GObject {
     private List<PanelProperty> properties;
     private PropertyEditPane pep;
     private StringProperty fieldNameProperty = new SimpleStringProperty();
+    
 
     @Override
     public String getFieldName() {
         return fieldNameProperty.getValue();
+       
     }
 
     @Override
@@ -32,7 +34,6 @@ public class GAnchorPane extends AnchorPane implements GObject {
     @Override
     public void setPanelProperties(List<PanelProperty> properties) {
         this.properties = properties;
-        
     }
 
     @Override
@@ -48,5 +49,7 @@ public class GAnchorPane extends AnchorPane implements GObject {
     @Override
     public PropertyEditPane getPEP() {
         return pep;
+        
     }
+
 }

@@ -73,7 +73,7 @@ public class LayoutProperty implements PanelProperty {
                         double value = Double.parseDouble(layoutX.getText());
                         if (value != node.getLayoutX()) {
                             updateHistory(node.getLayoutY(), value, node.getLayoutY(), node.getLayoutX());
-                            node.setLayoutX(value);
+                           node.setLayoutX(value);
                         }
                     } catch (Exception e) {
                         //Reset value

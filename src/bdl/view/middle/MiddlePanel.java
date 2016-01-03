@@ -69,6 +69,7 @@ public class MiddlePanel extends TabPane {
         outline.setFill(Color.TRANSPARENT);
         outline.setMouseTransparent(true);
         outline.setStyle("-fx-opacity: 1;");//Could use this to make a light grey foreground
+        
         viewPaneDecorator.getChildren().add(outline);
         
         highlight = new Rectangle();
