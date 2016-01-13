@@ -49,4 +49,8 @@ public class GImageView extends ImageView implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "ImageView";
+   	}
 }

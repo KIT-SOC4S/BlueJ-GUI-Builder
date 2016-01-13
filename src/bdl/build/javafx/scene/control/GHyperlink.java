@@ -53,4 +53,8 @@ public class GHyperlink extends Hyperlink implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+	public String getNodeClassName() {		
+		return "Hyperlink";
+	}
 }

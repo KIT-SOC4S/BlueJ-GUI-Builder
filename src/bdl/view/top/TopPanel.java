@@ -72,8 +72,8 @@ public class TopPanel extends MenuBar {
     	mntmNeuesProjekt = new MenuItem("Neues Projekt");
     	mntmProjektffnen = new MenuItem("Projekt öffnen");
     	mnClassInProjekt = new Menu("Quelltext generieren und speichern");
-		mnModellInProjekt = new Menu("GUI_Beschreibung in Projektordner exportieren");
-		mnModellAusProjekt = new Menu("GUI_Beschreibung aus Projektordner importieren");
+		mnModellInProjekt = new Menu("GUI_Beschreibung als FXML in Projektordner exportieren");
+		mnModellAusProjekt = new Menu("GUI_Beschreibung (FXML) aus Projektordner importieren");
         if (isBlueJAttached) {        	
     		menuBluej.getItems().addAll(mntmNeuesProjekt,mntmProjektffnen);    		
     		menuBluej.getItems().addAll(mnClassInProjekt,mnModellInProjekt,mnModellAusProjekt);        	

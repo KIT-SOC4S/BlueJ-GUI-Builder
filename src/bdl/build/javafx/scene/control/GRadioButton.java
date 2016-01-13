@@ -54,4 +54,8 @@ public class GRadioButton extends RadioButton implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "RadioButton";
+   	}
 }

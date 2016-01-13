@@ -49,4 +49,9 @@ public class GSplitPane extends SplitPane implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "SplitPane";
+   	}
+    
 }

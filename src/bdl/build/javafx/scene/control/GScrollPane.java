@@ -49,4 +49,9 @@ public class GScrollPane extends ScrollPane implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "ScrollPane";
+   	}
+    
 }

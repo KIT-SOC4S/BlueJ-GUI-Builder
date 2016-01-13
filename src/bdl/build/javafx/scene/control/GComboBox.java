@@ -53,4 +53,9 @@ public class GComboBox extends ComboBox implements GObject{
     public PropertyEditPane getPEP() {
         return pep;
     }
+    
+    @Override
+	public String getNodeClassName() {		
+		return "ComboBox";
+	}
 }

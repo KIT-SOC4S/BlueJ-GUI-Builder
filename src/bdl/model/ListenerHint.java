@@ -23,16 +23,37 @@ public class ListenerHint {
     private String listenerText;
     private String defaultValue;// Is true iff this listener should be implemented
     //as is by example setOnAction for Button 
+    private String packageName="";
+    private String listenertype="standard";
+    
+    public String getListenertype() {
+		return listenertype;
+	}
 
-    public ListenerHint(String name, String method, String event, String defaultValue) {
+	public ListenerHint(String name, String method, String event, String defaultValue, String packageName) {    	
         listenerName = name;
         listenerMethod = method;
         listenerEvent = event;
         listenerText = buildText();
         this.defaultValue=defaultValue;
+        this.packageName=packageName;
     }
     
-    public String getDefaultValue() {
+    public ListenerHint(String name, String method, String event, String defaultValue, String packageName, String listenerType) {    	
+        listenerName = name;
+        listenerMethod = method;
+        listenerEvent = event;
+        listenerText = buildText();
+        this.defaultValue=defaultValue;
+        this.packageName=packageName;
+        this.listenertype=listenerType;
+    }
+    
+    public String getPackageName() {
+		return packageName;
+	}
+
+	public String getDefaultValue() {
 		return defaultValue;
 	}
 

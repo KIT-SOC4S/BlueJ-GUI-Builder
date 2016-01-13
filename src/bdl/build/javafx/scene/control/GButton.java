@@ -48,4 +48,9 @@ public class GButton extends Button implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    
+    @Override
+	public String getNodeClassName() {		
+		return "Button";
+	}
 }

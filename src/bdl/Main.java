@@ -20,12 +20,6 @@ import javafx.stage.Stage;
  */
 public class Main extends Application implements Runnable {
     
-    // Singleton
-//    private static Main __instance;
-//    public static Main getInstance() {
-//        if (__instance == null) { __instance = new Main(); }
-//        return __instance;
-//    }
 
     public Interface blueJInterface;
     private BlueJ blueJ;

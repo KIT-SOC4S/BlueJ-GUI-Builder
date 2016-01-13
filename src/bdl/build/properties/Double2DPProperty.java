@@ -26,7 +26,7 @@ public class Double2DPProperty implements PanelProperty {
     private DecimalFormat format = new DecimalFormat("#.##");
     private final HistoryManager historyManager;
 
-    public Double2DPProperty(final GObject gObj, String name, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public Double2DPProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
         this.setter = setter;
         this.getter = getter;

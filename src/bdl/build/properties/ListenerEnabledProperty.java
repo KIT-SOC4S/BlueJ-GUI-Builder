@@ -15,27 +15,35 @@ public class ListenerEnabledProperty implements PanelProperty {
 
     private GObject gObj;
     private CheckBox checkBox;
-    private GUIObject guiObject;
     private String listenerMethod;
 	private String eventtype;
+	private String packageName;
+	private boolean toImplement;
+	private String eventname;
 
-    public ListenerEnabledProperty(final GObject gObj,final GUIObject guiObject, String listenerMethod, String eventname, String eventtype, String defaultValue, GridPane gp, int row) {
-        this.gObj = gObj;
-        this.guiObject=guiObject;
-        this.listenerMethod=listenerMethod;
+    public ListenerEnabledProperty(final GObject gObj, String listenerMethod, String eventname, String eventtype, String implementIt, String packageName, GridPane gp, int row) {
+        this.setgObj(gObj);
+        this.setListenerMethod(listenerMethod);
         this.eventtype=eventtype;
+        this.packageName=packageName;       
+        this.setEventname(eventname);
         gp.add(new Label(listenerMethod + ":"), 0, row);
         checkBox = new CheckBox();
-        if (defaultValue!=null){
-        checkBox.setSelected(Boolean.parseBoolean(defaultValue));//TODO - Handle bad defaultValue values
+        if (implementIt!=null){
+        checkBox.setSelected(Boolean.parseBoolean(implementIt));//TODO - Handle bad defaultValue values
         } else {
         	checkBox.setSelected(false);
         } 
-        gp.add(checkBox, 1, row);
-       
+        setToImplement(checkBox.isSelected());
+        checkBox.setOnAction(e->handleCheckboxevent(e));
+        gp.add(checkBox, 1, row);       
     }
 
-    private String firstLetterUpcase(String text){
+    private void handleCheckboxevent(ActionEvent e) {
+		setToImplement(checkBox.isSelected());
+	}
+
+	protected String firstLetterUpcase(String text){
     	
     	String newSt=(text.substring(0, 1)).toUpperCase();
     	if (text.length()>1){
@@ -46,30 +54,66 @@ public class ListenerEnabledProperty implements PanelProperty {
     
     @Override
     public String getJavaCode() {
-        if (checkBox.isSelected()) {
-            return guiObject.getClassName() + "."+gObj.getFieldName() + "." + listenerMethod+"("
-            		+ "e-> handle" + firstLetterUpcase(eventtype)+firstLetterUpcase(gObj.getFieldName())+"(e);";
+        if (isToImplement()) {
+            return getgObj().getFieldName() + "." + getListenerMethod()+"("
+            		+ "e-> handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"(e));";
         } else {
             return "";
         }
     }
     
-    public String getJavaCode2() {
-        if (checkBox.isSelected()) {
-            return "public void handle" + firstLetterUpcase(eventtype)+firstLetterUpcase(gObj.getFieldName())+"("
-            		+ eventtype +"event){\n        //TODO\n" + "    }\n" + "});";
+    public String getJavaCodeHandler() {
+        if (isToImplement()) {
+            return "public void handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"("
+            		+ eventtype +" event) {\n        //TODO\n" + "  }\n" ;
         } else {
             return "";
         }
+    }
+    @Override
+    public   String getPackageName() {
+    	 if (isToImplement()) {
+    		 return packageName;
+    	 } else {
+    		 return "";
+    	 }
     }
     
 
     @Override
-    public String getFXMLCode() {
-        if (checkBox.isSelected()) {
-            return "disable=\"" + checkBox.isSelected() + "\"";
-        } else {
-            return "";
-        }
+    public String getFXMLCode() {       
+            return "#handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName());        
     }
+
+	public boolean isToImplement() {
+		return toImplement;
+	}
+
+	public void setToImplement(boolean toImplement) {
+		this.toImplement = toImplement;
+	}
+
+	public String getListenerMethod() {
+		return listenerMethod;
+	}
+
+	public void setListenerMethod(String listenerMethod) {
+		this.listenerMethod = listenerMethod;
+	}
+
+	public GObject getgObj() {
+		return gObj;
+	}
+
+	public void setgObj(GObject gObj) {
+		this.gObj = gObj;
+	}
+
+	public String getEventname() {
+		return eventname;
+	}
+
+	public void setEventname(String eventname) {
+		this.eventname = eventname;
+	}
 }

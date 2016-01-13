@@ -35,6 +35,9 @@ public class LabelGrabber {
     
     
     public static String getLabel(String key) {
+    	if (lang==null){
+    		new LabelGrabber();
+    	}
         String string = lang.getProperty(key);
         if(string == null) {
             System.err.println("Missing value for key: " + key);

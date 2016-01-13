@@ -15,7 +15,7 @@ public class GLabel extends Label implements GObject {
     private StringProperty fieldNameProperty = new SimpleStringProperty();
 
     @Override
-    public String getFieldName() {
+    public String getFieldName() {    	
         return fieldNameProperty.getValue();
     }
 
@@ -48,4 +48,8 @@ public class GLabel extends Label implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "Label";
+   	}
 }

@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
@@ -28,6 +27,7 @@ import bdl.build.GUIObject;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
 import bdl.model.ComponentSettingsStore;
+import bdl.model.ListenerHint;
 import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryListener;
 import bdl.model.history.HistoryManager;
@@ -71,6 +71,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
@@ -153,11 +154,11 @@ public class Controller {
 
 	private void handleBlueJOffeneProjekte(ActionEvent e) {
 		MenuItem mi = (MenuItem) e.getSource();
-//		Alert alert = new Alert(AlertType.INFORMATION);
-//		alert.setTitle("Information Dialog");
-//		alert.setHeaderText(null);
-//		alert.setContentText(e.getEventType() + "");
-//		alert.showAndWait();
+		// Alert alert = new Alert(AlertType.INFORMATION);
+		// alert.setTitle("Information Dialog");
+		// alert.setHeaderText(null);
+		// alert.setContentText(e.getEventType() + "");
+		// alert.showAndWait();
 		if (blueJInterface2 != null) {
 			BProject aktuellesProjekt = null;
 			for (BProject bp : aktuelleBlueJProjekte) {
@@ -275,7 +276,7 @@ public class Controller {
 				return;
 			}
 			boolean inputOK = false;
-			
+
 			while (!inputOK) {
 
 				TextInputDialog dialog = new TextInputDialog("KlasseA");
@@ -301,8 +302,6 @@ public class Controller {
 					new BlueJExporter(aktuellesBlueJProjekt, result.get(), generateJavaCode(result.get()));
 				}
 			}
-			
-			
 
 		}
 
@@ -324,7 +323,6 @@ public class Controller {
 
 			}
 		});
-		
 
 		view.topPanel.menuBluej.addEventHandler(Event.ANY, e -> {
 			if (e.getEventType().getName().equals("MENU_ON_SHOWN")) {
@@ -622,7 +620,7 @@ public class Controller {
 				}
 				Node node = (Node) gObject;
 				Rectangle outline = view.middleTabPane.outline;
-			
+
 				outline.setVisible(true);
 
 				double nodeX = 0;
@@ -655,7 +653,6 @@ public class Controller {
 				outline.setWidth(nodeW + 8);
 				outline.setHeight(nodeH + 8);
 			}
-			
 
 			@Override
 			public void clearSelection() {
@@ -1003,6 +1000,7 @@ public class Controller {
 			blueJInterface.markAsDirty();
 		}
 	}
+
 	/**
 	 * Save file to FXML. If running with BlueJ, output Java code to file.
 	 */
@@ -1011,15 +1009,14 @@ public class Controller {
 			return;
 		}
 		File file;
-	
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setInitialDirectory(dir);
-			FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("FXML files (*.fxml)", "*.fxml");
-			fileChooser.getExtensionFilters().add(filter);
-			String vorgabe = view.middleTabPane.viewPane.getClassName()+".fxml";
-			fileChooser.setInitialFileName(vorgabe);
-			file = fileChooser.showSaveDialog(view.getStage());
-		
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialDirectory(dir);
+		FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("FXML files (*.fxml)", "*.fxml");
+		fileChooser.getExtensionFilters().add(filter);
+		String vorgabe = view.middleTabPane.viewPane.getNodeClassName() + ".fxml";
+		fileChooser.setInitialFileName(vorgabe);
+		file = fileChooser.showSaveDialog(view.getStage());
 
 		if (file != null) {
 			if (!file.getName().toLowerCase().endsWith(".fxml")) {
@@ -1088,6 +1085,13 @@ public class Controller {
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
 			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
 			imports.put(componentSettings.getType(), componentSettings.getPackageName());
+			if (componentSettings.getListenerHints() != null && componentSettings.getListenerHints().size() > 0) {
+				for (ListenerHint lh : componentSettings.getListenerHints()) {
+					if (!imports.containsKey(lh.getListenerEvent())) {
+						imports.put(lh.getListenerEvent(), lh.getPackageName());
+					}
+				}
+			}
 		}
 		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, blueJInterface);
 	}
@@ -1097,6 +1101,13 @@ public class Controller {
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
 			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
 			imports.put(componentSettings.getType(), componentSettings.getPackageName());
+			if (componentSettings.getListenerHints() != null && componentSettings.getListenerHints().size() > 0) {
+				for (ListenerHint lh : componentSettings.getListenerHints()) {
+					if (!imports.containsKey(lh.getListenerEvent())) {
+						imports.put(lh.getListenerEvent(), lh.getPackageName());
+					}
+				}
+			}
 		}
 		view.middleTabPane.viewPane.setClassName(className);
 		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, blueJInterface);
@@ -1140,7 +1151,43 @@ public class Controller {
 			}
 		});
 
+		
+		if (newNode instanceof Pane){
+		
 		newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
+					
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						selectionManager.updateSelected((GObject) newNode);
+						viewListeners.onMousePressed(newNode, mouseEvent);
+						mouseEvent.consume();// Stops the mouseEvent falling through to
+												// the viewPane which would clear
+												// selection
+					}
+				});
+						newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						viewListeners.onMouseReleased(newNode, mouseEvent);
+						mouseEvent.consume();
+					}
+				});
+				newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
+					
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+//						System.out.println("MouseDragged");
+						viewListeners.onMouseDragged(newNode, mouseEvent);
+						selectionManager.updateSelected((GObject) newNode);
+						mouseEvent.consume();
+					}
+				});
+			
+			
+		} else {
+
+		newNode.addEventFilter(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>() {
+			
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				selectionManager.updateSelected((GObject) newNode);
@@ -1150,20 +1197,24 @@ public class Controller {
 										// selection
 			}
 		});
-		newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
+		newNode.addEventFilter(MouseEvent.MOUSE_RELEASED,new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				viewListeners.onMouseReleased(newNode, mouseEvent);
+				mouseEvent.consume();
 			}
 		});
-		newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
+		newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED,new EventHandler<MouseEvent>() {
+			
 			@Override
 			public void handle(MouseEvent mouseEvent) {
+//				System.out.println("MouseDragged");
 				viewListeners.onMouseDragged(newNode, mouseEvent);
 				selectionManager.updateSelected((GObject) newNode);
+				mouseEvent.consume();
 			}
 		});
-
+		}
 		final ContextMenu nodePopUp = new ContextMenu();
 		final MenuItem deletebutton = new MenuItem(LabelGrabber.getLabel("delete.node.text"));
 		nodePopUp.getItems().add(deletebutton);
@@ -1240,7 +1291,7 @@ public class Controller {
 	}
 
 	private void dealWithPane(final Pane newThing) {
-
+//         System.out.println("dealWithPane");
 		newThing.setOnDragOver(new EventHandler<DragEvent>() {
 			@Override
 			public void handle(DragEvent t) {
@@ -1372,7 +1423,7 @@ public class Controller {
 				@Override
 				public void handle(MouseEvent t) {
 					if (view.leftPanel.leftList.getSelectionModel().getSelectedItem() != null) {
-						Dragboard db = view.leftPanel.leftList.startDragAndDrop(TransferMode.ANY);
+						Dragboard db = view.leftPanel.leftList.startDragAndDrop(TransferMode.ANY);					
 						ClipboardContent cc = new ClipboardContent();
 						cc.putString("");
 						db.setContent(cc);

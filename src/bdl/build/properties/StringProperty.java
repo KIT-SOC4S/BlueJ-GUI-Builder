@@ -21,7 +21,7 @@ public class StringProperty implements PanelProperty {
     private TextField textField;
     private final HistoryManager historyManager;
 
-    public StringProperty(final GObject gObj, String name, String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public StringProperty(final GObject gObj, String name, final String observedProperty, String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
         this.setter = setter;
         this.getter = getter;

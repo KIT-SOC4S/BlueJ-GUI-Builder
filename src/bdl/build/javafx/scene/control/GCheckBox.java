@@ -53,4 +53,9 @@ public class GCheckBox extends CheckBox implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    
+    @Override
+	public String getNodeClassName() {		
+		return "CheckBox";
+	}
 }

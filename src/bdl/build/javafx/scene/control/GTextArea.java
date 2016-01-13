@@ -17,6 +17,7 @@ public class GTextArea extends TextArea implements GObject {
 
     public GTextArea() {
         setEditable(false);
+        
     }
 
     @Override
@@ -53,4 +54,8 @@ public class GTextArea extends TextArea implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "TextArea";
+   	}
 }

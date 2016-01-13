@@ -38,6 +38,10 @@ public class GListView extends ListView implements GObject {
     public List<PanelProperty> getPanelProperties() {
         return properties;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "ListView";
+   	}
 
     @Override
     public void setPEP(PropertyEditPane propertyEditPane) {

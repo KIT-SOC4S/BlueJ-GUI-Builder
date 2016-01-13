@@ -49,4 +49,8 @@ public class GAnchorPane extends AnchorPane implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "AnchorPane";
+   	}
 }

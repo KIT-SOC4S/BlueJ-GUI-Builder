@@ -49,4 +49,9 @@ public class GToolBar extends ToolBar implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    
+    @Override
+   	public String getNodeClassName() {		
+   		return "ToolBar";
+   	}
 }

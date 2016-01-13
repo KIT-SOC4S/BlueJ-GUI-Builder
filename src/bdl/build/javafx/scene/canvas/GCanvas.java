@@ -17,8 +17,7 @@ public class GCanvas extends Canvas implements GObject {
 
     @Override
     public String getFieldName() {
-        return fieldNameProperty.getValue();
-       
+        return fieldNameProperty.getValue();       
     }
 
     @Override
@@ -28,6 +27,7 @@ public class GCanvas extends Canvas implements GObject {
 
     @Override
     public StringProperty fieldNameProperty() {
+    	
         return fieldNameProperty;
     }
 
@@ -51,5 +51,10 @@ public class GCanvas extends Canvas implements GObject {
         return pep;
         
     }
+
+	@Override
+	public String getNodeClassName() {		
+		return "Canvas";
+	}
 
 }

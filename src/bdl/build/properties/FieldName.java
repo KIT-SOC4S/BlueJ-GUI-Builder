@@ -47,6 +47,8 @@ public class FieldName {
 
         gp.add(textField, 1, row);
 
+     
+        
         //Upon losing focus, save to the GObject
         textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override

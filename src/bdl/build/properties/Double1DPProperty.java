@@ -26,7 +26,7 @@ public class Double1DPProperty implements PanelProperty {
     private DecimalFormat format = new DecimalFormat("#.##");
     private final HistoryManager historyManager;
 
-    public Double1DPProperty(final GObject gObj, String name, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public Double1DPProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
         this.setter = setter;
         this.getter = getter;
@@ -36,6 +36,9 @@ public class Double1DPProperty implements PanelProperty {
         gp.add(new Label(name + ":"), 0, row);
         textField = new TextField();
 
+       
+        
+        
         //Grab value from settingsNode if given
         if (settingsNode != null) {
             try {

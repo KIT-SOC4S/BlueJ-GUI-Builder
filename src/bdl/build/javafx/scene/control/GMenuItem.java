@@ -50,4 +50,8 @@ public class GMenuItem extends MenuItem implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "MenuItem";
+   	}
 }

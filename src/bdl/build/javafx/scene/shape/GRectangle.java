@@ -17,6 +17,7 @@ public class GRectangle extends Rectangle implements GObject {
 
     @Override
     public String getFieldName() {
+    	
         return fieldNameProperty.getValue();
     }
 
@@ -49,4 +50,8 @@ public class GRectangle extends Rectangle implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "Rectangle";
+   	}
 }

@@ -26,7 +26,7 @@ public class CanvasSizeProperty implements PanelProperty {
     private DecimalFormat format = new DecimalFormat("#.##");
     private HistoryManager historyManager;
 
-    public CanvasSizeProperty(final GObject gnObj, String name, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public CanvasSizeProperty(final GObject gnObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
        // this.node = (Node) gObj;
     	if (!(gnObj instanceof GCanvas)){
     		return;
@@ -50,6 +50,9 @@ public class CanvasSizeProperty implements PanelProperty {
         if (settingsNode != null && settingsNode instanceof Canvas) {
             node.setWidth(((Canvas)settingsNode).getWidth());
             node.setHeight(((Canvas)settingsNode).getHeight());
+        } else {
+        	node.setWidth(100);
+        	node.setHeight(100);
         }
 
         width.setText(format.format(node.getWidth()));

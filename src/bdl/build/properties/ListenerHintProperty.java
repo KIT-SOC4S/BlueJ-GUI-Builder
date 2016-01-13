@@ -14,14 +14,14 @@ public class ListenerHintProperty implements PanelProperty {
 
     private Button button = new Button(LabelGrabber.getLabel("hint.button.text"));
 
-    public ListenerHintProperty (final GObject gObj, final GUIObject guiObject, String name, final String text, GridPane gp, int row) {
+    public ListenerHintProperty (final GObject gObj, final GUIObject guiObject,  String name, final String text, GridPane gp, int row) {
         gp.add(new Label(name + ":"), 0, row);
         gp.add(button, 1, row);
 
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
-                new ListenerHintWindow(guiObject.getClassName() + '.' + gObj.getFieldName() + text);
+                new ListenerHintWindow(guiObject.getNodeClassName() + '.' + gObj.getFieldName() + text);
             }
         });
     }

@@ -11,8 +11,13 @@ public class Property {
     private String getter;
     private String setter;
     private String fxml;
+    private String observedProperty;
 
-    public Property(String name, String enabled, String type, String defaultValue, String getter, String setter, String fxml) {
+    public String getObservedProperty() {
+		return observedProperty;
+	}
+
+	public Property(String name, String enabled, String type, String defaultValue, String observedProperty, String getter, String setter, String fxml) {
         this.name = name;
         this.enabled = Boolean.parseBoolean(enabled);
         this.type = type;
@@ -20,6 +25,7 @@ public class Property {
         this.getter = getter;
         this.setter = setter;
         this.fxml = fxml;
+        this.observedProperty =  observedProperty;
     }
 
     public String getName() {

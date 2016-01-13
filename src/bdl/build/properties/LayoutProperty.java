@@ -24,7 +24,7 @@ public class LayoutProperty implements PanelProperty {
     private DecimalFormat format = new DecimalFormat("#.##");
     private HistoryManager historyManager;
 
-    public LayoutProperty(final GObject gObj, String name, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public LayoutProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.node = (Node) gObj;
         this.gObj = gObj;
         historyManager = hm;

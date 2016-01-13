@@ -15,7 +15,7 @@ public class HierarchyPane extends AnchorPane {
 
     public HierarchyPane() {
         this.setMinWidth(200);
-        this.setMaxWidth(200);
+//        this.setMaxWidth(200);
 
         treeView = new TreeView<>();
         AnchorPane.setBottomAnchor(treeView, 0.0);

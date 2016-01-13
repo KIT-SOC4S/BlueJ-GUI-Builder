@@ -49,4 +49,8 @@ public class GCircle extends Circle implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    @Override
+   	public String getNodeClassName() {		
+   		return "Circle";
+   	}
 }

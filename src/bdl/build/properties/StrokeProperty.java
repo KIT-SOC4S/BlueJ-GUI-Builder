@@ -23,7 +23,7 @@ public class StrokeProperty implements PanelProperty {
     private TextField textField;
     private final HistoryManager historyManager;
 
-    public StrokeProperty(final GObject gObj, String name, String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public StrokeProperty(final GObject gObj, String name, final String observedProperty, String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
         this.node = (Shape)gObj;
         this.historyManager = hm;
