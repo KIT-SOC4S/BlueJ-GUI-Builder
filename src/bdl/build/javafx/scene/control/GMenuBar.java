@@ -17,6 +17,7 @@ public class GMenuBar extends MenuBar implements GObject {
 	private PropertyEditPane pep;
 	private StringProperty fieldNameProperty = new SimpleStringProperty();
 	private MenuBuilder menuBuilder;
+	
 
 	public GMenuBar(){
     	super();
@@ -24,10 +25,11 @@ public class GMenuBar extends MenuBar implements GObject {
     	fieldNameProperty.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {	
-				if (menuBuilder.getFieldName()!=null&&menuBuilder.getFieldName().equals(newValue)){
+				if (menuBuilder.getFieldName()!=null && menuBuilder.getFieldName().equals(newValue)){
 					return;
 				}
-				menuBuilder.setFieldName(newValue);				
+				menuBuilder.setFieldName(newValue);	
+				
 			}
 		});
     }
@@ -79,5 +81,10 @@ public class GMenuBar extends MenuBar implements GObject {
 	@Override
 	public String getNodeClassName() {
 		return "MenuBar";
+	}
+
+	public void clearTree() {
+		menuBuilder.deleteTree();
+		
 	}
 }

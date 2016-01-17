@@ -24,6 +24,7 @@ import bdl.Interface;
 import bdl.build.CodeGenerator;
 import bdl.build.GObject;
 import bdl.build.GUIObject;
+import bdl.build.javafx.scene.control.GMenuBar;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
 import bdl.model.ComponentSettingsStore;
@@ -70,8 +71,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
@@ -97,20 +98,24 @@ public class Controller {
 	private View view;
 	private ComponentSettingsStore componentSettingsStore;
 	private ViewListeners viewListeners;
-	private ArrayList<String> fieldNames;
+	private static ArrayList<String> fieldNames= new ArrayList<>();
 	private HistoryManager historyManager;
 	private SelectionManager selectionManager;
 	private Interface blueJInterface;
 	private BlueJInterface blueJInterface2;
 	private boolean isOpeningFile = false;
-
+	
+	public static ArrayList<String> getFieldNames(){
+		return fieldNames;
+	}
+	
+	
 	public Controller(View view, ComponentSettingsStore componentSettingsStore, Interface blueJInterface,
 			BlueJInterface blueJInterface2) {
 		this.view = view;
 		this.componentSettingsStore = componentSettingsStore;
 		this.blueJInterface = blueJInterface;
 		this.blueJInterface2 = blueJInterface2;
-		fieldNames = new ArrayList<>();
 		historyManager = new HistoryManager();
 		selectionManager = new SelectionManager();
 		viewListeners = new ViewListeners(historyManager, selectionManager);
@@ -122,11 +127,11 @@ public class Controller {
 	}
 
 	BProject[] aktuelleBlueJProjekte;
-	MenuItem[] bjpitemModellExport;
-	MenuItem[] bjpitemClassExport;
-	MenuItem[] bjpitemModellImport;
+	MenuItem[] bjpitemFXMLExport;
+	MenuItem[] bjpitemJAVAExport;
+	MenuItem[] bjpitemFXMLImport;
 
-	private MenuItem[] erzeugeMenuMitOffenenProjekten(final Menu oben) {
+	private MenuItem[] generateMenuItemsForOpenBluejProjects(final Menu oben) {
 		MenuItem[] bjpitem = null;
 		oben.getItems().clear();
 
@@ -145,20 +150,15 @@ public class Controller {
 				} catch (ProjectNotOpenException e) {
 					e.printStackTrace();
 				}
-				bjpitem[i].setOnAction(e -> handleBlueJOffeneProjekte(e));
+				bjpitem[i].setOnAction(e -> handleBlueJOpenProjects(e));
 				oben.getItems().add(bjpitem[i]);
 			}
 		}
 		return bjpitem;
 	}
 
-	private void handleBlueJOffeneProjekte(ActionEvent e) {
+	private void handleBlueJOpenProjects(ActionEvent e) {
 		MenuItem mi = (MenuItem) e.getSource();
-		// Alert alert = new Alert(AlertType.INFORMATION);
-		// alert.setTitle("Information Dialog");
-		// alert.setHeaderText(null);
-		// alert.setContentText(e.getEventType() + "");
-		// alert.showAndWait();
 		if (blueJInterface2 != null) {
 			BProject aktuellesProjekt = null;
 			for (BProject bp : aktuelleBlueJProjekte) {
@@ -168,28 +168,27 @@ public class Controller {
 						break;
 					}
 				} catch (ProjectNotOpenException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
 			// JOptionPane.showMessageDialog(null,"Export"+abp);
 
 			if (aktuellesProjekt != null) {
-				for (MenuItem item : bjpitemClassExport) {
+				for (MenuItem item : bjpitemJAVAExport) {
 					if (mi == item) {
-						exportiereKlasseNachBlueJ(aktuellesProjekt);
+						exportJavaToBlueJ(aktuellesProjekt);
 						break;
 					}
 				}
-				for (MenuItem item : bjpitemModellImport) {
+				for (MenuItem item : bjpitemFXMLImport) {
 					if (mi == item) {
-						importiereModellbeschreibungAusBlueJ(aktuellesProjekt);
+						importFXMLFromBlueJ(aktuellesProjekt);
 						break;
 					}
 				}
-				for (MenuItem item : bjpitemModellExport) {
+				for (MenuItem item : bjpitemFXMLExport) {
 					if (mi == item) {
-						exportiereModellbeschreibungNachBlueJ(aktuellesProjekt);
+						exportFXMLToBlueJ(aktuellesProjekt);
 						break;
 					}
 				}
@@ -197,7 +196,7 @@ public class Controller {
 		}
 	}
 
-	private void exportiereModellbeschreibungNachBlueJ(BProject aktuellesProjekt) {
+	private void exportFXMLToBlueJ(BProject aktuellesProjekt) {
 		if (aktuellesProjekt == null) {
 			return;
 		}
@@ -208,7 +207,7 @@ public class Controller {
 		}
 	}
 
-	private void importiereModellbeschreibungAusBlueJ(BProject aktuellesProjekt) {
+	private void importFXMLFromBlueJ(BProject aktuellesProjekt) {
 		if (aktuellesProjekt == null) {
 			return;
 		}
@@ -228,16 +227,17 @@ public class Controller {
 	/**
 	 * 
 	 */
-	public void exportiereKlasseNachBlueJ(BProject aktuellesBlueJProjekt) {
+	public void exportJavaToBlueJ(BProject aktuellesBlueJProjekt) {
 
 		if (blueJInterface2 == null) {
 			Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("Information Dialog");
+			alert.setTitle(LabelGrabber.getLabel("bluejlink.dialog.infoheader"));
 			alert.setHeaderText(null);
-			alert.setContentText("Fehler: Es ist kein Zugriff auf BlueJ möglich");
+			alert.setContentText(LabelGrabber.getLabel("bluejlink.error.attach"));
 			alert.showAndWait();
 
 			return;
+			
 		}
 		BlueJ bluej = blueJInterface2.getBlueJ();
 		// BProject aktuellesBlueJProjekt = blueJInterface.getBlueJProjekt();
@@ -245,7 +245,7 @@ public class Controller {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Information Dialog");
 			alert.setHeaderText(null);
-			alert.setContentText("Fehler: Es ist kein Zugriff auf BlueJ möglich");
+			alert.setContentText(LabelGrabber.getLabel("bluejlink.error.attach"));
 			alert.showAndWait();
 
 			return;
@@ -255,11 +255,10 @@ public class Controller {
 				aktuellesBlueJProjekt = bluej.getCurrentPackage().getProject();
 			} catch (ProjectNotOpenException e) {
 				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("Information Dialog");
+				alert.setTitle(LabelGrabber.getLabel("bluejlink.dialog.infoheader"));
 				alert.setHeaderText(null);
-				alert.setContentText("Bitte erst ein BlueJ-Projekt auswählen und öffnen");
+				alert.setContentText(LabelGrabber.getLabel("bluejlink.error.missingprojekt"));
 				alert.showAndWait();
-
 				return;
 			}
 		}
@@ -269,9 +268,9 @@ public class Controller {
 				bluej.openProject(aktuellesBlueJProjekt.getDir());
 			} catch (ProjectNotOpenException e) {
 				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("Information Dialog");
+				alert.setTitle(LabelGrabber.getLabel("bluejlink.dialog.infoheader"));
 				alert.setHeaderText(null);
-				alert.setContentText("Bitte erst ein BlueJ-Projekt auswählen und öffnen");
+				alert.setContentText(LabelGrabber.getLabel("bluejlink.error.missingprojekt"));
 				alert.showAndWait();
 				return;
 			}
@@ -279,9 +278,9 @@ public class Controller {
 
 			while (!inputOK) {
 
-				TextInputDialog dialog = new TextInputDialog("KlasseA");
-				dialog.setTitle("Eingabe Klassenbezeichner");
-				dialog.setContentText("Bitte einen Klassenbezeichner eingeben:");
+				TextInputDialog dialog = new TextInputDialog(LabelGrabber.getLabel("bluejlink.dialog.fieldname"));
+				dialog.setTitle(LabelGrabber.getLabel("bluejlink.dialog.inputfieldnameheader"));
+				dialog.setContentText(LabelGrabber.getLabel("bluejlink.dialog.inputfieldname")+":");
 
 				// Traditional way to get the response value.
 				Optional<String> result = dialog.showAndWait();
@@ -291,12 +290,10 @@ public class Controller {
 
 				if (!Bezeichnertester.bezeichnerOK(result.get())) {
 					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("Information Dialog");
+					alert.setTitle(LabelGrabber.getLabel("bluejlink.dialog.infoheader"));
 					alert.setHeaderText(null);
-					alert.setContentText(result.get() + ": Der Klassenbezeichner ist unzulässig");
+					alert.setContentText(result.get() + ":"+LabelGrabber.getLabel("bluejlink.dialog.wrongfieldname"));
 					alert.showAndWait();
-					// Localisation.setUebersetzung("Der Klassenbezeichner ist
-					// unzulässig", "classname is not allowed", "englisch");
 				} else {
 					inputOK = true;
 					new BlueJExporter(aktuellesBlueJProjekt, result.get(), generateJavaCode(result.get()));
@@ -320,15 +317,13 @@ public class Controller {
 			@Override
 			public void handle(ActionEvent actionEvent) {
 				blueJInterface2.oeffneProjekt();
-
 			}
 		});
-
 		view.topPanel.menuBluej.addEventHandler(Event.ANY, e -> {
 			if (e.getEventType().getName().equals("MENU_ON_SHOWN")) {
-				bjpitemModellExport = erzeugeMenuMitOffenenProjekten(view.topPanel.mnModellInProjekt);
-				bjpitemClassExport = erzeugeMenuMitOffenenProjekten(view.topPanel.mnClassInProjekt);
-				bjpitemModellImport = erzeugeMenuMitOffenenProjekten(view.topPanel.mnModellAusProjekt);
+				bjpitemFXMLExport = generateMenuItemsForOpenBluejProjects(view.topPanel.mnModellInProjekt);
+				bjpitemJAVAExport = generateMenuItemsForOpenBluejProjects(view.topPanel.mnClassInProjekt);
+				bjpitemFXMLImport = generateMenuItemsForOpenBluejProjects(view.topPanel.mnModellAusProjekt);
 			}
 		});
 		// File > Load File
@@ -413,12 +408,16 @@ public class Controller {
 				view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent actionEvent) {
+//						if (gObject instanceof GMenuBar){
+//							((GMenuBar)gObject).clearTree();
+//						}
 						view.middleTabPane.viewPane.getChildren().remove(gObject);
 						selectionManager.clearSelection();
 						historyManager.addHistory(new HistoryItem() {
 							@Override
 							public void restore() {
-								view.middleTabPane.viewPane.getChildren().remove(gObject);
+								
+								view.middleTabPane.viewPane.getChildren().remove(gObject);								
 								selectionManager.clearSelection();
 							}
 
@@ -440,14 +439,22 @@ public class Controller {
 					@Override
 					public void handle(ActionEvent actionEvent) {
 						final List<Node> list = new ArrayList<>();
-						list.addAll(view.middleTabPane.viewPane.getChildren());
+						list.addAll(view.middleTabPane.viewPane.getChildren());						
+//						for (Node n : list) {
+//							if (n instanceof GMenuBar){
+//								((GMenuBar)n).clearTree();
+//							}
+//					    }
 						view.middleTabPane.viewPane.getChildren().clear();
+						
+						
+						
 						selectionManager.clearSelection();
 
 						historyManager.addHistory(new HistoryItem() {
 							@Override
 							public void restore() {
-								for (Node n : list) {
+								for (Node n : list) {									
 									view.middleTabPane.viewPane.getChildren().remove(n);
 								}
 								selectionManager.clearSelection();
@@ -588,23 +595,29 @@ public class Controller {
 			@Override
 			public void updateSelected(GObject gObject) {
 				update(gObject.getFieldName(), view.leftPanel.hierarchyPane.treeRoot);
+				
 			}
 
 			private void update(String fieldName, TreeItem<HierarchyTreeItem> treeRoot) {
 				for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
 					GObject gObject = ti.getValue().getGObject();
 					if (gObject.getFieldName().equals(fieldName)) {
-						view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
+						view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);	
+						
+						
 					} else if (gObject instanceof Pane) {
 						update(fieldName, ti);
 					}
+					
 
 				}
 			}
 
 			@Override
 			public void clearSelection() {
-				view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);
+				System.out.println("ClearSelection");
+				view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);				
+				
 			}
 		});
 	}
@@ -884,7 +897,7 @@ public class Controller {
 
 			try {
 				Parent parent = FXMLLoader.load(file.toURI().toURL());
-
+                ausgabe(parent);
 				GUIHelper.setBounds(view.middleTabPane.viewPane, view.middleTabPane.viewPaneDecorator,
 						parent.prefWidth(0), parent.prefHeight(0));
 				String className = parent.getId();
@@ -905,7 +918,7 @@ public class Controller {
 								GObject newThing = (GObject) constructor.newInstance();
 								newThing.setFieldName(node.getId());
 
-								addGObject(newThing, componentSettings, view, viewListeners, node, -1, -1,
+								addGObjectRec(newThing, componentSettings, view, viewListeners, node, -1, -1,
 										view.middleTabPane.viewPane);
 								historyManager.unpause();
 								break;
@@ -921,6 +934,23 @@ public class Controller {
 			}
 		}
 		isOpeningFile = false;
+	}
+
+	private void ausgabe(Parent parent) {
+		System.out.println(parent);
+		for (Node node : parent.getChildrenUnmodifiable()) {
+			nodeausgabe(node,"  ");
+		}
+		
+	}
+
+	private void nodeausgabe(Node node, String string) {		
+		System.out.println(string+node);
+		if (node instanceof Pane){
+			for (Node cnode : ((Pane)node).getChildren()) {
+				nodeausgabe(cnode,string+"  ");
+			}
+		}		
 	}
 
 	/**
@@ -1122,6 +1152,9 @@ public class Controller {
 		final PropertyEditPane propertyEditPane = new PropertyEditPane(newThing, componentSettings, fieldNames,
 				view.middleTabPane.viewPane, settingsNode, historyManager);
 
+		
+		
+		
 		newThing.setPEP(propertyEditPane);
 
 		if (componentSettings.getLayoutType().equals("anchorpane")) {
@@ -1151,69 +1184,69 @@ public class Controller {
 			}
 		});
 
-		
-		if (newNode instanceof Pane){
-		
-		newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
-					
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						selectionManager.updateSelected((GObject) newNode);
-						viewListeners.onMousePressed(newNode, mouseEvent);
-						mouseEvent.consume();// Stops the mouseEvent falling through to
-												// the viewPane which would clear
-												// selection
-					}
-				});
-						newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						viewListeners.onMouseReleased(newNode, mouseEvent);
-						mouseEvent.consume();
-					}
-				});
-				newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
-					
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-//						System.out.println("MouseDragged");
-						viewListeners.onMouseDragged(newNode, mouseEvent);
-						selectionManager.updateSelected((GObject) newNode);
-						mouseEvent.consume();
-					}
-				});
-			
-			
+		if (newNode instanceof Pane) {
+
+			newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent mouseEvent) {
+					selectionManager.updateSelected((GObject) newNode);
+					viewListeners.onMousePressed(newNode, mouseEvent);
+					mouseEvent.consume();// Stops the mouseEvent falling through
+											// to
+											// the viewPane which would clear
+											// selection
+				}
+			});
+			newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent mouseEvent) {
+					viewListeners.onMouseReleased(newNode, mouseEvent);
+					mouseEvent.consume();
+				}
+			});
+			newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent mouseEvent) {
+					// System.out.println("MouseDragged");
+					viewListeners.onMouseDragged(newNode, mouseEvent);
+					selectionManager.updateSelected((GObject) newNode);
+					mouseEvent.consume();
+				}
+			});
+
 		} else {
 
-		newNode.addEventFilter(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>() {
-			
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-				selectionManager.updateSelected((GObject) newNode);
-				viewListeners.onMousePressed(newNode, mouseEvent);
-				mouseEvent.consume();// Stops the mouseEvent falling through to
-										// the viewPane which would clear
-										// selection
-			}
-		});
-		newNode.addEventFilter(MouseEvent.MOUSE_RELEASED,new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-				viewListeners.onMouseReleased(newNode, mouseEvent);
-				mouseEvent.consume();
-			}
-		});
-		newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED,new EventHandler<MouseEvent>() {
-			
-			@Override
-			public void handle(MouseEvent mouseEvent) {
-//				System.out.println("MouseDragged");
-				viewListeners.onMouseDragged(newNode, mouseEvent);
-				selectionManager.updateSelected((GObject) newNode);
-				mouseEvent.consume();
-			}
-		});
+			newNode.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent mouseEvent) {
+					selectionManager.updateSelected((GObject) newNode);
+					viewListeners.onMousePressed(newNode, mouseEvent);
+					mouseEvent.consume();// Stops the mouseEvent falling through
+											// to
+											// the viewPane which would clear
+											// selection
+				}
+			});
+			newNode.addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent mouseEvent) {
+					viewListeners.onMouseReleased(newNode, mouseEvent);
+					mouseEvent.consume();
+				}
+			});
+			newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent mouseEvent) {
+					// System.out.println("MouseDragged");
+					viewListeners.onMouseDragged(newNode, mouseEvent);
+					selectionManager.updateSelected((GObject) newNode);
+					mouseEvent.consume();
+				}
+			});
 		}
 		final ContextMenu nodePopUp = new ContextMenu();
 		final MenuItem deletebutton = new MenuItem(LabelGrabber.getLabel("delete.node.text"));
@@ -1226,6 +1259,9 @@ public class Controller {
 					deletebutton.setOnAction(new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent t) {
+//							if (newNode instanceof GMenuBar){
+//								((GMenuBar)newNode).clearTree();
+//							}
 							destination.getChildren().remove(newNode);
 							selectionManager.clearSelection();
 							historyManager.addHistory(new HistoryItem() {
@@ -1289,9 +1325,217 @@ public class Controller {
 			}
 		});
 	}
+	// x and y are initial layout positions. To be used only with drag and drop.
+		private void addGObjectRec(final GObject newThing, ComponentSettings componentSettings, final View view,
+				final ViewListeners viewListeners, Node settingsNode, int x, int y, final Pane destination) {
+
+			// Sets the default settings on the gObject and creates the property
+			// edit pane
+			final PropertyEditPane propertyEditPane = new PropertyEditPane(newThing, componentSettings, fieldNames,
+					view.middleTabPane.viewPane, settingsNode, historyManager);
+
+			newThing.setPEP(propertyEditPane);
+
+			
+			
+			if (componentSettings.getLayoutType().equals("anchorpane")) {
+				dealWithPane((Pane) newThing);	
+				
+			}
+			final Node newNode = (Node) newThing;
+			
+
+			newNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+				@Override
+				public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
+					selectionManager.updateSelected((GObject) newNode);
+				}
+			});
+
+			newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
+				@Override
+				public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+					selectionManager.updateSelected((GObject) newNode);
+				}
+			});
+
+			newNode.layoutYProperty().addListener(new ChangeListener<Number>() {
+				@Override
+				public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+					selectionManager.updateSelected((GObject) newNode);
+				}
+			});
+
+			if (newNode instanceof Pane) {
+
+				newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
+
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						selectionManager.updateSelected((GObject) newNode);
+						viewListeners.onMousePressed(newNode, mouseEvent);
+						mouseEvent.consume();// Stops the mouseEvent falling through
+												// to
+												// the viewPane which would clear
+												// selection
+					}
+				});
+				newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						viewListeners.onMouseReleased(newNode, mouseEvent);
+						mouseEvent.consume();
+					}
+				});
+				newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
+
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						// System.out.println("MouseDragged");
+						viewListeners.onMouseDragged(newNode, mouseEvent);
+						selectionManager.updateSelected((GObject) newNode);
+						mouseEvent.consume();
+					}
+				});
+
+			} else {
+
+				newNode.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						selectionManager.updateSelected((GObject) newNode);
+						viewListeners.onMousePressed(newNode, mouseEvent);
+						mouseEvent.consume();// Stops the mouseEvent falling through
+												// to
+												// the viewPane which would clear
+												// selection
+					}
+				});
+				newNode.addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						viewListeners.onMouseReleased(newNode, mouseEvent);
+						mouseEvent.consume();
+					}
+				});
+				newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						// System.out.println("MouseDragged");
+						viewListeners.onMouseDragged(newNode, mouseEvent);
+						selectionManager.updateSelected((GObject) newNode);
+						mouseEvent.consume();
+					}
+				});
+			}
+			final ContextMenu nodePopUp = new ContextMenu();
+			final MenuItem deletebutton = new MenuItem(LabelGrabber.getLabel("delete.node.text"));
+			nodePopUp.getItems().add(deletebutton);
+			newNode.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent t) {
+					if (t.getButton().equals(MouseButton.SECONDARY)) {
+						nodePopUp.show(newNode, Side.RIGHT, 0, 0);
+						deletebutton.setOnAction(new EventHandler<ActionEvent>() {
+							@Override
+							public void handle(ActionEvent t) {
+								destination.getChildren().remove(newNode);
+								selectionManager.clearSelection();
+								historyManager.addHistory(new HistoryItem() {
+									@Override
+									public void revert() {
+										destination.getChildren().add(newNode);
+										selectionManager.updateSelected((GObject) newNode);
+									}
+
+									@Override
+									public void restore() {
+										destination.getChildren().remove(newNode);
+										selectionManager.clearSelection();
+									}
+
+									@Override
+									public String getAppearance() {
+										return ((GObject) newNode).getFieldName() + " deleted!";
+									}
+								});
+							}
+						});
+					}
+				}
+			});
+
+			destination.getChildren().add(newNode);
+
+			if (settingsNode == null) {
+				if (newNode instanceof Circle) {
+					newNode.setLayoutX((newNode.getLayoutBounds().getWidth() / 2) + 4);
+					newNode.setLayoutY((newNode.getLayoutBounds().getWidth() / 2) + 4);
+				} else {
+					newNode.setLayoutX(newNode.getLayoutX() + 4);
+					newNode.setLayoutY(newNode.getLayoutY() + 4);
+				}
+			}
+
+			if (x > 0 && y > 0) {
+				newNode.setLayoutX(x);
+				newNode.setLayoutY(y);
+			}
+
+			// Finally, let the history manager know this new thing has happened.
+			historyManager.addHistory(new HistoryItem() {
+				@Override
+				public void restore() {
+					destination.getChildren().add(newNode);
+					selectionManager.updateSelected(newThing);
+				}
+
+				@Override
+				public void revert() {
+					destination.getChildren().remove(newThing);
+					selectionManager.clearSelection();
+				}
+
+				@Override
+				public String getAppearance() {
+					return newThing.getClass().getSuperclass().getSimpleName() + " added!";
+				}
+			});
+
+			if (settingsNode instanceof Pane){
+				Pane newPane = (Pane)settingsNode;				
+				for (Node cnode : newPane.getChildren()) {
+					for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
+						ComponentSettings componentSettings2 = componentMenuItem.getComponentSettings();
+						try {
+//							System.out.println(cnode+ " "+componentSettings2.getType()+" "+cnode.getClass().getSimpleName());	
+							if (componentSettings2.getType().equals(cnode.getClass().getSimpleName())) {								
+								Class componentClass = Class.forName("bdl.build." + componentSettings2.getPackageName()
+										+ ".G" + componentSettings2.getType());
+								Constructor constructor = componentClass.getConstructor();
+								GObject verynewThing = (GObject) constructor.newInstance();
+								verynewThing.setFieldName(cnode.getId());
+
+								addGObjectRec(verynewThing, componentSettings2, view, viewListeners, cnode, -1, -1,
+										(Pane)newThing);								
+								break;
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			
+			if (settingsNode instanceof MenuBar){
+				((GMenuBar)newThing).getMenuBuilder().buildTreeFromNode(settingsNode);				
+			}
+		}
 
 	private void dealWithPane(final Pane newThing) {
-//         System.out.println("dealWithPane");
+		// System.out.println("dealWithPane");
 		newThing.setOnDragOver(new EventHandler<DragEvent>() {
 			@Override
 			public void handle(DragEvent t) {
@@ -1423,7 +1667,7 @@ public class Controller {
 				@Override
 				public void handle(MouseEvent t) {
 					if (view.leftPanel.leftList.getSelectionModel().getSelectedItem() != null) {
-						Dragboard db = view.leftPanel.leftList.startDragAndDrop(TransferMode.ANY);					
+						Dragboard db = view.leftPanel.leftList.startDragAndDrop(TransferMode.ANY);
 						ClipboardContent cc = new ClipboardContent();
 						cc.putString("");
 						db.setContent(cc);

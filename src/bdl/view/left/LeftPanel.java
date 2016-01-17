@@ -11,10 +11,11 @@ public class LeftPanel extends SplitPane {
 
     public TitledPane hierarchyTitledPane;
     public AnchorPane dummyPane;
-    public TitledPane menuBarTitledPane;
     public ListView<ComponentMenuItem> leftList;
     public HierarchyPane hierarchyPane;
 
+        
+    
     public LeftPanel() {
         //Begin left component list
         leftList = new ListView<>();
@@ -29,9 +30,9 @@ public class LeftPanel extends SplitPane {
         //End left hierarchy panel
         
         dummyPane = new AnchorPane();
-        menuBarTitledPane= new TitledPane(LabelGrabber.getLabel("menuBar.tab.title"), dummyPane);
-        menuBarTitledPane.setCollapsible(false);
-        menuBarTitledPane.setMinWidth(205);
-        getItems().addAll(leftList, hierarchyTitledPane,menuBarTitledPane);
+      
+        
+        
+        getItems().addAll(leftList, hierarchyTitledPane);
     }
 }

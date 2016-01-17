@@ -79,12 +79,32 @@
 				<setter>setText</setter>
 				<getter>getText</getter>
 				<fxml>text</fxml>
+			</property>			
+			<property>
+				<name>MinWidth</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>minWidthProperty</observedProperty>
+				<default>100</default>
+				<setter>setMinWidth</setter>
+				<getter>getMinWidth</getter>
+				<fxml>minWidth</fxml>
+			</property>
+			<property>
+				<name>MinHeight</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>minHeightProperty</observedProperty>
+				<default>100</default>
+				<setter>setMinHeight</setter>
+				<getter>getMinHeight</getter>
+				<fxml>minHeight</fxml>
 			</property>
 			<property>
 				<name>prefWidth</name>
 				<enabled>true</enabled>
 				<pseudotype>Double1DP</pseudotype>
-				<default>0</default>
+				<default>-1.0</default>
 				<setter>setPrefWidth</setter>
 				<getter>getPrefWidth</getter>
 				<fxml>prefWidth</fxml>
@@ -93,7 +113,7 @@
 				<name>prefHeight</name>
 				<enabled>true</enabled>
 				<pseudotype>Double1DP</pseudotype>
-				<default>0</default>
+				<default>-1.0</default>
 				<setter>setPrefHeight</setter>
 				<getter>getPrefHeight</getter>
 				<fxml>prefHeight</fxml>
@@ -130,7 +150,7 @@
 				<enabled>true</enabled>
 				<pseudotype>DoubleObserved</pseudotype>
 				<observedProperty>prefWidthProperty</observedProperty>
-				<default>0</default>
+				<default>-1.0</default>
 				<setter>setPrefWidth</setter>
 				<getter>getPrefWidth</getter>
 				<fxml>prefWidth</fxml>
@@ -140,7 +160,7 @@
 				<enabled>true</enabled>
 				<pseudotype>DoubleObserved</pseudotype>
 				<observedProperty>prefHeightProperty</observedProperty>
-				<default>0</default>
+				<default>-1.0</default>
 				<setter>setPrefHeight</setter>
 				<getter>getPrefHeight</getter>
 				<fxml>prefHeight</fxml>
@@ -150,7 +170,7 @@
 				<enabled>true</enabled>
 				<pseudotype>DoubleObserved</pseudotype>
 				<observedProperty>minWidthProperty</observedProperty>
-				<default>0</default>
+				<default>100</default>
 				<setter>setMinWidth</setter>
 				<getter>getMinWidth</getter>
 				<fxml>minWidth</fxml>
@@ -160,7 +180,7 @@
 				<enabled>true</enabled>
 				<pseudotype>DoubleObserved</pseudotype>
 				<observedProperty>minHeightProperty</observedProperty>
-				<default>0</default>
+				<default>100</default>
 				<setter>setMinHeight</setter>
 				<getter>getMinHeight</getter>
 				<fxml>minHeight</fxml>
@@ -194,12 +214,32 @@
 				<getter>getText</getter>
 				<fxml>text</fxml>
 			</property>
+			<property>
+				<name>minWidth</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>minWidthProperty</observedProperty>
+				<default>-1</default>
+				<setter>setMinWidth</setter>
+				<getter>getMinWidth</getter>
+				<fxml>minWidth</fxml>
+			</property>
+			<property>
+				<name>minHeight</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>minHeightProperty</observedProperty>
+				<default>-1</default>
+				<setter>setMinHeight</setter>
+				<getter>getMinHeight</getter>
+				<fxml>minHeight</fxml>
+			</property>
 		</properties>
 		<listeners>
 			<listener>
 				<package>javafx.scene.input</package>
 				<isActive>true</isActive>
-				<name>keyTyped</name>
+				<name>onKeyTyped</name>
 				<method>setOnKeyTyped</method>
 				<event>KeyEvent</event>
 			</listener>
@@ -207,11 +247,20 @@
 	</component>
 	<component>
 		<type>MenuBar</type>
-		<enabled>false</enabled>
+		<enabled>true</enabled>
 		<package>javafx.scene.control</package>
 		<layouttype>MenuLayout</layouttype>
 		<icon>MenuBar.png</icon>
 		<properties>
+		<property>
+				<name>Layout</name>
+				<enabled>true</enabled>
+				<pseudotype>Layout</pseudotype>
+				<default></default>
+				<setter></setter>
+				<getter></getter>
+				<fxml></fxml>
+			</property>
 		</properties>
 		<listeners>
 		</listeners>
@@ -866,15 +915,26 @@
 				<setter></setter>
 				<getter></getter>
 				<fxml></fxml>
+			</property>			
+			<property>
+				<name>Width</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>widthProperty</observedProperty>
+				<default>100</default>
+				<setter>setWidth</setter>
+				<getter>getWidth</getter>
+				<fxml>width</fxml>
 			</property>
 			<property>
-				<name>CanvasSize</name>
+				<name>Height</name>
 				<enabled>true</enabled>
-				<pseudotype>CanvasSize</pseudotype>
-				<default></default>
-				<setter></setter>
-				<getter></getter>
-				<fxml></fxml>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>heightProperty</observedProperty>
+				<default>100</default>
+				<setter>setHeight</setter>
+				<getter>getHeight</getter>
+				<fxml>height</fxml>
 			</property>
 		</properties>
 		<listeners>

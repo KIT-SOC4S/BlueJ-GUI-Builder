@@ -81,8 +81,10 @@ public class ListenerEnabledProperty implements PanelProperty {
     
 
     @Override
-    public String getFXMLCode() {       
-            return "#handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName());        
+    public String getFXMLCode() {   
+    	return "";
+    	//vorläufig mal weglassen, ansonsten benötigt man wohl eine Controllerklassenangabe im FXML Header
+//            return getEventname()+"=\"#handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName()+"\"");        
     }
 
 	public boolean isToImplement() {

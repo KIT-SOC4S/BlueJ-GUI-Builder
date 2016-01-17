@@ -6,11 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import bdl.Interface;
+import bdl.build.javafx.scene.control.GMenuBar;
 import bdl.build.properties.ListenerEnabledProperty;
 import bdl.build.properties.PanelProperty;
+import di.menubuilder.MenuBuilder;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
-import javafx.event.*;
 
 public class CodeGenerator {
 
@@ -107,13 +108,15 @@ public class CodeGenerator {
 
 		code.append(getFXMLImports(guiObject, allImports)).append('\n');
 
-		code.append("<AnchorPane id=\"");
+		code.append("<AnchorPane fx:id=\"");
 		code.append(guiObject.getClassName());
 		code.append("\" prefWidth=\"");
 		code.append(guiObject.getGUIWidth());
 		code.append("\" prefHeight=\"");
 		code.append(guiObject.getGUIHeight());
+//		code.append("\" xmlns:fx=\"http://javafx.com/fxml/1\" xmlns=\"http://javafx.com/javafx/2.2\" fx:controller=\"DummyController\">\n");
 		code.append("\" xmlns:fx=\"http://javafx.com/fxml/1\" xmlns=\"http://javafx.com/javafx/2.2\">\n");
+		
 		code.append("    <children>\n");
 
 		for (Node node : guiObject.getChildren()) {
@@ -133,12 +136,9 @@ public class CodeGenerator {
 		}
 
 		StringBuilder importsString = new StringBuilder();
-		importsString.append("import javafx.application.*;\n")
-				.append("import javafx.embed.swing.JFXPanel;\n")
-				.append("import javafx.scene.*;\n")
-				.append("import javafx.scene.layout.AnchorPane;\n")
-				.append("import javafx.stage.Stage;\n")
-				.append("import javafx.scene.paint.Color;\n")
+		importsString.append("import javafx.application.*;\n").append("import javafx.embed.swing.JFXPanel;\n")
+				.append("import javafx.scene.*;\n").append("import javafx.scene.layout.AnchorPane;\n")
+				.append("import javafx.stage.Stage;\n").append("import javafx.scene.paint.Color;\n")
 				.append("import javafx.scene.control.Tooltip;\n\n");
 		for (String s : imports) {
 			importsString.append(s);
@@ -160,11 +160,20 @@ public class CodeGenerator {
 	private static void declaration(Node node, StringBuilder code) {
 		GObject gObj = (GObject) node;
 		String nodeType = node.getClass().getSimpleName().substring(1);
-		code.append("    public ").append(nodeType).append(" ").append(gObj.getFieldName()).append(" = new ")
-				.append(nodeType).append("();\n");
+		if (!(node instanceof GMenuBar)) {
+			code.append("    private ").append(nodeType).append(" ").append(gObj.getFieldName()).append(" = new ")
+					.append(nodeType).append("();\n");
+		}
 		if (node instanceof Pane) {
 			for (Node node2 : ((Pane) node).getChildren()) {
 				declaration(node2, code);
+			}
+		}
+		if (node instanceof GMenuBar) {
+			MenuBuilder mb = ((GMenuBar) node).getMenuBuilder();
+			if (mb != null) {
+				code.append("    ").append(mb.getJAVADeclaration().replace("\n", "\n    ")).append("\n");
+
 			}
 		}
 	}
@@ -198,6 +207,14 @@ public class CodeGenerator {
 				panelProperties(node2, code);
 			}
 		}
+		if (node instanceof GMenuBar) {
+			MenuBuilder mb = ((GMenuBar) node).getMenuBuilder();
+			if (mb != null) {
+				code.append("        ").append(mb.getJAVAMenuStructure().replace("\n", "\n        ")).append("\n");
+				code.append("        ").append(mb.getActionListenerDeclaration().replace("\n", "\n        "))
+						.append("\n");
+			}
+		}
 	}
 
 	private static void listenerProperties(Node node, StringBuilder code) {
@@ -217,26 +234,48 @@ public class CodeGenerator {
 				listenerProperties(node2, code);
 			}
 		}
+		if (node instanceof GMenuBar) {
+			MenuBuilder mb = ((GMenuBar) node).getMenuBuilder();
+			if (mb != null) {
+				code.append("        ").append(mb.getActionListenerMethods().replace("\n", "\n        ")).append("\n");
+			}
+		}
 	}
 
 	private static void fxmlOutput(Node node, StringBuilder code) {
-		String nodeClass = node.getClass().getSuperclass().getSimpleName();
-		code.append("        <").append(nodeClass);
+		String nodeClass = node.getClass().getSuperclass().getSimpleName();		
 		GObject gObj = (GObject) node;
-		code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
-		for (PanelProperty property : gObj.getPanelProperties()) {
-			String fxmlCode = property.getFXMLCode();
-			if (!fxmlCode.isEmpty()) {
-				code.append(fxmlCode).append(' ');
-			}
-		}
-		code.append("/>\n");
 		if (node instanceof Pane) {
+			code.append("        <").append(nodeClass);
+			code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
+			for (PanelProperty property : gObj.getPanelProperties()) {
+				String fxmlCode = property.getFXMLCode();
+				if (!fxmlCode.isEmpty()) {
+					code.append(fxmlCode).append(' ');
+				}
+			}
+			code.append(">\n");
+			code.append("<children>\n");
 			for (Node node2 : ((Pane) node).getChildren()) {
 				fxmlOutput(node2, code);
 			}
+			code.append("</children>\n");
+			code.append("</" + nodeClass + ">\n");
+		} else if (node instanceof GMenuBar){
+			MenuBuilder mb = ((GMenuBar) node).getMenuBuilder();			
+			code.append(mb.getFXML());
+		} else {
+			code.append("        <").append(nodeClass);
+			code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
+			for (PanelProperty property : gObj.getPanelProperties()) {
+				String fxmlCode = property.getFXMLCode();
+				if (!fxmlCode.isEmpty()) {
+					code.append(fxmlCode).append(' ');
+				}
+			}
+			code.append("/>\n");
 		}
-		
+
 	}
 
 	private static void javaImports(Node node, HashSet<String> imports, HashMap<String, String> allImports) {
@@ -257,6 +296,10 @@ public class CodeGenerator {
 						imports.add("import " + panprop.getPackageName() + ".*;\n");
 					}
 				}
+			}
+			if (gnode instanceof GMenuBar) {
+				MenuBuilder mb = ((GMenuBar) gnode).getMenuBuilder();
+				imports.add(mb.getMenuImportString());
 			}
 		}
 
@@ -287,8 +330,5 @@ public class CodeGenerator {
 			}
 		}
 	}
-	
-	
-	
-	
+
 }

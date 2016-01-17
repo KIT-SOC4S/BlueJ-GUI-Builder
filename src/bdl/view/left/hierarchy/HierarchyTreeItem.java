@@ -1,6 +1,7 @@
 package bdl.view.left.hierarchy;
 
 import bdl.build.GObject;
+import bdl.build.javafx.scene.control.GMenuBar;
 import bdl.lang.LabelGrabber;
 import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
@@ -59,6 +60,9 @@ public class HierarchyTreeItem extends Label {
                                     return gObject.getFieldName() + " deleted!";
                                 }
                             });
+//                            if (gObject instanceof GMenuBar){
+//                            	((GMenuBar)gObject).clearTree();
+//                            }
                             view.middleTabPane.viewPane.getChildren().remove(gObject);
                             selectionManager.clearSelection();
                         }

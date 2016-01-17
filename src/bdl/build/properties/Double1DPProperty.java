@@ -51,7 +51,9 @@ public class Double1DPProperty implements PanelProperty {
                 e.printStackTrace();
             }
         }
-
+        
+        
+        
         textField.setText(format.format(Double.parseDouble(defaultValue))); //TODO - Handle bad defaultValue values
 
         setValue();

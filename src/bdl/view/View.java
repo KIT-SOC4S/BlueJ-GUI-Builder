@@ -80,7 +80,6 @@ public class View extends AnchorPane {
 
         mainContent.getItems().addAll(leftAnchorPane, middleAnchorPane, rightAnchorPane);
         mainContent.setDividerPositions(0.25, 0.75);
-
         borderPane.setCenter(mainContent);
 
     }

@@ -47,39 +47,51 @@ public class FieldName {
 
         gp.add(textField, 1, row);
 
-     
+        gObj.fieldNameProperty().addListener(new ChangeListener<String>() {
+			
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (newValue.equals(textField.getText())){
+					return;
+				}
+				textField.setText(newValue);
+				handleChangeHistory(oldValue);
+			}
+		 
+		});
         
         //Upon losing focus, save to the GObject
         textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean aBoolean2) {
                 if (!aBoolean2) {
-                    historyManager.addHistory(new HistoryItem() {
-                        String old = gObj.getFieldName();
-                        String nnew = textField.getText();
-
-                        @Override
-                        public void revert() {
-                            gObj.setFieldName(old);
-                            textField.setText(old);
-                        }
-
-                        @Override
-                        public void restore() {
-                            gObj.setFieldName(nnew);
-                            textField.setText(nnew);
-                        }
-
-                        @Override
-                        public String getAppearance() {
-                            return old + " -> " + nnew;
-                        }
-                    });
-                    gObj.setFieldName(textField.getText());
-
+                    handleChangeHistory(gObj.getFieldName());
                 }
             }
         });
+    }
+    public void handleChangeHistory(String old){
+    	 historyManager.addHistory(new HistoryItem() {            
+             String nnew = textField.getText();
+
+             @Override
+             public void revert() {
+                 gObj.setFieldName(old);
+                 textField.setText(old);
+             }
+
+             @Override
+             public void restore() {
+                 gObj.setFieldName(nnew);
+                 textField.setText(nnew);
+             }
+
+             @Override
+             public String getAppearance() {
+                 return old + " -> " + nnew;
+             }
+         });
+         gObj.setFieldName(textField.getText());
     }
 
     private class FieldNameTextField extends TextField {

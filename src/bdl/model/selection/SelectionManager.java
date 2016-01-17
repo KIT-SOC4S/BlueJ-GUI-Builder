@@ -1,9 +1,10 @@
 package bdl.model.selection;
 
-import bdl.build.GObject;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import bdl.build.GObject;
+import bdl.build.javafx.scene.control.GMenuBar;
 
 public class SelectionManager {
 
@@ -23,9 +24,10 @@ public class SelectionManager {
             selectionListener.updateSelected(gObject);
         }
         currentlySelected = gObject;
+        
     }
 
-    public void clearSelection() {
+    public void clearSelection() {    	
         for (SelectionListener selectionListener : selectionListeners) {
             selectionListener.clearSelection();
         }
