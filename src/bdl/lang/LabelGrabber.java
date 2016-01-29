@@ -16,7 +16,8 @@ public class LabelGrabber {
 
 	public LabelGrabber(String language) {
 		lang = new Properties();
-		// languageFile = new File("lang/gb.lang"); //TODO update later with
+		// languageFile = new File("lang/gb.lang"); 
+		// TODO update later with
 		// more languages
 		// if(languageFile == null) {
 		// System.err.println("Missing language file at: lang/gb.lang");

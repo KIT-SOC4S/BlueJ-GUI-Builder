@@ -16,15 +16,15 @@ import javafx.scene.layout.Pane;
 public class CodeGenerator {
 
 	public static String generateJavaCode(GUIObject guiObject, HashMap<String, String> allImports,
-			Interface blueJInterface, boolean forPreview) {
+			 boolean forPreview) {
 
 		StringBuilder code = new StringBuilder();
 
 		code.append(getJavaImports(guiObject, allImports)).append('\n');// Add
 																		// imports
 
-		String clName = (blueJInterface != null ? blueJInterface.getOpenGUIName() : guiObject.getClassName());
-		String clExtends = (blueJInterface != null ? "guibuilder.GUI" : "Application");
+		String clName =  guiObject.getClassName();
+		String clExtends = "Application";
 		code.append("public class ").append(clName).append(" extends ").append(clExtends).append(" {\n\n");// Open
 																											// class
 																											// tag
@@ -102,7 +102,7 @@ public class CodeGenerator {
 //				+ "     * @param args the command line arguments\n" + "     */\n"
 //				+ "    public static void main(String[] args) {\n" + "        launch(args);\n" + "    }\n");
 //		;
-		code.append( "     * @param args the command line arguments\n" + "     */\n"
+		code.append( "     /* @param args the command line arguments\n" + "     */\n"
 				+ "    public static void main(String[] args) {\n" + "        launch(args);\n" + "    }\n");
 		;
 		code.append('}');// Close class tag
@@ -255,6 +255,7 @@ public class CodeGenerator {
 
 	private static void fxmlOutput(Node node, StringBuilder code) {
 		String nodeClass = node.getClass().getSuperclass().getSimpleName();		
+		if (node instanceof GObject){
 		GObject gObj = (GObject) node;
 		if (node instanceof Pane) {
 			code.append("        <").append(nodeClass);
@@ -285,6 +286,7 @@ public class CodeGenerator {
 				}
 			}
 			code.append("/>\n");
+		}
 		}
 
 	}

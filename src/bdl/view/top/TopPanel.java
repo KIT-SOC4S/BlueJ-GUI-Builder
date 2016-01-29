@@ -22,6 +22,7 @@ public class TopPanel extends MenuBar {
     public MenuItem mItmUndo;
     public MenuItem mItmRedo;
     public MenuItem mItmDelete;
+    public MenuItem mItmLanguage;
 
     public Menu menuView;
     public CheckMenuItem mItmHistory;
@@ -60,6 +61,7 @@ public class TopPanel extends MenuBar {
         mItmDelete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
         mItmClearAll = new MenuItem(LabelGrabber.getLabel("menu.edit.clearall"));
         mItmClearAll.setDisable(true);
+        mItmLanguage= new MenuItem(LabelGrabber.getLabel("menu.edit.language"));
 
         menuView = new Menu(LabelGrabber.getLabel("menu.view"));
         mItmHistory = new CheckMenuItem(LabelGrabber.getLabel("menu.view.history"));
@@ -86,7 +88,7 @@ public class TopPanel extends MenuBar {
         } else {
             menuFile.getItems().addAll(mItmLoadFile, mItmSaveFXMLFile,mItmSaveJAVAFile, mItmFullScreen, mItmClose);
         }
-        menuEdit.getItems().addAll(mItmUndo, mItmRedo, mItmDelete, mItmClearAll);
+        menuEdit.getItems().addAll(mItmUndo, mItmRedo, mItmDelete, mItmClearAll,mItmLanguage);
         menuView.getItems().addAll(mItmHierarchy, mItmHistory, mItmErrorlog);
         menuHelp.getItems().addAll(mItmAbout);
 
