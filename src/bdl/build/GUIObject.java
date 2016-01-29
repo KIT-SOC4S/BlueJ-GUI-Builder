@@ -2,6 +2,7 @@ package bdl.build;
 
 import bdl.build.javafx.scene.layout.GAnchorPane;
 import bdl.lang.LabelGrabber;
+import javafx.scene.layout.AnchorPane;
 
 public class GUIObject extends GAnchorPane {
 
@@ -9,6 +10,7 @@ public class GUIObject extends GAnchorPane {
     private String title = LabelGrabber.getLabel("default.gui.title");
     private double width;
     private double height;
+	private AnchorPane setVPD;
 
     public GUIObject() {
         setFieldName(title);
@@ -36,7 +38,12 @@ public class GUIObject extends GAnchorPane {
 
     public void setGUIWidth(double width) {
         this.width = width;
-        this.setWidth(width);
+        if (setVPD!=null){
+        	setVPD.setMinWidth(width);
+        	setVPD.setMaxWidth(width);
+        }
+        this.setMinWidth(width);
+        this.setMaxWidth(width);
     }
 
     public double getGUIHeight() {
@@ -45,6 +52,17 @@ public class GUIObject extends GAnchorPane {
 
     public void setGUIHeight(double height) {
         this.height = height;
-        this.setHeight(height);
+        if (setVPD!=null){
+        	setVPD.setMinHeight(height);
+        	setVPD.setMaxHeight(height);
+        }
+        this.setMinHeight(height);
+        this.setMaxHeight(height);
     }
+
+	public void setVPD(AnchorPane viewPaneDecorator) {
+		this.setVPD = viewPaneDecorator;
+		
+		
+	}
 }

@@ -15,6 +15,8 @@ import javafx.scene.layout.GridPane;
 
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public class Double1DPProperty implements PanelProperty {
 
@@ -23,7 +25,7 @@ public class Double1DPProperty implements PanelProperty {
     private String getter;
     private String fxml;
     private TextField textField;
-    private DecimalFormat format = new DecimalFormat("#.##");
+    private DecimalFormat format = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
     private final HistoryManager historyManager;
 
     public Double1DPProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
@@ -130,11 +132,23 @@ public class Double1DPProperty implements PanelProperty {
 
     @Override
     public String getJavaCode() {
+    	if (setter.toLowerCase().contains("height")||setter.toLowerCase().contains("width")){
+    		double wert = Double.parseDouble(textField.getText());
+    		if (wert <=0 && wert >=-2){
+    			return "";
+    		}
+    	}
         return gObj.getFieldName() + "." + setter + "(" + textField.getText() + ");";
     }
 
     @Override
     public String getFXMLCode() {
+    	if (setter.toLowerCase().contains("height")||setter.toLowerCase().contains("width")){
+    		double wert = Double.parseDouble(textField.getText());
+    		if (wert <=0 && wert >=-2){
+    			return "";
+    		}
+    	}
         return fxml + "=\"" + textField.getText() + "\"";
     }
 }

@@ -4,14 +4,14 @@ import bdl.controller.Controller;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettingsStore;
 import bdl.view.View;
-import blueJLink.BlueJInterface;
-import blueJLink.BlueJProjektVerwalter;
 import bluej.extensions.BlueJ;
+import di.blueJLink.BlueJInterface;
+import di.blueJLink.BlueJProjektVerwalter;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
@@ -24,17 +24,24 @@ public class Main extends Application implements Runnable {
     public Interface blueJInterface;
     private BlueJ blueJ;
 	private BlueJInterface blueJInterface2;
+	public static String language="english";
     public void run() {
         launch();
     }
-    
+    public static String getLanguage(){
+    	return language;
+    }
     @Override
     public void start(final Stage stage) throws Exception {
+    	
         stage.setMinWidth(800);
         stage.setMinHeight(500);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/bdl/icons/BlueJ_Orange_64.png")));
-        new LabelGrabber();
-
+        if (blueJ!=null){
+        	language = blueJ.getBlueJPropertyString("bluej.language", "english");
+        }
+        new LabelGrabber(language);
+        //stage.setOnCloseRequest(value);
         //Allow user to specify their own file
         String componentSettingsLocation = System.getProperty("bdl.guibuilder.componentSettings");
         if (componentSettingsLocation == null) {

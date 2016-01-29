@@ -1,4 +1,5 @@
-package blueJLink;
+
+package di.blueJLink;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 
@@ -6,16 +7,16 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-
 import bdl.Main;
 import bluej.extensions.BClass;
 import bluej.extensions.BObject;
 import bluej.extensions.BPackage;
 import bluej.extensions.BlueJ;
 import bluej.extensions.MenuGenerator;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class MenueFXGUIDesignerFenster extends MenuGenerator {
@@ -31,7 +32,7 @@ public class MenueFXGUIDesignerFenster extends MenuGenerator {
 	}
 
 	public JMenuItem getToolsMenuItem(BPackage aPackage) {
-		return new JMenuItem(new SimpleAction("GUI Designer für FX"));
+		return new JMenuItem(new SimpleAction("FX GUI Designer"));
 	}
 
 	// public JMenuItem getClassMenuItem(BClass aClass) {
@@ -89,19 +90,23 @@ public class MenueFXGUIDesignerFenster extends MenuGenerator {
 		}
 
 		public void actionPerformed(ActionEvent anEvent) {	
+			
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
 						 new JFXPanel();
+						 Platform.setImplicitExit(false);
 					        Platform.runLater(() -> {
 					            try {
+					            	
 									Main m;
 									m = new Main();
 									m.setBlueJ(bluej);
 									m.start(new Stage());
 									
+							    
+									
 								} catch (Exception e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 					        });

@@ -1,6 +1,8 @@
 package bdl.build.properties;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 import bdl.build.GObject;
 import bdl.build.javafx.scene.canvas.GCanvas;
@@ -23,7 +25,7 @@ public class CanvasSizeProperty implements PanelProperty {
     private GCanvas node;
     private TextField width;
     private TextField height;
-    private DecimalFormat format = new DecimalFormat("#.##");
+    private DecimalFormat format = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
     private HistoryManager historyManager;
 
     public CanvasSizeProperty(final GObject gnObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {

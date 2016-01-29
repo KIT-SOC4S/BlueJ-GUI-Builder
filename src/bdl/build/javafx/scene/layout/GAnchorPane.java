@@ -21,6 +21,9 @@ public class GAnchorPane extends AnchorPane implements GObject {
 
     @Override
     public void setFieldName(String fieldName) {
+//    	setStyle("-fx-background-color: #F0F0F0;-fx-border-color:green;-fx-border-width:4");
+        
+    	setStyle("-fx-background-color: #F0F0F0");
         fieldNameProperty.setValue(fieldName);
     }
 

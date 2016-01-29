@@ -1,22 +1,19 @@
 /**
- * 
+ * @author Georg Dick
  */
-package blueJLink;
+package di.blueJLink;
 
 
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 
-
+import bdl.lang.LabelGrabber;
 import bluej.extensions.BPackage;
 import bluej.extensions.BProject;
 import bluej.extensions.BlueJ;
 import bluej.extensions.editor.Editor;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
-/**
- * @author Georg Dick
- * 
- */
 public class BlueJProjektVerwalter implements BlueJInterface {
 	private BlueJ blueJ = null;
 	private BProject aktuellesProjekt = null;
@@ -44,7 +41,7 @@ public class BlueJProjektVerwalter implements BlueJInterface {
 		this.blueJ = blueJ;
 	}
 	/**
-	 * @see blueJLink.BlueJInterface#getBlueJProjekte()
+	 * @see di.blueJLink.BlueJInterface#getBlueJProjekte()
 	 */
 	@Override
 	public BProject[] getBlueJProjekte() {		
@@ -85,7 +82,7 @@ public class BlueJProjektVerwalter implements BlueJInterface {
 	String dateiname;
 
 	/**
-	 * @see blueJLink.BlueJInterface#erzeugeProjekt(java.lang.String)
+	 * @see di.blueJLink.BlueJInterface#erzeugeProjekt(java.lang.String)
 	 */
 	@Override
 	public boolean erzeugeProjekt() {
@@ -97,9 +94,11 @@ public class BlueJProjektVerwalter implements BlueJInterface {
 				dateiname = fc.getSelectedFile().getAbsolutePath();
 
 				if (fc.getSelectedFile().exists()) {
-					JOptionPane
-							.showMessageDialog(null,
-									"Eine Datei oder ein Verzeichnis\nmit diesem Namen ist schon vorhanden");
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setContentText("Eine Datei oder ein Verzeichnis\nmit diesem Namen ist schon vorhanden");
+
+					alert.showAndWait();
+					
 
 				} else {
 					aktuellesProjekt = this.blueJ.newProject(fc
@@ -107,7 +106,11 @@ public class BlueJProjektVerwalter implements BlueJInterface {
 				}
 			}
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null,e.getMessage());
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setContentText(e.getMessage());
+
+			alert.showAndWait();
+			
 			return false;
 		}
 		return aktuellesProjekt != null;
@@ -119,15 +122,19 @@ public class BlueJProjektVerwalter implements BlueJInterface {
 		try {
 			
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			int returnVal = fc.showDialog(null, "Projekt öffnen");
+			int returnVal = fc.showDialog(null, LabelGrabber.getLabel("menu.bluej.openproject"));
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				dateiname = fc.getSelectedFile().getAbsolutePath();
 				//JOptionPane.showMessageDialog(null, dateiname);
 				if (fc.getSelectedFile().exists()) {
 					aktuellesProjekt = this.blueJ.openProject(fc.getSelectedFile());
 					} else {
-						JOptionPane.showMessageDialog(null,
-								"Eine Projektverzeichnis mit diesem Namen ist nicht vorhanden");			
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setContentText(LabelGrabber.getLabel("bluejexport.missingproject"));
+
+						alert.showAndWait();
+						
+								
 				}
 			}
 		} catch (Exception e) {
@@ -138,20 +145,12 @@ public class BlueJProjektVerwalter implements BlueJInterface {
 	}
 
 	/**
-	 * @see blueJLink.BlueJInterface#schreibeTextInEditor(java.lang.String)
+	 * @see di.blueJLink.BlueJInterface#schreibeTextInEditor(java.lang.String)
 	 */
 	@Override
 	public void schreibeTextInEditor(String string) {
 		// TODO Auto-generated method stub
 
 	}
-
-	/**
-	 * @see blueJLink.BlueJInterface#getBlueJProjekt()
-	 */
-//	@Override
-//	public BProject getBlueJProjekt() {
-//		return aktuellesProjekt;
-//	}
 
 }

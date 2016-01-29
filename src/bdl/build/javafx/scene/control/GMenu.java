@@ -53,5 +53,7 @@ public class GMenu extends Menu implements GObject {
    	public String getNodeClassName() {		
    		return "Menu";
    	}
+
+	
     
 }

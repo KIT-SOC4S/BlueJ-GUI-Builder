@@ -15,7 +15,8 @@ public class TopPanel extends MenuBar {
     public MenuItem mItmClose;
     public MenuItem mItmFullScreen;
     public MenuItem mItmLoadFile;
-    public MenuItem mItmSaveFile;
+    public MenuItem mItmSaveFXMLFile;    
+    public MenuItem mItmSaveJAVAFile;
 
     public Menu menuEdit;
     public MenuItem mItmUndo;
@@ -25,6 +26,7 @@ public class TopPanel extends MenuBar {
     public Menu menuView;
     public CheckMenuItem mItmHistory;
     public CheckMenuItem mItmHierarchy;
+    public MenuItem mItmErrorlog;
 
     public Menu menuHelp;
     public MenuItem mItmAbout;
@@ -41,7 +43,8 @@ public class TopPanel extends MenuBar {
 	public TopPanel(boolean isBlueJAttached) {
         menuFile = new Menu(LabelGrabber.getLabel("menu.file"));
         mItmLoadFile = new MenuItem(LabelGrabber.getLabel("menu.file.open"));
-        mItmSaveFile = new MenuItem(LabelGrabber.getLabel("menu.file.save"));
+        mItmSaveFXMLFile = new MenuItem(LabelGrabber.getLabel("menu.file.save"));
+        mItmSaveJAVAFile = new MenuItem(LabelGrabber.getLabel("menu.filejava.save"));
         mItmClose = new MenuItem(LabelGrabber.getLabel("menu.file.close"));
         mItmFullScreen = new MenuItem(LabelGrabber.getLabel("fullscreen.enable.text"));
 
@@ -63,27 +66,28 @@ public class TopPanel extends MenuBar {
         mItmHistory.setSelected(true);
         mItmHierarchy = new CheckMenuItem(LabelGrabber.getLabel("menu.view.hierarchy"));
         mItmHierarchy.setSelected(true);
+        mItmErrorlog= new MenuItem(LabelGrabber.getLabel("menu.view.errorlog"));
 
         menuHelp = new Menu(LabelGrabber.getLabel("menu.help"));
         mItmAbout = new MenuItem(LabelGrabber.getLabel("menu.help.about"));
 
         
         menuBluej = new Menu("BlueJ");
-    	mntmNeuesProjekt = new MenuItem("Neues Projekt");
-    	mntmProjektffnen = new MenuItem("Projekt öffnen");
-    	mnClassInProjekt = new Menu("Quelltext generieren und speichern");
-		mnModellInProjekt = new Menu("GUI_Beschreibung als FXML in Projektordner exportieren");
-		mnModellAusProjekt = new Menu("GUI_Beschreibung (FXML) aus Projektordner importieren");
+    	mntmNeuesProjekt = new MenuItem(LabelGrabber.getLabel("menu.bluej.newproject"));
+    	mntmProjektffnen = new MenuItem(LabelGrabber.getLabel("menu.bluej.openproject"));
+    	mnClassInProjekt = new Menu(LabelGrabber.getLabel("menu.bluej.savesource"));
+		mnModellInProjekt = new Menu(LabelGrabber.getLabel("menu.bluej.exportfxml"));
+		mnModellAusProjekt = new Menu(LabelGrabber.getLabel("menu.bluej.importfxml"));
         if (isBlueJAttached) {        	
     		menuBluej.getItems().addAll(mntmNeuesProjekt,mntmProjektffnen);    		
     		menuBluej.getItems().addAll(mnClassInProjekt,mnModellInProjekt,mnModellAusProjekt);        	
-            menuFile.getItems().addAll(mItmSaveFile, mItmFullScreen, mItmClose);
+            menuFile.getItems().addAll(mItmSaveFXMLFile,mItmSaveJAVAFile, mItmFullScreen, mItmClose);
             
         } else {
-            menuFile.getItems().addAll(mItmLoadFile, mItmSaveFile, mItmFullScreen, mItmClose);
+            menuFile.getItems().addAll(mItmLoadFile, mItmSaveFXMLFile,mItmSaveJAVAFile, mItmFullScreen, mItmClose);
         }
         menuEdit.getItems().addAll(mItmUndo, mItmRedo, mItmDelete, mItmClearAll);
-        menuView.getItems().addAll(mItmHierarchy, mItmHistory);
+        menuView.getItems().addAll(mItmHierarchy, mItmHistory, mItmErrorlog);
         menuHelp.getItems().addAll(mItmAbout);
 
         getMenus().addAll(menuFile, menuEdit, menuView);

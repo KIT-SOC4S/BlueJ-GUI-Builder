@@ -14,6 +14,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public class LayoutProperty implements PanelProperty {
 
@@ -21,7 +23,7 @@ public class LayoutProperty implements PanelProperty {
     private Node node;
     private TextField layoutX;
     private TextField layoutY;
-    private DecimalFormat format = new DecimalFormat("#.##");
+    private DecimalFormat format = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
     private HistoryManager historyManager;
 
     public LayoutProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {

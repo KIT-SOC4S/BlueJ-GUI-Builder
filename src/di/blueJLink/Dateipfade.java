@@ -1,9 +1,9 @@
 /**
- * 
+ * @author Georg Dick
  */
-package blueJLink;
+ 
+package di.blueJLink;
 
-import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -14,8 +14,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import javax.swing.JOptionPane;
+import bdl.lang.LabelGrabber;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 /**
  * @author Georg Dick
@@ -169,7 +173,7 @@ public class Dateipfade {
 	
 	public void erzeugeKlassendatei(String basisDirectory, String paketname,
 			String klassenbezeichner, String klassenquelltext,
-			boolean fallsDaKopieren, Component parentComponent ) {
+			boolean fallsDaKopieren ) {
 
 		this.erzeugePaket(basisDirectory, paketname);
 		String pfad = basisDirectory;
@@ -188,11 +192,15 @@ public class Dateipfade {
 		pfad += klassenbezeichner + ".java";
 		if (existiert(pfad)) {
 		//	System.out.println(pfad + " existiert");
-//			Localisation.setUebersetzung("Die Datei ist bereits vorhanden. Soll sie überschrieben werden?","File exists already. Overwrite?","englisch");
-			int ueberschreiben = JOptionPane.showConfirmDialog(parentComponent, "Die Datei ist bereits vorhanden. Soll sie überschrieben werden?","",JOptionPane.YES_NO_OPTION);
-			if (ueberschreiben != JOptionPane.OK_OPTION) {
+//			Localisation.setUebersetzung("Die Datei ist bereits vorhanden. Soll sie überschrieben werden?","File exists. Overwrite?","englisch");
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setContentText(LabelGrabber.getLabel("output.fileexists.question")+"?");
+
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() != ButtonType.OK){
 				return;
 			}
+			
 			if (fallsDaKopieren) {
 				int i = 1;
 				String targetAbsPath = pfad + ".kopie_" + i;

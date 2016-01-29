@@ -54,4 +54,6 @@ public class GMenuItem extends MenuItem implements GObject {
    	public String getNodeClassName() {		
    		return "MenuItem";
    	}
+
+	
 }

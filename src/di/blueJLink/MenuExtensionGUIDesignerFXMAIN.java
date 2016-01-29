@@ -1,4 +1,4 @@
-package blueJLink;
+package di.blueJLink;
 
 import java.awt.EventQueue;
 
@@ -37,14 +37,18 @@ public class MenuExtensionGUIDesignerFXMAIN extends Extension {
 			public void run() {
 				try {
 					new JFXPanel();
+					
+					
 					Platform.runLater(() -> {
 						try {
 							new Main().start(new Stage());
+							
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					});
+					
 					/*
 					 * JOptionPane.showInputDialog("Start");
 					 * Application.launch(Main.class);

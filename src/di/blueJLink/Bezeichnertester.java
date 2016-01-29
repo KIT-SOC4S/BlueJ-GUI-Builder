@@ -1,4 +1,6 @@
-package blueJLink;
+/**
+ * @author Georg Dick
+ */package di.blueJLink;
 
 public class Bezeichnertester {
 	static String[] javaKeys = {

@@ -41,12 +41,15 @@ import bdl.view.left.ComponentMenuItem;
 import bdl.view.left.hierarchy.HierarchyTreeItem;
 import bdl.view.right.PropertyEditPane;
 import bdl.view.right.history.HistoryPanelItem;
-import blueJLink.Bezeichnertester;
-import blueJLink.BlueJExporter;
-import blueJLink.BlueJInterface;
 import bluej.extensions.BProject;
 import bluej.extensions.BlueJ;
 import bluej.extensions.ProjectNotOpenException;
+import di.anfasser.SAnfasserSatz;
+import di.blueJLink.Bezeichnertester;
+import di.blueJLink.BlueJExporter;
+import di.blueJLink.BlueJInterface;
+import di.errorlog.Fehlerausgabe;
+import di.inout.ExportJAVA;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -98,32 +101,41 @@ public class Controller {
 	private View view;
 	private ComponentSettingsStore componentSettingsStore;
 	private ViewListeners viewListeners;
-	private static ArrayList<String> fieldNames= new ArrayList<>();
+	private static ArrayList<String> fieldNames = new ArrayList<>();
+	
 	private HistoryManager historyManager;
 	private SelectionManager selectionManager;
 	private Interface blueJInterface;
 	private BlueJInterface blueJInterface2;
 	private boolean isOpeningFile = false;
-	
-	public static ArrayList<String> getFieldNames(){
+	SAnfasserSatz anfasser  = new SAnfasserSatz();
+	// private static Controller controller;
+	//
+	//
+	// public static Controller getController() {
+	// return controller;
+	// }
+	private Fehlerausgabe errorlog;
+	public static ArrayList<String> getFieldNames() {
 		return fieldNames;
 	}
-	
-	
+
 	public Controller(View view, ComponentSettingsStore componentSettingsStore, Interface blueJInterface,
 			BlueJInterface blueJInterface2) {
+		errorlog= new Fehlerausgabe();
 		this.view = view;
 		this.componentSettingsStore = componentSettingsStore;
 		this.blueJInterface = blueJInterface;
 		this.blueJInterface2 = blueJInterface2;
 		historyManager = new HistoryManager();
 		selectionManager = new SelectionManager();
-		viewListeners = new ViewListeners(historyManager, selectionManager);
+		viewListeners = new ViewListeners(historyManager, selectionManager, view);
 		setupLeftPanel();
 		setupMiddlePanel();
 		setupRightPanel();
 		setupTopPanel();
 		setupAutoSave();
+		// controller = this;
 	}
 
 	BProject[] aktuelleBlueJProjekte;
@@ -237,7 +249,7 @@ public class Controller {
 			alert.showAndWait();
 
 			return;
-			
+
 		}
 		BlueJ bluej = blueJInterface2.getBlueJ();
 		// BProject aktuellesBlueJProjekt = blueJInterface.getBlueJProjekt();
@@ -280,9 +292,9 @@ public class Controller {
 
 				TextInputDialog dialog = new TextInputDialog(LabelGrabber.getLabel("bluejlink.dialog.fieldname"));
 				dialog.setTitle(LabelGrabber.getLabel("bluejlink.dialog.inputfieldnameheader"));
-				dialog.setContentText(LabelGrabber.getLabel("bluejlink.dialog.inputfieldname")+":");
+				dialog.setContentText(LabelGrabber.getLabel("bluejlink.dialog.inputfieldname") + ":");
 
-				// Traditional way to get the response value.
+				
 				Optional<String> result = dialog.showAndWait();
 				if (!result.isPresent()) {
 					return;
@@ -292,7 +304,7 @@ public class Controller {
 					Alert alert = new Alert(AlertType.INFORMATION);
 					alert.setTitle(LabelGrabber.getLabel("bluejlink.dialog.infoheader"));
 					alert.setHeaderText(null);
-					alert.setContentText(result.get() + ":"+LabelGrabber.getLabel("bluejlink.dialog.wrongfieldname"));
+					alert.setContentText(result.get() + ":" + LabelGrabber.getLabel("bluejlink.dialog.wrongfieldname"));
 					alert.showAndWait();
 				} else {
 					inputOK = true;
@@ -340,13 +352,22 @@ public class Controller {
 				openFile(file);
 			}
 		});
-		// File > Save File
-		view.topPanel.mItmSaveFile.setOnAction(new EventHandler<ActionEvent>() {
+		// File > Save FXML File
+		view.topPanel.mItmSaveFXMLFile.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent actionEvent) {
 				saveFile();
 			}
 		});
+		// File > Save JAVA File
+				view.topPanel.mItmSaveJAVAFile.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent actionEvent) {
+						saveJAVAFile();
+					}
+
+					
+				});
 		// File > Close
 		view.topPanel.mItmClose.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -367,6 +388,8 @@ public class Controller {
 				}
 			}
 		});
+		// View > Errorlog
+		view.topPanel.mItmErrorlog.setOnAction(e->showErrorlog(e));
 
 		// Add HistoryListener for the Undo/Redo menu items in the Edit menu
 		historyManager.addHistoryListener(new HistoryListener() {
@@ -408,16 +431,16 @@ public class Controller {
 				view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent actionEvent) {
-//						if (gObject instanceof GMenuBar){
-//							((GMenuBar)gObject).clearTree();
-//						}
+						// if (gObject instanceof GMenuBar){
+						// ((GMenuBar)gObject).clearTree();
+						// }
 						view.middleTabPane.viewPane.getChildren().remove(gObject);
 						selectionManager.clearSelection();
 						historyManager.addHistory(new HistoryItem() {
 							@Override
 							public void restore() {
-								
-								view.middleTabPane.viewPane.getChildren().remove(gObject);								
+
+								view.middleTabPane.viewPane.getChildren().remove(gObject);
 								selectionManager.clearSelection();
 							}
 
@@ -439,22 +462,20 @@ public class Controller {
 					@Override
 					public void handle(ActionEvent actionEvent) {
 						final List<Node> list = new ArrayList<>();
-						list.addAll(view.middleTabPane.viewPane.getChildren());						
-//						for (Node n : list) {
-//							if (n instanceof GMenuBar){
-//								((GMenuBar)n).clearTree();
-//							}
-//					    }
+						list.addAll(view.middleTabPane.viewPane.getChildren());
+						// for (Node n : list) {
+						// if (n instanceof GMenuBar){
+						// ((GMenuBar)n).clearTree();
+						// }
+						// }
 						view.middleTabPane.viewPane.getChildren().clear();
-						
-						
-						
+
 						selectionManager.clearSelection();
 
 						historyManager.addHistory(new HistoryItem() {
 							@Override
 							public void restore() {
-								for (Node n : list) {									
+								for (Node n : list) {
 									view.middleTabPane.viewPane.getChildren().remove(n);
 								}
 								selectionManager.clearSelection();
@@ -526,6 +547,12 @@ public class Controller {
 
 	}
 
+	private void showErrorlog(ActionEvent e) {
+		if (errorlog!=null){
+		errorlog.show();
+		}
+	}
+
 	private void setupLeftPanel() {
 		view.leftPanel.leftList
 				.setCellFactory(new Callback<ListView<ComponentMenuItem>, ListCell<ComponentMenuItem>>() {
@@ -537,6 +564,7 @@ public class Controller {
 
 		for (ComponentSettings componentSettings : componentSettingsStore.getComponents()) {
 			String type = componentSettings.getType();
+			// System.out.println(type);
 			ImageView icon = new ImageView(
 					new Image(getClass().getResourceAsStream("/bdl/icons/" + componentSettings.getIcon())));
 			view.leftPanel.leftList.getItems().add(new ComponentMenuItem(type, icon, componentSettings));
@@ -595,20 +623,18 @@ public class Controller {
 			@Override
 			public void updateSelected(GObject gObject) {
 				update(gObject.getFieldName(), view.leftPanel.hierarchyPane.treeRoot);
-				
+
 			}
 
 			private void update(String fieldName, TreeItem<HierarchyTreeItem> treeRoot) {
 				for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
 					GObject gObject = ti.getValue().getGObject();
 					if (gObject.getFieldName().equals(fieldName)) {
-						view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);	
-						
-						
+						view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
+
 					} else if (gObject instanceof Pane) {
 						update(fieldName, ti);
 					}
-					
 
 				}
 			}
@@ -616,8 +642,8 @@ public class Controller {
 			@Override
 			public void clearSelection() {
 				System.out.println("ClearSelection");
-				view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);				
-				
+				view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);
+
 			}
 		});
 	}
@@ -665,11 +691,15 @@ public class Controller {
 				}
 				outline.setWidth(nodeW + 8);
 				outline.setHeight(nodeH + 8);
+				anfasser.setNode((Node)gObject,(Pane)node.getParent());
+				//anfasser.setzeSichtbar(true);
+
 			}
 
 			@Override
 			public void clearSelection() {
 				view.middleTabPane.outline.setVisible(false);
+				if (anfasser!=null){anfasser.setzeSichtbar(false);}
 			}
 		});
 
@@ -687,7 +717,7 @@ public class Controller {
 			public void handle(Event event) {
 				if (view.middleTabPane.codeTab.isSelected()) {
 					selectionManager.clearSelection();
-					view.middleTabPane.codePane.setText(generateJavaCode());
+					view.middleTabPane.codePane.setText(generateJavaCode(false));
 				}
 			}
 		});
@@ -713,7 +743,7 @@ public class Controller {
 					}
 					try {
 						BufferedOutputStream cssOutput = new BufferedOutputStream(new FileOutputStream(fileJava));
-						cssOutput.write(generateJavaCode().getBytes());
+						cssOutput.write(generateJavaCode(true).getBytes());
 						cssOutput.flush();
 						cssOutput.close();
 					} catch (Exception e) {
@@ -798,8 +828,10 @@ public class Controller {
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
+					int xpos = view.leftPanel.getRasterPane().getRasterPosX(t.getX());
+					int ypos = view.leftPanel.getRasterPane().getRasterPosY(t.getY());
 
-					addGObject(newThing, componentSettings, view, viewListeners, null, (int) t.getX(), (int) t.getY(),
+					addGObject(newThing, componentSettings, view, viewListeners, null, xpos, ypos,
 							view.middleTabPane.viewPane);
 					historyManager.unpause();
 				}
@@ -807,6 +839,14 @@ public class Controller {
 			}
 		});
 	}
+
+	// public int getRasterPosX(int pos) {
+	// return rasterx == 0 ? pos : pos - pos % rasterx;
+	// }
+	//
+	// public int getRasterPosY(int pos) {
+	// return rastery == 0 ? pos : pos - pos % rastery;
+	// }
 
 	private void setupRightPanel() {
 
@@ -897,7 +937,7 @@ public class Controller {
 
 			try {
 				Parent parent = FXMLLoader.load(file.toURI().toURL());
-                ausgabe(parent);
+				ausgabe(parent);
 				GUIHelper.setBounds(view.middleTabPane.viewPane, view.middleTabPane.viewPaneDecorator,
 						parent.prefWidth(0), parent.prefHeight(0));
 				String className = parent.getId();
@@ -939,18 +979,18 @@ public class Controller {
 	private void ausgabe(Parent parent) {
 		System.out.println(parent);
 		for (Node node : parent.getChildrenUnmodifiable()) {
-			nodeausgabe(node,"  ");
+			nodeausgabe(node, "  ");
 		}
-		
+
 	}
 
-	private void nodeausgabe(Node node, String string) {		
-		System.out.println(string+node);
-		if (node instanceof Pane){
-			for (Node cnode : ((Pane)node).getChildren()) {
-				nodeausgabe(cnode,string+"  ");
+	private void nodeausgabe(Node node, String string) {
+		System.out.println(string + node);
+		if (node instanceof Pane) {
+			for (Node cnode : ((Pane) node).getChildren()) {
+				nodeausgabe(cnode, string + "  ");
 			}
-		}		
+		}
 	}
 
 	/**
@@ -988,6 +1028,8 @@ public class Controller {
 			FileChooser fileChooser = new FileChooser();
 			FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("FXML files (*.fxml)", "*.fxml");
 			fileChooser.getExtensionFilters().add(filter);
+			String vorgabe = view.middleTabPane.viewPane.getClassName() + ".fxml";
+			fileChooser.setInitialFileName(vorgabe);
 
 			file = fileChooser.showSaveDialog(view.getStage());
 		} else {
@@ -1020,7 +1062,7 @@ public class Controller {
 			// Write java code to GUI java file.
 			try {
 				FileWriter fileWriter = new FileWriter(blueJInterface.getOpenGUIFile());
-				fileWriter.write(generateJavaCode());
+				fileWriter.write(generateJavaCode(false));
 				fileWriter.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -1044,7 +1086,7 @@ public class Controller {
 		fileChooser.setInitialDirectory(dir);
 		FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("FXML files (*.fxml)", "*.fxml");
 		fileChooser.getExtensionFilters().add(filter);
-		String vorgabe = view.middleTabPane.viewPane.getNodeClassName() + ".fxml";
+		String vorgabe = view.middleTabPane.viewPane.getClassName() + ".fxml";
 		fileChooser.setInitialFileName(vorgabe);
 		file = fileChooser.showSaveDialog(view.getStage());
 
@@ -1110,7 +1152,7 @@ public class Controller {
 	/**
 	 * Generates the full Java code.
 	 */
-	private String generateJavaCode() {
+	private String generateJavaCode(boolean forPreview) {
 		HashMap<String, String> imports = new HashMap<>();
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
 			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
@@ -1123,10 +1165,10 @@ public class Controller {
 				}
 			}
 		}
-		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, blueJInterface);
+		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, blueJInterface, forPreview);
 	}
 
-	private String generateJavaCode(String className) {
+	public String generateJavaCode(String className) {
 		HashMap<String, String> imports = new HashMap<>();
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
 			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
@@ -1140,7 +1182,7 @@ public class Controller {
 			}
 		}
 		view.middleTabPane.viewPane.setClassName(className);
-		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, blueJInterface);
+		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, blueJInterface, false);
 	}
 
 	// x and y are initial layout positions. To be used only with drag and drop.
@@ -1152,9 +1194,6 @@ public class Controller {
 		final PropertyEditPane propertyEditPane = new PropertyEditPane(newThing, componentSettings, fieldNames,
 				view.middleTabPane.viewPane, settingsNode, historyManager);
 
-		
-		
-		
 		newThing.setPEP(propertyEditPane);
 
 		if (componentSettings.getLayoutType().equals("anchorpane")) {
@@ -1259,9 +1298,9 @@ public class Controller {
 					deletebutton.setOnAction(new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent t) {
-//							if (newNode instanceof GMenuBar){
-//								((GMenuBar)newNode).clearTree();
-//							}
+							// if (newNode instanceof GMenuBar){
+							// ((GMenuBar)newNode).clearTree();
+							// }
 							destination.getChildren().remove(newNode);
 							selectionManager.clearSelection();
 							historyManager.addHistory(new HistoryItem() {
@@ -1325,214 +1364,214 @@ public class Controller {
 			}
 		});
 	}
+
 	// x and y are initial layout positions. To be used only with drag and drop.
-		private void addGObjectRec(final GObject newThing, ComponentSettings componentSettings, final View view,
-				final ViewListeners viewListeners, Node settingsNode, int x, int y, final Pane destination) {
+	private void addGObjectRec(final GObject newThing, ComponentSettings componentSettings, final View view,
+			final ViewListeners viewListeners, Node settingsNode, int x, int y, final Pane destination) {
 
-			// Sets the default settings on the gObject and creates the property
-			// edit pane
-			final PropertyEditPane propertyEditPane = new PropertyEditPane(newThing, componentSettings, fieldNames,
-					view.middleTabPane.viewPane, settingsNode, historyManager);
+		// Sets the default settings on the gObject and creates the property
+		// edit pane
+		final PropertyEditPane propertyEditPane = new PropertyEditPane(newThing, componentSettings, fieldNames,
+				view.middleTabPane.viewPane, settingsNode, historyManager);
 
-			newThing.setPEP(propertyEditPane);
+		newThing.setPEP(propertyEditPane);
 
-			
-			
-			if (componentSettings.getLayoutType().equals("anchorpane")) {
-				dealWithPane((Pane) newThing);	
-				
+		if (componentSettings.getLayoutType().equals("anchorpane")) {
+			dealWithPane((Pane) newThing);
+
+		}
+		final Node newNode = (Node) newThing;
+
+		newNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+			@Override
+			public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
+				selectionManager.updateSelected((GObject) newNode);
 			}
-			final Node newNode = (Node) newThing;
-			
+		});
 
-			newNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+		newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+				selectionManager.updateSelected((GObject) newNode);
+			}
+		});
+
+		newNode.layoutYProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+				selectionManager.updateSelected((GObject) newNode);
+			}
+		});
+
+		if (newNode instanceof Pane) {
+
+			newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
+
 				@Override
-				public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
+				public void handle(MouseEvent mouseEvent) {
 					selectionManager.updateSelected((GObject) newNode);
+					viewListeners.onMousePressed(newNode, mouseEvent);
+					mouseEvent.consume();// Stops the mouseEvent falling through
+											// to
+											// the viewPane which would clear
+											// selection
 				}
 			});
-
-			newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
+			newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
 				@Override
-				public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+				public void handle(MouseEvent mouseEvent) {
+					viewListeners.onMouseReleased(newNode, mouseEvent);
+					mouseEvent.consume();
+				}
+			});
+			newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
+
+				@Override
+				public void handle(MouseEvent mouseEvent) {
+					// System.out.println("MouseDragged");
+					viewListeners.onMouseDragged(newNode, mouseEvent);
 					selectionManager.updateSelected((GObject) newNode);
+					mouseEvent.consume();
 				}
 			});
 
-			newNode.layoutYProperty().addListener(new ChangeListener<Number>() {
+		} else {
+
+			newNode.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+
 				@Override
-				public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
+				public void handle(MouseEvent mouseEvent) {
 					selectionManager.updateSelected((GObject) newNode);
+					viewListeners.onMousePressed(newNode, mouseEvent);
+					mouseEvent.consume();// Stops the mouseEvent falling through
+											// to
+											// the viewPane which would clear
+											// selection
 				}
 			});
-
-			if (newNode instanceof Pane) {
-
-				newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
-
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						selectionManager.updateSelected((GObject) newNode);
-						viewListeners.onMousePressed(newNode, mouseEvent);
-						mouseEvent.consume();// Stops the mouseEvent falling through
-												// to
-												// the viewPane which would clear
-												// selection
-					}
-				});
-				newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						viewListeners.onMouseReleased(newNode, mouseEvent);
-						mouseEvent.consume();
-					}
-				});
-				newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
-
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						// System.out.println("MouseDragged");
-						viewListeners.onMouseDragged(newNode, mouseEvent);
-						selectionManager.updateSelected((GObject) newNode);
-						mouseEvent.consume();
-					}
-				});
-
-			} else {
-
-				newNode.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						selectionManager.updateSelected((GObject) newNode);
-						viewListeners.onMousePressed(newNode, mouseEvent);
-						mouseEvent.consume();// Stops the mouseEvent falling through
-												// to
-												// the viewPane which would clear
-												// selection
-					}
-				});
-				newNode.addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						viewListeners.onMouseReleased(newNode, mouseEvent);
-						mouseEvent.consume();
-					}
-				});
-				newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
-
-					@Override
-					public void handle(MouseEvent mouseEvent) {
-						// System.out.println("MouseDragged");
-						viewListeners.onMouseDragged(newNode, mouseEvent);
-						selectionManager.updateSelected((GObject) newNode);
-						mouseEvent.consume();
-					}
-				});
-			}
-			final ContextMenu nodePopUp = new ContextMenu();
-			final MenuItem deletebutton = new MenuItem(LabelGrabber.getLabel("delete.node.text"));
-			nodePopUp.getItems().add(deletebutton);
-			newNode.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			newNode.addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
 				@Override
-				public void handle(MouseEvent t) {
-					if (t.getButton().equals(MouseButton.SECONDARY)) {
-						nodePopUp.show(newNode, Side.RIGHT, 0, 0);
-						deletebutton.setOnAction(new EventHandler<ActionEvent>() {
-							@Override
-							public void handle(ActionEvent t) {
-								destination.getChildren().remove(newNode);
-								selectionManager.clearSelection();
-								historyManager.addHistory(new HistoryItem() {
-									@Override
-									public void revert() {
-										destination.getChildren().add(newNode);
-										selectionManager.updateSelected((GObject) newNode);
-									}
-
-									@Override
-									public void restore() {
-										destination.getChildren().remove(newNode);
-										selectionManager.clearSelection();
-									}
-
-									@Override
-									public String getAppearance() {
-										return ((GObject) newNode).getFieldName() + " deleted!";
-									}
-								});
-							}
-						});
-					}
+				public void handle(MouseEvent mouseEvent) {
+					viewListeners.onMouseReleased(newNode, mouseEvent);
+					mouseEvent.consume();
 				}
 			});
-
-			destination.getChildren().add(newNode);
-
-			if (settingsNode == null) {
-				if (newNode instanceof Circle) {
-					newNode.setLayoutX((newNode.getLayoutBounds().getWidth() / 2) + 4);
-					newNode.setLayoutY((newNode.getLayoutBounds().getWidth() / 2) + 4);
-				} else {
-					newNode.setLayoutX(newNode.getLayoutX() + 4);
-					newNode.setLayoutY(newNode.getLayoutY() + 4);
-				}
-			}
-
-			if (x > 0 && y > 0) {
-				newNode.setLayoutX(x);
-				newNode.setLayoutY(y);
-			}
-
-			// Finally, let the history manager know this new thing has happened.
-			historyManager.addHistory(new HistoryItem() {
-				@Override
-				public void restore() {
-					destination.getChildren().add(newNode);
-					selectionManager.updateSelected(newThing);
-				}
+			newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
 
 				@Override
-				public void revert() {
-					destination.getChildren().remove(newThing);
-					selectionManager.clearSelection();
-				}
-
-				@Override
-				public String getAppearance() {
-					return newThing.getClass().getSuperclass().getSimpleName() + " added!";
+				public void handle(MouseEvent mouseEvent) {
+					// System.out.println("MouseDragged");
+					viewListeners.onMouseDragged(newNode, mouseEvent);
+					selectionManager.updateSelected((GObject) newNode);
+					mouseEvent.consume();
 				}
 			});
+		}
+		final ContextMenu nodePopUp = new ContextMenu();
+		final MenuItem deletebutton = new MenuItem(LabelGrabber.getLabel("delete.node.text"));
+		nodePopUp.getItems().add(deletebutton);
+		newNode.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent t) {
+				if (t.getButton().equals(MouseButton.SECONDARY)) {
+					nodePopUp.show(newNode, Side.RIGHT, 0, 0);
+					deletebutton.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent t) {
+							destination.getChildren().remove(newNode);
+							selectionManager.clearSelection();
+							historyManager.addHistory(new HistoryItem() {
+								@Override
+								public void revert() {
+									destination.getChildren().add(newNode);
+									selectionManager.updateSelected((GObject) newNode);
+								}
 
-			if (settingsNode instanceof Pane){
-				Pane newPane = (Pane)settingsNode;				
-				for (Node cnode : newPane.getChildren()) {
-					for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
-						ComponentSettings componentSettings2 = componentMenuItem.getComponentSettings();
-						try {
-//							System.out.println(cnode+ " "+componentSettings2.getType()+" "+cnode.getClass().getSimpleName());	
-							if (componentSettings2.getType().equals(cnode.getClass().getSimpleName())) {								
-								Class componentClass = Class.forName("bdl.build." + componentSettings2.getPackageName()
-										+ ".G" + componentSettings2.getType());
-								Constructor constructor = componentClass.getConstructor();
-								GObject verynewThing = (GObject) constructor.newInstance();
-								verynewThing.setFieldName(cnode.getId());
+								@Override
+								public void restore() {
+									destination.getChildren().remove(newNode);
+									selectionManager.clearSelection();
+								}
 
-								addGObjectRec(verynewThing, componentSettings2, view, viewListeners, cnode, -1, -1,
-										(Pane)newThing);								
-								break;
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
+								@Override
+								public String getAppearance() {
+									return ((GObject) newNode).getFieldName() + " deleted!";
+								}
+							});
 						}
-					}
+					});
 				}
 			}
-			
-			if (settingsNode instanceof MenuBar){
-				((GMenuBar)newThing).getMenuBuilder().buildTreeFromNode(settingsNode);				
+		});
+
+		destination.getChildren().add(newNode);
+
+		if (settingsNode == null) {
+			if (newNode instanceof Circle) {
+				newNode.setLayoutX((newNode.getLayoutBounds().getWidth() / 2) + 4);
+				newNode.setLayoutY((newNode.getLayoutBounds().getWidth() / 2) + 4);
+			} else {
+				newNode.setLayoutX(newNode.getLayoutX() + 4);
+				newNode.setLayoutY(newNode.getLayoutY() + 4);
 			}
 		}
+
+		if (x > 0 && y > 0) {
+			newNode.setLayoutX(x);
+			newNode.setLayoutY(y);
+		}
+
+		// Finally, let the history manager know this new thing has happened.
+		historyManager.addHistory(new HistoryItem() {
+			@Override
+			public void restore() {
+				destination.getChildren().add(newNode);
+				selectionManager.updateSelected(newThing);
+			}
+
+			@Override
+			public void revert() {
+				destination.getChildren().remove(newThing);
+				selectionManager.clearSelection();
+			}
+
+			@Override
+			public String getAppearance() {
+				return newThing.getClass().getSuperclass().getSimpleName() + " added!";
+			}
+		});
+
+		if (settingsNode instanceof Pane) {
+			Pane newPane = (Pane) settingsNode;
+			for (Node cnode : newPane.getChildren()) {
+				for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
+					ComponentSettings componentSettings2 = componentMenuItem.getComponentSettings();
+					try {
+						// System.out.println(cnode+ "
+						// "+componentSettings2.getType()+"
+						// "+cnode.getClass().getSimpleName());
+						if (componentSettings2.getType().equals(cnode.getClass().getSimpleName())) {
+							Class componentClass = Class.forName("bdl.build." + componentSettings2.getPackageName()
+									+ ".G" + componentSettings2.getType());
+							Constructor constructor = componentClass.getConstructor();
+							GObject verynewThing = (GObject) constructor.newInstance();
+							verynewThing.setFieldName(cnode.getId());
+
+							addGObjectRec(verynewThing, componentSettings2, view, viewListeners, cnode, -1, -1,
+									(Pane) newThing);
+							break;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		if (settingsNode instanceof MenuBar) {
+			((GMenuBar) newThing).getMenuBuilder().buildTreeFromNode(settingsNode);
+		}
+	}
 
 	private void dealWithPane(final Pane newThing) {
 		// System.out.println("dealWithPane");
@@ -1586,9 +1625,9 @@ public class Controller {
 						e.printStackTrace();
 					}
 					final GObject newGObj = (GObject) newnewThing;
-
-					addGObject(newGObj, componentSettings, view, viewListeners, null, (int) t.getX(), (int) t.getY(),
-							newThing);
+					int xpos = view.leftPanel.getRasterPane().getRasterPosX(t.getX());
+					int ypos = view.leftPanel.getRasterPane().getRasterPosY(t.getY());
+					addGObject(newGObj, componentSettings, view, viewListeners, null, xpos, ypos, newThing);
 					// newThing.getChildren().add((Node) newGObj);
 					historyManager.unpause();
 					historyManager.addHistory(new HistoryItem() {
@@ -1633,21 +1672,28 @@ public class Controller {
 		// Add backwards so that they appear in the correct order
 		for (int i = nodes.size() - 1; i >= 0; i--) {
 			Node curNode = nodes.get(i);
-			TreeItem ti = new TreeItem<>(
-					new HierarchyTreeItem((GObject) curNode, view, selectionManager, historyManager));
-			root.getChildren().add(ti);
-			if (curNode instanceof Pane) {
-				addPaneChildrenToHierarchy((Pane) curNode, ti);// Recurse to
-																// continue
-																// adding all
-																// children,
-																// grandkids etc
-																// to hierarchy
-																// pane
-				addPaneListChangeListener((Pane) curNode, ti);// Add listener to
-																// any panes
+			if (curNode instanceof GObject || curNode instanceof GUIObject) {
+				TreeItem ti = new TreeItem<>(
+						new HierarchyTreeItem((GObject) curNode, view, selectionManager, historyManager));
+				root.getChildren().add(ti);
+				if (curNode instanceof Pane) {
+					addPaneChildrenToHierarchy((Pane) curNode, ti);// Recurse to
+																	// continue
+																	// adding
+																	// all
+																	// children,
+																	// grandkids
+																	// etc
+																	// to
+																	// hierarchy
+																	// pane
+					addPaneListChangeListener((Pane) curNode, ti);// Add
+																	// listener
+																	// to
+																	// any panes
+				}
+				ti.setExpanded(true);
 			}
-			ti.setExpanded(true);
 		}
 	}
 
@@ -1689,5 +1735,10 @@ public class Controller {
 				return;
 			}
 		}
+	}
+	
+	private void saveJAVAFile() {
+		ExportJAVA.saveJavaFile(view, this);
+		
 	}
 }

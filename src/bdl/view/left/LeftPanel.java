@@ -10,8 +10,14 @@ import javafx.scene.layout.AnchorPane;
 public class LeftPanel extends SplitPane {
 
     public TitledPane hierarchyTitledPane;
-    public AnchorPane dummyPane;
-    public ListView<ComponentMenuItem> leftList;
+    private RasterPane rasterPane;
+    public RasterPane getRasterPane() {
+		return rasterPane;
+	}
+
+
+
+	public ListView<ComponentMenuItem> leftList;
     public HierarchyPane hierarchyPane;
 
         
@@ -26,13 +32,9 @@ public class LeftPanel extends SplitPane {
         hierarchyTitledPane = new TitledPane(LabelGrabber.getLabel("hierarchy.tab.title"), hierarchyPane);
         hierarchyTitledPane.setCollapsible(false);
         hierarchyTitledPane.setMinWidth(205);
-//        hierarchyTitledPane.setMaxWidth(205);
-        //End left hierarchy panel
+        hierarchyTitledPane.setMinHeight(200);
         
-        dummyPane = new AnchorPane();
-      
-        
-        
-        getItems().addAll(leftList, hierarchyTitledPane);
+        rasterPane = new RasterPane();
+        getItems().addAll(leftList, hierarchyTitledPane,rasterPane);
     }
 }

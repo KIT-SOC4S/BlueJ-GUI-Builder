@@ -4,11 +4,13 @@ import bdl.build.GObject;
 import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import bdl.model.selection.SelectionManager;
+import bdl.view.View;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 public class ViewListeners {
 
@@ -17,10 +19,13 @@ public class ViewListeners {
 	double historyX, historyY;
 	boolean isMousePressed = false;
 	double curX = 0, curY = 0;
+	double breite, hoehe;
+	private View view;
 
-	public ViewListeners(HistoryManager hm, SelectionManager selectionManager) {
+	public ViewListeners(HistoryManager hm, SelectionManager selectionManager, View view) {
 		historyManager = hm;
 		this.selectionManager = selectionManager;
+		this.view = view;
 	}
 
 	public void onMousePressed(Node node, MouseEvent mouseEvent) {
@@ -30,66 +35,86 @@ public class ViewListeners {
 		curY = mouseEvent.getY();
 		historyX = node.getLayoutX();
 		historyY = node.getLayoutY();
-		
-		if (mouseEvent.isPrimaryButtonDown() && mouseEvent.isAltDown()&&
-				node instanceof Region) {
-			Region c = (Region) node;
-			// System.out.println("MD");
-			if (c.getMinWidth()!=c.getWidth()){
-				c.setMinWidth(c.getWidth());
+
+		if (mouseEvent.isPrimaryButtonDown() && mouseEvent.isAltDown())
+			if (node instanceof Region) {
+				Region c = (Region) node;
+				System.out.println("MDown");
+				if (c.getMinWidth() != c.getWidth()) {
+					c.setMinWidth(c.getWidth());
+				}
+				if (c.getMinHeight() != c.getHeight()) {
+					c.setMinHeight(c.getHeight());
+				}
+				breite = c.getWidth();
+				hoehe = c.getHeight();
+			} else if (node instanceof Canvas) {
+				Canvas c = (Canvas) node;
+				breite = c.getWidth();
+				hoehe = c.getHeight();
+			} else if (node instanceof Rectangle) {
+				Rectangle c = (Rectangle) node;
+
+				breite = c.getWidth();
+				hoehe = c.getHeight();
 			}
-			if (c.getMinHeight()!=c.getHeight()){
-				c.setMinHeight(c.getHeight());
-			}
-		}
-		
-		
 	}
 
+	
+
 	public void onMouseDragged(Node node, MouseEvent mouseEvent) {
-		if (isMousePressed && selectionManager.getCurrentlySelected() == node && mouseEvent.isPrimaryButtonDown()&&
-				!mouseEvent.isAltDown()) {
+		if (isMousePressed && selectionManager.getCurrentlySelected() == node && mouseEvent.isPrimaryButtonDown()
+				&& !mouseEvent.isAltDown()) {
 			// System.out.println("MD");
 			double x = node.getLayoutX() + (mouseEvent.getX() - curX);
 			double y = node.getLayoutY() + (mouseEvent.getY() - curY);
-			node.setLayoutX(x);
-			node.setLayoutY(y);
+			
+			node.setLayoutX(view.leftPanel.getRasterPane().getRasterPosX(x));
+			node.setLayoutY(view.leftPanel.getRasterPane().getRasterPosY(y));
 			mouseEvent.consume();
-		} else if (isMousePressed && selectionManager.getCurrentlySelected() == node
-				&& mouseEvent.isPrimaryButtonDown()&& mouseEvent.isAltDown()) {
+		} else if (isMousePressed && selectionManager.getCurrentlySelected() == node && mouseEvent.isPrimaryButtonDown()
+				&& mouseEvent.isAltDown()) {
 			if (node instanceof Canvas) {
 				Canvas c = (Canvas) node;
-				// System.out.println("MD");
-				double x = c.getWidth() + (mouseEvent.getX() - curX);
-				double y = c.getHeight() + (mouseEvent.getY() - curY);
+				System.out.println("breite" + breite);
+				breite = breite + mouseEvent.getX() - curX;
+				hoehe = hoehe + mouseEvent.getY() - curY;
+//
+//				double x = c.getWidth() + (mouseEvent.getX() - curX);
+//				double y = c.getHeight() + (mouseEvent.getY() - curY);
 				curX = mouseEvent.getX();
 				curY = mouseEvent.getY();
-				c.setHeight(y);
-				c.setWidth(x);
+				c.setHeight(view.leftPanel.getRasterPane().getRasterPosY(hoehe));
+				c.setWidth(view.leftPanel.getRasterPane().getRasterPosX(breite));
 			} else if (node instanceof Region) {
 				Region c = (Region) node;
 				// System.out.println("MD");
-//				if (c.getMinWidth()!=c.getWidth()){
-//					c.setMinWidth(c.getWidth());
-//				}
-//				if (c.getMinHeight()!=c.getHeight()){
-//					c.setMinHeight(c.getHeight());
-//				}
-				double x = c.getMinWidth() + (mouseEvent.getX() - curX);
-				double y = c.getMinHeight() + (mouseEvent.getY() - curY);
+				// if (c.getMinWidth()!=c.getWidth()){
+				// c.setMinWidth(c.getWidth());
+				// }
+				// if (c.getMinHeight()!=c.getHeight()){
+				// c.setMinHeight(c.getHeight());
+				// }
+				breite = breite + mouseEvent.getX() - curX;
+				hoehe = hoehe + mouseEvent.getY() - curY;
+//				double x = c.getMinWidth() + (mouseEvent.getX() - curX);
+//				double y = c.getMinHeight() + (mouseEvent.getY() - curY);
 				curX = mouseEvent.getX();
 				curY = mouseEvent.getY();
-				c.setMinHeight(y);
-				c.setMinWidth(x);
+
+				c.setMinHeight(view.leftPanel.getRasterPane().getRasterPosY(hoehe));
+				c.setMinWidth(view.leftPanel.getRasterPane().getRasterPosX(breite));
 			} else if (((GObject) node) instanceof Rectangle) {
 				Rectangle c = (Rectangle) node;
 				// System.out.println("MD");
-				double x = c.getWidth() + (mouseEvent.getX() - curX);
-				double y = c.getHeight() + (mouseEvent.getY() - curY);
+				breite = breite + mouseEvent.getX() - curX;
+				hoehe = hoehe + mouseEvent.getY() - curY;
+//				double x = c.getWidth() + (mouseEvent.getX() - curX);
+//				double y = c.getHeight() + (mouseEvent.getY() - curY);
 				curX = mouseEvent.getX();
 				curY = mouseEvent.getY();
-				c.setHeight(y);
-				c.setWidth(x);
+				c.setHeight(view.leftPanel.getRasterPane().getRasterPosY(hoehe));
+				c.setWidth(view.leftPanel.getRasterPane().getRasterPosX(breite));
 			}
 		}
 	}

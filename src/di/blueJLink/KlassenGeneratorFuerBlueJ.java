@@ -1,4 +1,7 @@
-package blueJLink;
+/**
+ * @author Georg Dick
+ */
+package di.blueJLink;
 import java.io.FileWriter;
 
 import javax.swing.JOptionPane;
@@ -113,7 +116,7 @@ public class KlassenGeneratorFuerBlueJ implements BlueJInterface{
 	}
 
 	/**
-	 * @see blueJLink.BlueJInterface#erzeugeProjekt(java.lang.String)
+	 * @see di.blueJLink.BlueJInterface#erzeugeProjekt(java.lang.String)
 	 */
 	@Override
 	public boolean erzeugeProjekt() {
@@ -122,7 +125,7 @@ public class KlassenGeneratorFuerBlueJ implements BlueJInterface{
 	}
 
 	/**
-	 * @see blueJLink.BlueJInterface#oeffneProjekt()
+	 * @see di.blueJLink.BlueJInterface#oeffneProjekt()
 	 */
 	@Override
 	public boolean oeffneProjekt() {
@@ -132,14 +135,14 @@ public class KlassenGeneratorFuerBlueJ implements BlueJInterface{
 
 
 	/**
-	 * @see blueJLink.BlueJInterface#getBlueJProjekte()
+	 * @see di.blueJLink.BlueJInterface#getBlueJProjekte()
 	 */
 	@Override
 	public BProject[] getBlueJProjekte() {		
 			return getBlueJ().getOpenProjects();			
 	}
 	/**
-	 * @see blueJLink.BlueJInterface#getBlueJ()
+	 * @see di.blueJLink.BlueJInterface#getBlueJ()
 	 */
 	@Override
 	public BlueJ getBlueJ() {

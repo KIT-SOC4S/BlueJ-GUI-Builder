@@ -16,7 +16,7 @@ import javafx.scene.layout.Pane;
 public class CodeGenerator {
 
 	public static String generateJavaCode(GUIObject guiObject, HashMap<String, String> allImports,
-			Interface blueJInterface) {
+			Interface blueJInterface, boolean forPreview) {
 
 		StringBuilder code = new StringBuilder();
 
@@ -31,21 +31,24 @@ public class CodeGenerator {
 
 		// Add declarations
 		for (Node node : guiObject.getChildren()) {
+			if (node instanceof GObject){
 			declaration(node, code);
+			}
 		}
 		code.append('\n');
 
 		// Add properties
 		code.append("    private Parent getRoot() {\n");
 		code.append("        AnchorPane root = new AnchorPane();\n");
-
 		code.append("        root.getChildren().addAll(");
 		String prefix = "";
 		for (Node node : guiObject.getChildren()) {
+			if (node instanceof GObject){
 			GObject gObj = (GObject) node;
 			code.append(prefix);
 			prefix = ", ";
 			code.append(gObj.getFieldName());
+			}
 		}
 		code.append(");\n");
 
@@ -78,9 +81,12 @@ public class CodeGenerator {
 				+ "        });\n" + "    }\n\n");
 
 		// Add start method
+		String stPreview = forPreview?"":"        primaryStage.setOnCloseRequest(e->System.exit(0));//needed(helps) for BlueJ\n";
+		
 		code.append("    @Override\n" + "    public void start(Stage primaryStage) {\n"
 				+ "        Scene scene = new Scene(getRoot(), " + guiObject.getWidth() + ", " + guiObject.getHeight()
 				+ ");\n" + "        \n" + "        primaryStage.setTitle(\"" + guiObject.getGUITitle() + "\");\n"
+				+ stPreview
 				+ "        primaryStage.setScene(scene);\n" + "        primaryStage.show();\n" + "    }\n\n");
 		// Add eventHandler
 
@@ -89,14 +95,16 @@ public class CodeGenerator {
 		}
 
 		// Add main method
-		code.append("    /**\n" + "     * The main() method is ignored in correctly deployed JavaFX application.\n"
-				+ "     * main() serves only as fallback in case the application can not be\n"
-				+ "     * launched through deployment artifacts, e.g., in IDEs with limited FX\n"
-				+ "     * support. NetBeans ignores main().\n" + "     *\n"
-				+ "     * @param args the command line arguments\n" + "     */\n"
+//		code.append("    /**\n" + "     * The main() method is ignored in correctly deployed JavaFX application.\n"
+//				+ "     * main() serves only as fallback in case the application can not be\n"
+//				+ "     * launched through deployment artifacts, e.g., in IDEs with limited FX\n"
+//				+ "     * support. NetBeans ignores main().\n" + "     *\n"
+//				+ "     * @param args the command line arguments\n" + "     */\n"
+//				+ "    public static void main(String[] args) {\n" + "        launch(args);\n" + "    }\n");
+//		;
+		code.append( "     * @param args the command line arguments\n" + "     */\n"
 				+ "    public static void main(String[] args) {\n" + "        launch(args);\n" + "    }\n");
 		;
-
 		code.append('}');// Close class tag
 		return code.toString();
 	}
@@ -158,6 +166,7 @@ public class CodeGenerator {
 	}
 
 	private static void declaration(Node node, StringBuilder code) {
+		
 		GObject gObj = (GObject) node;
 		String nodeType = node.getClass().getSimpleName().substring(1);
 		if (!(node instanceof GMenuBar)) {
@@ -194,6 +203,7 @@ public class CodeGenerator {
 	}
 
 	private static void panelProperties(Node node, StringBuilder code) {
+		if (!(node instanceof GObject)){ return;}
 		GObject gObj = (GObject) node;
 		for (PanelProperty property : gObj.getPanelProperties()) {
 			String javaCode = property.getJavaCode();
@@ -218,6 +228,7 @@ public class CodeGenerator {
 	}
 
 	private static void listenerProperties(Node node, StringBuilder code) {
+		if (!(node instanceof GObject)){return;}
 		GObject gObj = (GObject) node;
 		for (PanelProperty property : gObj.getPanelProperties()) {
 			if (property instanceof ListenerEnabledProperty) {

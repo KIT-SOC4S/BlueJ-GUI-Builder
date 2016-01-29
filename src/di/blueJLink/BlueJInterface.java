@@ -1,4 +1,7 @@
-package blueJLink;
+/**
+ * @author Georg Dick
+ */
+package di.blueJLink;
 
 
 

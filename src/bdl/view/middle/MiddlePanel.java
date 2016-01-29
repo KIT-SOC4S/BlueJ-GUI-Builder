@@ -28,6 +28,7 @@ public class MiddlePanel extends TabPane {
     private StackPane blankPane;
 
     public Rectangle outline;
+    public Rectangle anfasser;
     public Rectangle highlight;
 
     public MiddlePanel() {
@@ -40,16 +41,17 @@ public class MiddlePanel extends TabPane {
         getTabs().addAll(viewTab, codeTab, previewTab);
 
         blankPane = new StackPane();
-        blankPane.setStyle("-fx-background-color:#94B2E0;");
+        blankPane.setStyle("-fx-background-color:#94B2E0;");//
         
         viewPane = new GUIObject();
         viewPane.setPEP(new PropertyEditPane(viewPane));
         viewPane.setStyle("-fx-background-color:#FFFFFF;");
-
+         
         scroll = new ScrollPane();
         
         viewPaneDecorator = new AnchorPane();
         viewPaneDecorator.getChildren().add(viewPane);
+        viewPane.setVPD(viewPaneDecorator);
 
         GUIHelper.setBounds(viewPane, viewPaneDecorator, 600, 400);
 
@@ -57,11 +59,10 @@ public class MiddlePanel extends TabPane {
         rect.widthProperty().bind(viewPaneDecorator.widthProperty());
         rect.heightProperty().bind(viewPaneDecorator.heightProperty());
         viewPaneDecorator.setClip(rect);
-
         scroll.setContent(blankPane);
         blankPane.getChildren().addAll(viewPaneDecorator);
         StackPane.setAlignment(viewPaneDecorator, Pos.CENTER);
-        StackPane.setMargin(viewPaneDecorator, new Insets(30, 30, 30, 30));
+        StackPane.setMargin(viewPaneDecorator, new Insets(20, 20, 20, 20));
 
         outline = new Rectangle();
         outline.setStrokeWidth(2);
@@ -69,6 +70,7 @@ public class MiddlePanel extends TabPane {
         outline.setFill(Color.TRANSPARENT);
         outline.setMouseTransparent(true);
         outline.setStyle("-fx-opacity: 1;");//Could use this to make a light grey foreground
+        
         
         viewPaneDecorator.getChildren().add(outline);
         

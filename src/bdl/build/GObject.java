@@ -28,4 +28,5 @@ public interface GObject {
     public StringProperty fieldNameProperty();
     
     public String getNodeClassName();
+   
 }

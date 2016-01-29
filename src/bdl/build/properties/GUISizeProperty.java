@@ -11,12 +11,14 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 
 public class GUISizeProperty implements PanelProperty {
 
     private TextField width;
     private TextField height;
-    private DecimalFormat format = new DecimalFormat("#.##");
+    private DecimalFormat format = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
 
     public GUISizeProperty(final GUIObject gObj, String name, GridPane gp, int row) {
         int row1 = row;
@@ -29,7 +31,9 @@ public class GUISizeProperty implements PanelProperty {
         gp.add(lheight, 0, row2);
         width = new TextField();
         height = new TextField();
-
+        
+        gObj.widthProperty().addListener((a,b,newV)->{width.setText(format.format(gObj.getGUIWidth()));});
+        gObj.heightProperty().addListener((a,b,newV)->{height.setText(format.format(gObj.getGUIHeight()));}); 
         width.setText(format.format(gObj.getGUIWidth()));
         height.setText(format.format(gObj.getGUIHeight()));
 
