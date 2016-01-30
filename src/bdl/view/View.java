@@ -21,7 +21,6 @@ public class View extends AnchorPane {
 
     public View(Stage stage, boolean isBlueJAttached) {
         this.stage = stage;
-
         //Begin Main panel
         BorderPane borderPane = new BorderPane();
         prefWidth(854);

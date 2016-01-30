@@ -1,6 +1,7 @@
 package bdl.build.properties;
 
 public interface PanelProperty {
+	public default String getImport(){return"";};
 
     public String getJavaCode();
 

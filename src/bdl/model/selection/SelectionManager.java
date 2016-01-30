@@ -7,6 +7,14 @@ import bdl.build.GObject;
 import bdl.build.javafx.scene.control.GMenuBar;
 
 public class SelectionManager {
+	private boolean enabled=true;
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled){
+		this.enabled=enabled;
+	}
 
     private List<SelectionListener> selectionListeners;
     private GObject currentlySelected = null;
@@ -20,6 +28,7 @@ public class SelectionManager {
     }
 
     public void updateSelected(GObject gObject) {
+    	if (!enabled){return;}
         for (SelectionListener selectionListener : selectionListeners) {
             selectionListener.updateSelected(gObject);
         }
@@ -27,7 +36,8 @@ public class SelectionManager {
         
     }
 
-    public void clearSelection() {    	
+    public void clearSelection() {   
+    	if (!enabled){return;}
         for (SelectionListener selectionListener : selectionListeners) {
             selectionListener.clearSelection();
         }

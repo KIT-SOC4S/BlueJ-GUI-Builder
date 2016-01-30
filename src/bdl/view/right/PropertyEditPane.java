@@ -60,7 +60,7 @@ public class PropertyEditPane extends GridPane {
 		//this.setMaxWidth(300);
 
 		Label propertiesHeading = new Label(LabelGrabber.getLabel("properties.text") + ":");
-		propertiesHeading.setMinWidth(90);
+		propertiesHeading.setMinWidth(120);
 		propertiesHeading.setFont(Font.font(propertiesHeading.getFont().getFamily(), FontWeight.BOLD,
 				propertiesHeading.getFont().getSize() + 0.5));
 		add(propertiesHeading, 0, currentRow++);

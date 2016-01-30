@@ -560,7 +560,7 @@
 		</properties>
 		<listeners>
 			<listener>
-				<package>javafx.event.*</package>
+				<package>javafx.event</package>
 				<isActive>true</isActive>
 				<name>onAction</name>
 				<method>setOnAction</method>
@@ -575,25 +575,34 @@
 		<layouttype>Todo</layouttype>
 		<icon>ListView.png</icon>
 		<properties>
-			<property>
-				<name>MinWidth</name>
+		    <property>
+				<name>Layout</name>
 				<enabled>true</enabled>
-				<pseudotype>DoubleObserved</pseudotype>
-				<observedProperty>minWidthProperty</observedProperty>
-				<default>10</default>
-				<setter>setMinWidth</setter>
-				<getter>getMinWidth</getter>
-				<fxml>minWidth</fxml>
+				<pseudotype>Layout</pseudotype>
+				<default></default>
+				<setter></setter>
+				<getter></getter>
+				<fxml></fxml>
 			</property>
 			<property>
-				<name>MinHeight</name>
+				<name>PrefWidth</name>
 				<enabled>true</enabled>
 				<pseudotype>DoubleObserved</pseudotype>
-				<observedProperty>minHeightProperty</observedProperty>
-				<default>10</default>
-				<setter>setMinHeight</setter>
-				<getter>getMinHeight</getter>
-				<fxml>minHeight</fxml>
+				<observedProperty>prefWidthProperty</observedProperty>
+				<default>50</default>
+				<setter>setPrefWidth</setter>
+				<getter>getPrefWidth</getter>
+				<fxml>prefWidth</fxml>
+			</property>
+			<property>
+				<name>PrefHeight</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>prefHeightProperty</observedProperty>
+				<default>30</default>
+				<setter>setPrefHeight</setter>
+				<getter>getPrefHeight</getter>
+				<fxml>prefHeight</fxml>
 			</property>
 		</properties>
 		<listeners>
@@ -660,7 +669,7 @@
 				<isActive>true</isActive>
 				<name>onAction</name>
 				<method>setOnAction</method>
-				<event>ActionEvent</event>
+				<event>Event</event>
 			</listener>
 		</listeners>
 	</component>
@@ -851,7 +860,7 @@
 		</properties>
 		<listeners>
 			<listener>
-				<package>javafx.event.*</package>
+				<package>javafx.event</package>
 				<isActive>true</isActive>
 				<name>onAction</name>
 				<method>setOnAction</method>
@@ -905,7 +914,7 @@
 		</properties>
 		<listeners>
 			<listener>
-				<package>javafx.event.*</package>
+				<package>javafx.event</package>
 				<isActive>true</isActive>
 				<name>onAction</name>
 				<method>setOnAction</method>

@@ -44,13 +44,13 @@ import bdl.view.right.history.HistoryPanelItem;
 import bluej.extensions.BProject;
 import bluej.extensions.BlueJ;
 import bluej.extensions.ProjectNotOpenException;
-import di.anfasser.AnfasserSatz;
 import di.blueJLink.Bezeichnertester;
 import di.blueJLink.BlueJExporter;
 import di.blueJLink.BlueJInterface;
 import di.errorlog.Fehlerausgabe;
 import di.inout.ExportJAVA;
 import di.inout.LanguageChooser;
+import di.mover.MoverSet;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -87,6 +87,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
@@ -108,9 +109,11 @@ public class Controller {
 	private SelectionManager selectionManager;
 	private BlueJInterface blueJInterface2;
 	private boolean isOpeningFile = false;
-	private AnfasserSatz anfasser = new AnfasserSatz();
+	private MoverSet anfasser = new MoverSet();
 	private Fehlerausgabe errorlog;
-
+     public View getView(){
+    	 return view;
+     }
 	public static ArrayList<String> getFieldNames() {
 		return fieldNames;
 	}
@@ -127,8 +130,6 @@ public class Controller {
 		setupMiddlePanel();
 		setupRightPanel();
 		setupTopPanel();
-		setupAutoSave();
-		// controller = this;
 	}
 
 	BProject[] aktuelleBlueJProjekte;
@@ -308,87 +309,190 @@ public class Controller {
 
 	}
 
-	{
-		view.topPanel.mItmRedo.setDisable(true);
-	}
+	private void setupTopPanel() {
+		final Stage stage = view.getStage();
 
-	@Override
-	public void updateSelected(final GObject gObject) {
-		view.topPanel.mItmDelete.setDisable(false);
-		view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>() {
+		view.topPanel.mntmNeuesProjekt.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent actionEvent) {
-				// if (gObject instanceof GMenuBar){
-				// ((GMenuBar)gObject).clearTree();
-				// }
-				view.middleTabPane.viewPane.getChildren().remove(gObject);
-				selectionManager.clearSelection();
-				historyManager.addHistory(new HistoryItem() {
-					@Override
-					public void restore() {
+				blueJInterface2.erzeugeProjekt();
+			}
+		});
+		view.topPanel.mntmProjektffnen.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				blueJInterface2.oeffneProjekt();
+			}
+		});
+		view.topPanel.menuBluej.addEventHandler(Event.ANY, e -> {
+			if (e.getEventType().getName().equals("MENU_ON_SHOWN")) {
+				bjpitemFXMLExport = generateMenuItemsForOpenBluejProjects(view.topPanel.mnModellInProjekt);
+				bjpitemJAVAExport = generateMenuItemsForOpenBluejProjects(view.topPanel.mnClassInProjekt);
+				bjpitemFXMLImport = generateMenuItemsForOpenBluejProjects(view.topPanel.mnModellAusProjekt);
+			}
+		});
+		// File > Load File
+		view.topPanel.mItmLoadFile.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				FileChooser fileChooser = new FileChooser();
 
+				FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("FXML files (*.fxml)", "*.fxml");
+				fileChooser.getExtensionFilters().add(filter);
+				File file = fileChooser.showOpenDialog(view.getStage());
+				// Platform.runLater(()->{openFile(file);});
+				openFile(file);
+			}
+		});
+		// File > Save FXML File
+		view.topPanel.mItmSaveFXMLFile.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				saveFile();
+			}
+		});
+		// File > Save JAVA File
+		view.topPanel.mItmSaveJAVAFile.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				saveJAVAFile();
+			}
+
+		});
+		// File > Close
+		view.topPanel.mItmClose.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				stage.close();
+			}
+		});
+		// File > Make Full Screen
+		view.topPanel.mItmFullScreen.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				if (stage.isFullScreen()) {
+					stage.setFullScreen(false);
+					view.topPanel.mItmFullScreen.setText(LabelGrabber.getLabel("fullscreen.enable.text"));
+				} else {
+					stage.setFullScreen(true);
+					view.topPanel.mItmFullScreen.setText(LabelGrabber.getLabel("fullscreen.disable.text"));
+				}
+			}
+		});
+		// View > Errorlog
+		view.topPanel.mItmErrorlog.setOnAction(e -> showErrorlog(e));
+
+		// Add HistoryListener for the Undo/Redo menu items in the Edit menu
+		historyManager.addHistoryListener(new HistoryListener() {
+			@Override
+			public void historyUpdated(final HistoryUpdate historyUpdate) {
+				// Undo MenuItem
+				if (historyUpdate.canUndo()) {
+					view.topPanel.mItmUndo.setDisable(false);
+					view.topPanel.mItmUndo.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent actionEvent) {
+							historyManager.updateTo(historyUpdate.getCurrentIndex() - 1);
+						}
+					});
+				} else {
+					view.topPanel.mItmUndo.setDisable(true);
+				}
+
+				// Redo MenuItem
+				if (historyUpdate.canRedo()) {
+					view.topPanel.mItmRedo.setDisable(false);
+					view.topPanel.mItmRedo.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent actionEvent) {
+							historyManager.updateTo(historyUpdate.getCurrentIndex() + 1);
+						}
+					});
+				} else {
+					view.topPanel.mItmRedo.setDisable(true);
+				}
+			}
+		});
+
+		// Edit Menu > Delete button functionality
+		selectionManager.addSelectionListener(new SelectionListener() {
+			@Override
+			public void updateSelected(final GObject gObject) {
+				view.topPanel.mItmDelete.setDisable(false);
+				view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent actionEvent) {
+						// if (gObject instanceof GMenuBar){
+						// ((GMenuBar)gObject).clearTree();
+						// }
 						view.middleTabPane.viewPane.getChildren().remove(gObject);
 						selectionManager.clearSelection();
-					}
+						historyManager.addHistory(new HistoryItem() {
+							@Override
+							public void restore() {
 
-					@Override
-					public void revert() {
-						view.middleTabPane.viewPane.getChildren().add((Node) gObject);
-						selectionManager.updateSelected(gObject);
-					}
+								view.middleTabPane.viewPane.getChildren().remove(gObject);
+								selectionManager.clearSelection();
+							}
 
-					@Override
-					public String getAppearance() {
-						return gObject.getFieldName() + " deleted";
+							@Override
+							public void revert() {
+								view.middleTabPane.viewPane.getChildren().add((Node) gObject);
+								selectionManager.updateSelected(gObject);
+							}
+
+							@Override
+							public String getAppearance() {
+								return gObject.getFieldName() + " deleted";
+							}
+						});
 					}
 				});
-			}
-		});
-		view.topPanel.mItmClearAll.setDisable(false);
-		view.topPanel.mItmClearAll.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent actionEvent) {
-				final List<Node> list = new ArrayList<>();
-				list.addAll(view.middleTabPane.viewPane.getChildren());
-				// for (Node n : list) {
-				// if (n instanceof GMenuBar){
-				// ((GMenuBar)n).clearTree();
-				// }
-				// }
-				view.middleTabPane.viewPane.getChildren().clear();
-
-				selectionManager.clearSelection();
-
-				historyManager.addHistory(new HistoryItem() {
+				view.topPanel.mItmClearAll.setDisable(false);
+				view.topPanel.mItmClearAll.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
-					public void restore() {
-						for (Node n : list) {
-							view.middleTabPane.viewPane.getChildren().remove(n);
-						}
+					public void handle(ActionEvent actionEvent) {
+						final List<Node> list = new ArrayList<>();
+						list.addAll(view.middleTabPane.viewPane.getChildren());
+						// for (Node n : list) {
+						// if (n instanceof GMenuBar){
+						// ((GMenuBar)n).clearTree();
+						// }
+						// }
+						view.middleTabPane.viewPane.getChildren().clear();
+
 						selectionManager.clearSelection();
-					}
 
-					@Override
-					public void revert() {
-						for (Node n : list) {
-							view.middleTabPane.viewPane.getChildren().add(n);
-							selectionManager.updateSelected((GObject) n);
-						}
-					}
+						historyManager.addHistory(new HistoryItem() {
+							@Override
+							public void restore() {
+								for (Node n : list) {
+									view.middleTabPane.viewPane.getChildren().remove(n);
+								}
+								selectionManager.clearSelection();
+							}
 
-					@Override
-					public String getAppearance() {
-						return ("Clear All");
+							@Override
+							public void revert() {
+								for (Node n : list) {
+									view.middleTabPane.viewPane.getChildren().add(n);
+									selectionManager.updateSelected((GObject) n);
+								}
+							}
+
+							@Override
+							public String getAppearance() {
+								return ("Clear All");
+							}
+						});
 					}
 				});
 			}
-		});
-	}
 
-	@Override
+			@Override
 			public void clearSelection() {
 				view.topPanel.mItmDelete.setDisable(true);
-				view.topPanel.mItmClearAll.setDisable(true);
+//				view.topPanel.mItmClearAll.setDisable(true);
 			}
 		});
 		view.topPanel.mItmLanguage.setOnAction(e -> LanguageChooser.getLanguageByDialog());
@@ -498,7 +602,12 @@ public class Controller {
 						.getSelectedItem();
 				if (item != null) {
 					selectionManager.updateSelected(item.getValue().getGObject());
+					selectionManager.updateSelected(item.getValue().getGObject());
+					// view.leftPanel.hierarchyPane.treeView.requestFocus();
+					// popupTree.getSelectionModel().select(5);
+					// popupTree.getFocusModel().focus(5);
 				}
+
 			}
 		});
 
@@ -548,11 +657,9 @@ public class Controller {
 				Rectangle outline = view.middleTabPane.outline;
 
 				outline.setVisible(true);
-
 				if (anfasser != null) {
 					anfasser.setNode((Node) gObject, (Pane) node.getParent());
 				}
-
 				double nodeX = 0;
 				double nodeY = 0;
 				Node node2 = node;
@@ -720,14 +827,6 @@ public class Controller {
 		});
 	}
 
-	// public int getRasterPosX(int pos) {
-	// return rasterx == 0 ? pos : pos - pos % rasterx;
-	// }
-	//
-	// public int getRasterPosY(int pos) {
-	// return rastery == 0 ? pos : pos - pos % rastery;
-	// }
-
 	private void setupRightPanel() {
 
 		// Add selection handlers for the Property Edit Pane
@@ -788,21 +887,6 @@ public class Controller {
 	}
 
 	/**
-	 * Adds a HistoryListener and saves whenever a change is made. Only
-	 * effective when running with BlueJ.
-	 */
-	private void setupAutoSave() {
-		// if (blueJInterface2 != null) {
-		// historyManager.addHistoryListener(new HistoryListener() {
-		// @Override
-		// public void historyUpdated(HistoryUpdate historyUpdate) {
-		// saveFile();
-		// }
-		// });
-		// }
-	}
-
-	/**
 	 * Open the specified FXML file.
 	 * 
 	 * @param file
@@ -815,6 +899,7 @@ public class Controller {
 			view.middleTabPane.viewPane.getChildren().clear();
 
 			selectionManager.clearSelection();
+//			selectionManager.setEnabled(false);
 			historyManager.clearHistory();
 
 			try {
@@ -839,6 +924,8 @@ public class Controller {
 										+ ".G" + componentSettings.getType());
 								Constructor constructor = componentClass.getConstructor();
 								GObject newThing = (GObject) constructor.newInstance();
+								// System.out.println("NewThing "
+								// +newThing.getClass());
 								newThing.setFieldName(node.getId());
 
 								addGObjectRec(newThing, componentSettings, view, viewListeners, node,
@@ -857,9 +944,31 @@ public class Controller {
 				e.printStackTrace();
 			}
 		}
-
+//		selectionManager.setEnabled(true);
+		Platform.runLater(() -> {
+			visitTree(view.middleTabPane.viewPane);
+		});// otherwise to early for mover
 		isOpeningFile = false;
-		ausgabe(parent);
+		// ausgabe(parent);
+	}
+
+	private void visitTree(Pane parent) {
+		if (parent == null) {
+			return;
+		}
+
+		for (Node node : parent.getChildren()) {
+			node.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+				@Override
+				public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
+					selectionManager.updateSelected((GObject) node);
+				}
+			});
+			if (node instanceof Pane) {
+				visitTree((Pane) node);
+			}
+		}
+
 	}
 
 	private void ausgabe(Parent parent) {
@@ -926,17 +1035,9 @@ public class Controller {
 			if (!file.getName().toLowerCase().endsWith(".fxml")) {
 				file = new File(file.getAbsoluteFile() + ".fxml");
 			}
-
 			try {
 				FileWriter fileWriter = new FileWriter(file);
-				fileWriter.write(CodeGenerator.generateFXMLCode(view.middleTabPane.viewPane, null));// We
-																									// don't
-																									// need
-																									// the
-																									// imports,
-																									// for
-																									// the
-																									// minute...
+				fileWriter.write(CodeGenerator.generateFXMLCode(view.middleTabPane.viewPane, this));
 				fileWriter.close();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -969,7 +1070,7 @@ public class Controller {
 
 			try {
 				FileWriter fileWriter = new FileWriter(file);
-				fileWriter.write(CodeGenerator.generateFXMLCode(view.middleTabPane.viewPane, null));
+				fileWriter.write(CodeGenerator.generateFXMLCode(view.middleTabPane.viewPane,this));
 				fileWriter.close();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1033,6 +1134,9 @@ public class Controller {
 		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, forPreview);
 	}
 
+
+	
+	
 	public String generateJavaCode(String className) {
 		HashMap<String, String> imports = new HashMap<>();
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
@@ -1050,6 +1154,17 @@ public class Controller {
 		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, false);
 	}
 
+	
+
+	public  HashMap<String, String> getFXMLImports() {
+		HashMap<String, String> allImports = new HashMap<>();
+		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
+			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
+			allImports.put(componentSettings.getType(), componentSettings.getPackageName());			
+		}
+		return allImports;
+	}
+	
 	// x and y are initial layout positions. To be used only with drag and drop.
 	private void addGObject(final GObject newThing, ComponentSettings componentSettings, final View view,
 			final ViewListeners viewListeners, Node settingsNode, int x, int y, final Pane destination) {
@@ -1247,12 +1362,14 @@ public class Controller {
 
 		Node newNode = (Node) newThing;
 		destination.getChildren().add(newNode);
-		newNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
-			@Override
-			public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
-				selectionManager.updateSelected((GObject) newNode);
-			}
-		});
+
+//		Must run later
+//		newNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+//			@Override
+//			public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
+//				selectionManager.updateSelected((GObject) newNode);
+//			}
+//		});
 
 		newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -1370,15 +1487,6 @@ public class Controller {
 			}
 		});
 
-		/*
-		 * if (settingsNode == null) { if (newNode instanceof Circle) {
-		 * newNode.setLayoutX((newNode.getLayoutBounds().getWidth() / 2) + 4);
-		 * newNode.setLayoutY((newNode.getLayoutBounds().getWidth() / 2) + 4); }
-		 * else { newNode.setLayoutX(newNode.getLayoutX() + 4);
-		 * newNode.setLayoutY(newNode.getLayoutY() + 4); } }
-		 * 
-		 * if (x > 0 && y > 0) { newNode.setLayoutX(x); newNode.setLayoutY(y); }
-		 */
 		// Finally, let the history manager know this new thing has happened.
 		historyManager.addHistory(new HistoryItem() {
 			@Override
@@ -1434,6 +1542,9 @@ public class Controller {
 	}
 
 	private void dealWithPane(final Pane newThing) {
+		if (!(newThing instanceof AnchorPane)){
+			return;
+		}
 		// System.out.println("dealWithPane");
 		newThing.setOnDragOver(new EventHandler<DragEvent>() {
 			@Override
