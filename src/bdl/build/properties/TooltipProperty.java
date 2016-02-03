@@ -4,6 +4,7 @@ import bdl.build.GObject;
 import bdl.model.history.HistoryManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -32,6 +33,24 @@ public class TooltipProperty implements PanelProperty {
         }
 
         textField.setText(defaultValue);
+        textField.setOnAction(e -> {
+			ObservableList<Node> children = textField.getParent().getChildrenUnmodifiable();
+			int ci = children.indexOf(textField);
+			int maxi = children.size()-1;
+			int i = ci + 1;
+			while (i != ci) {
+				if (i<=maxi) {
+					if (children.get(i).isFocusTraversable()) {
+						children.get(i).requestFocus();
+						return;
+					} else {
+						i++;
+					}
+				} else {
+					i=0;
+				}
+			}
+		});
 
         control = (Control) gObj;
 

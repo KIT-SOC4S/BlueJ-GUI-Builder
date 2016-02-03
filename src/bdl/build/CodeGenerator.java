@@ -31,16 +31,29 @@ public class CodeGenerator {
 																											// tag
 
 		// Add declarations
+		/*
 		for (Node node : guiObject.getChildren()) {
 			if (node instanceof GObject) {
 				declaration(node, code);
+				
+			}
+		}
+		*/
+		for (Node node : guiObject.getChildren()) {
+			if (node instanceof GObject) {
+				declarationOnly(node, code);				
 			}
 		}
 		code.append('\n');
-
+		
 		// Add properties
 		code.append("    private Parent getRoot() {\n");
 		code.append("        AnchorPane root = new AnchorPane();\n");
+		for (Node node : guiObject.getChildren()) {
+			if (node instanceof GObject) {
+				construction(node, code);				
+			}
+		}
 		code.append("        root.getChildren().addAll(");
 		String prefix = "";
 		for (Node node : guiObject.getChildren()) {
@@ -231,6 +244,7 @@ public class CodeGenerator {
 		return importsString.toString();
 	}
 */
+	/*
 	private static void declaration(Node node, StringBuilder code) {
 
 		GObject gObj = (GObject) node;
@@ -252,7 +266,46 @@ public class CodeGenerator {
 			}
 		}
 	}
+	*/
+	private static void declarationOnly(Node node, StringBuilder code) {
 
+		GObject gObj = (GObject) node;
+		String nodeType = node.getClass().getSimpleName().substring(1);
+		if (!(node instanceof GMenuBar)) {
+			code.append("    private ").append(nodeType).append(" ").append(gObj.getFieldName()).append(";\n");
+		}
+		if (node instanceof Pane) {
+			for (Node node2 : ((Pane) node).getChildren()) {
+				declarationOnly(node2, code);
+			}
+		}
+		if (node instanceof GMenuBar) {
+			MenuBuilder mb = ((GMenuBar) node).getMenuBuilder();
+			if (mb != null) {
+				code.append("    ").append(mb.getJAVADeclarationOnly().replace("\n", "\n    ")).append("\n");
+
+			}
+		}
+	}
+	private static void construction(Node node, StringBuilder code) {
+		GObject gObj = (GObject) node;
+		String nodeType = node.getClass().getSimpleName().substring(1);
+		if (!(node instanceof GMenuBar)) {
+			code.append("        "+gObj.getFieldName()).append(" = new ").append(nodeType).append("();\n");
+		}
+		if (node instanceof Pane) {
+			for (Node node2 : ((Pane) node).getChildren()) {
+				construction(node2, code);
+			}
+		}
+		if (node instanceof GMenuBar) {
+			MenuBuilder mb = ((GMenuBar) node).getMenuBuilder();
+			if (mb != null) {
+				code.append("        ").append(mb.getJAVAConstruction().replace("\n","\n        ")).append("\n");
+			}
+		}
+	}
+	
 	private static void properties(String prefix, Node node, StringBuilder code) {
 		GObject gObj = (GObject) node;
 		code.append(prefix);

@@ -26,6 +26,19 @@ public class Bezeichnertester {
 		"Zahl","Zeichenkette","Zeichen","Wahrheitswert"
 		};
 	
+
+	public static boolean variablenBezeichnerOK(String neu) {
+		if (neu == null || neu.equals("") || istJAVAKeywortInclDatentypen(neu,false)){
+			return false;
+		}
+		for (int i = 0; i < neu.length(); i++) {
+			if (!erlaubtesZeichen(neu.charAt(i), i)) {
+				return false;
+			}
+		}		
+		return true;
+	}
+	
 	public static boolean bezeichnerOK(String neu) {
 		if (neu == null || neu.equals("") || istJAVAKeywort(neu)){
 			return false;

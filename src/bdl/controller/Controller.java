@@ -293,7 +293,7 @@ public class Controller {
 					return;
 				}
 
-				if (!Bezeichnertester.bezeichnerOK(result.get())) {
+				if (!Bezeichnertester.variablenBezeichnerOK(result.get())) {
 					Alert alert = new Alert(AlertType.INFORMATION);
 					alert.setTitle(LabelGrabber.getLabel("bluejlink.dialog.infoheader"));
 					alert.setHeaderText(null);

@@ -5,6 +5,7 @@ import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -49,7 +50,42 @@ public class LayoutProperty implements PanelProperty {
 
         layoutX.setText(format.format(node.getLayoutX()));
         layoutY.setText(format.format(node.getLayoutY()));
-
+        layoutX.setOnAction(e -> {
+			ObservableList<Node> children = layoutX.getParent().getChildrenUnmodifiable();
+			int ci = children.indexOf(layoutX);
+			int maxi = children.size()-1;
+			int i = ci + 1;
+			while (i != ci) {
+				if (i<=maxi) {
+					if (children.get(i).isFocusTraversable()) {
+						children.get(i).requestFocus();
+						return;
+					} else {
+						i++;
+					}
+				} else {
+					i=0;
+				}
+			}
+		});
+        layoutY.setOnAction(e -> {
+			ObservableList<Node> children = layoutY.getParent().getChildrenUnmodifiable();
+			int ci = children.indexOf(layoutY);
+			int maxi = children.size()-1;
+			int i = ci + 1;
+			while (i != ci) {
+				if (i<=maxi) {
+					if (children.get(i).isFocusTraversable()) {
+						children.get(i).requestFocus();
+						return;
+					} else {
+						i++;
+					}
+				} else {
+					i=0;
+				}
+			}
+		});
         gp.add(layoutX, 1, row1);
         gp.add(layoutY, 1, row2);
 
@@ -170,4 +206,13 @@ public class LayoutProperty implements PanelProperty {
             }
         });
     }
+    
+    private boolean istZahl(String s) {
+		try {
+			Double.valueOf(s).doubleValue();
+			return true;
+		} catch (Exception nfe) {
+			return false;
+		}
+	}
 }

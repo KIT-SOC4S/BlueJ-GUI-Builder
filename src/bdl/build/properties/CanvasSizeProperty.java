@@ -10,6 +10,7 @@ import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -59,7 +60,44 @@ public class CanvasSizeProperty implements PanelProperty {
 
         width.setText(format.format(node.getWidth()));
         height.setText(format.format(node.getHeight()));
-
+        width.setOnAction(e -> {
+			ObservableList<Node> children = width.getParent().getChildrenUnmodifiable();
+			int ci = children.indexOf(width);
+			int maxi = children.size()-1;
+			int i = ci + 1;
+			while (i != ci) {
+				if (i<=maxi) {
+				
+					if (children.get(i).isFocusTraversable()) {
+						children.get(i).requestFocus();
+						return;
+					} else {
+						i++;
+					}
+				} else {
+					i=0;
+				}
+			}
+		});
+        height.setOnAction(e -> {
+			ObservableList<Node> children = height.getParent().getChildrenUnmodifiable();
+			int ci = children.indexOf(height);
+			
+			int maxi = children.size()-1;
+			int i = ci + 1;
+			while (i != ci) {
+				if (i<=maxi) {
+					if (children.get(i).isFocusTraversable()) {
+						children.get(i).requestFocus();
+						return;
+					} else {
+						i++;
+					}
+				} else {
+					i=0;
+				}
+			}
+		});
         gp.add(width, 1, row1);
         gp.add(height, 1, row2);
 
@@ -148,6 +186,24 @@ public class CanvasSizeProperty implements PanelProperty {
                 }
             }
         });
+        height.textProperty().addListener(new ChangeListener<String>() {
+	        @Override
+	        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	        	if (!(istZahl(newValue)||newValue.equals(""))){
+	        		height.setText(oldValue);
+	        	}
+	           
+	        }
+	    });
+        width.textProperty().addListener(new ChangeListener<String>() {
+	        @Override
+	        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	        	if (!(istZahl(newValue)||newValue.equals(""))){
+	        		width.setText(oldValue);
+	        	}
+	           
+	        }
+	    });
     }
 
     @Override
@@ -181,4 +237,12 @@ public class CanvasSizeProperty implements PanelProperty {
             }
         });
     }
+    private boolean istZahl(String s) {
+		try {
+			Double.valueOf(s).doubleValue();
+			return true;
+		} catch (Exception nfe) {
+			return false;
+		}
+	}
 }

@@ -36,7 +36,8 @@ public class ListenerEnabledProperty implements PanelProperty {
         } 
         setToImplement(checkBox.isSelected());
         checkBox.setOnAction(e->handleCheckboxevent(e));
-        gp.add(checkBox, 1, row);       
+        gp.add(checkBox, 1, row);      
+        
     }
 
     private void handleCheckboxevent(ActionEvent e) {

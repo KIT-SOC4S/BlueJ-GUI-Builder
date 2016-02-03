@@ -5,6 +5,7 @@ import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -48,6 +49,24 @@ public class StrokeProperty implements PanelProperty {
 
         colorPicker.setValue(defaultStrokeColor);
         textField.setText("" + defaultStrokeWidth);
+        textField.setOnAction(e -> {
+			ObservableList<Node> children = textField.getParent().getChildrenUnmodifiable();
+			int ci = children.indexOf(textField);
+			int maxi = children.size()-1;
+			int i = ci + 1;
+			while (i != ci) {
+				if (i<=maxi) {
+					if (children.get(i).isFocusTraversable()) {
+						children.get(i).requestFocus();
+						return;
+					} else {
+						i++;
+					}
+				} else {
+					i=0;
+				}
+			}
+		});
 
         setColor();
         setWidth();
@@ -137,6 +156,15 @@ public class StrokeProperty implements PanelProperty {
             //double value didn't parse
             textField.setText("" + node.getStrokeWidth());
         }
+        textField.textProperty().addListener(new ChangeListener<String>() {
+	        @Override
+	        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	        	if (!(istZahl(newValue)||newValue.equals(""))){
+	        		textField.setText(oldValue);
+	        	}
+	           
+	        }
+	    });
     }
 
 
@@ -158,4 +186,12 @@ public class StrokeProperty implements PanelProperty {
             return "";
         }
     }
+    private boolean istZahl(String s) {
+		try {
+			Double.valueOf(s).doubleValue();
+			return true;
+		} catch (Exception nfe) {
+			return false;
+		}
+	}
 }

@@ -21,7 +21,8 @@ public class ListenerHintProperty implements PanelProperty {
         button.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent t) {
-                new ListenerHintWindow(guiObject.getNodeClassName() + '.' + gObj.getFieldName() + text);
+               // new ListenerHintWindow(guiObject.getNodeClassName() + '.' + gObj.getFieldName() + text);
+            	new ListenerHintWindow( gObj.getFieldName() + text);
             }
         });
     }

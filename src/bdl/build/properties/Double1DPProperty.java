@@ -5,6 +5,7 @@ import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -57,7 +58,25 @@ public class Double1DPProperty implements PanelProperty {
         
         
         textField.setText(format.format(Double.parseDouble(defaultValue))); //TODO - Handle bad defaultValue values
-
+        textField.setOnAction(e -> {
+			ObservableList<Node> children = textField.getParent().getChildrenUnmodifiable();
+			int ci = children.indexOf(textField);
+			int maxi = children.size()-1;
+			int i = ci + 1;
+			while (i != ci) {
+				if (i<=maxi) {
+					if (children.get(i).isFocusTraversable()) {
+						children.get(i).requestFocus();
+						return;
+					} else {
+						i++;
+					}
+				} else {
+					i=0;
+				}
+			}
+		});
+        
         setValue();
 
         gp.add(textField, 1, row);
@@ -80,6 +99,16 @@ public class Double1DPProperty implements PanelProperty {
                 }
             }
         });
+        textField.textProperty().addListener(new ChangeListener<String>() {
+	        @Override
+	        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+	        	if (!(istZahl(newValue)||newValue.equals("")||newValue.equals("-"))){
+	        		textField.setText(oldValue);
+	        	}
+	           
+	        }
+	    });
+   
     }
 
     private void setValue() {
@@ -151,4 +180,12 @@ public class Double1DPProperty implements PanelProperty {
     	}
         return fxml + "=\"" + textField.getText() + "\"";
     }
+    private boolean istZahl(String s) {
+		try {
+			Double.valueOf(s).doubleValue();
+			return true;
+		} catch (Exception nfe) {
+			return false;
+		}
+	}
 }
