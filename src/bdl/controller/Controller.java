@@ -241,7 +241,6 @@ public class Controller {
 			alert.setHeaderText(null);
 			alert.setContentText(LabelGrabber.getLabel("bluejlink.error.attach"));
 			alert.showAndWait();
-
 			return;
 
 		}
@@ -336,7 +335,6 @@ public class Controller {
 			@Override
 			public void handle(ActionEvent actionEvent) {
 				FileChooser fileChooser = new FileChooser();
-
 				FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("FXML files (*.fxml)", "*.fxml");
 				fileChooser.getExtensionFilters().add(filter);
 				File file = fileChooser.showOpenDialog(view.getStage());
@@ -380,7 +378,7 @@ public class Controller {
 			}
 		});
 		// View > Errorlog
-		view.topPanel.mItmErrorlog.setOnAction(e -> showErrorlog(e));
+		view.topPanel.mItmErrorlog.setOnAction(e -> showErrorlog());
 
 		// Add HistoryListener for the Undo/Redo menu items in the Edit menu
 		historyManager.addHistoryListener(new HistoryListener() {
@@ -538,7 +536,7 @@ public class Controller {
 
 	}
 
-	private void showErrorlog(ActionEvent e) {
+	private void showErrorlog() {
 		if (errorlog != null) {
 			errorlog.show();
 		}
@@ -1136,7 +1134,7 @@ public class Controller {
 
 
 	
-	
+	/** Generates the full Java code */
 	public String generateJavaCode(String className) {
 		HashMap<String, String> imports = new HashMap<>();
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {

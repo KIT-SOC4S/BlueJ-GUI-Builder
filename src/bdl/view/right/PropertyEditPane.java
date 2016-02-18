@@ -7,7 +7,6 @@ import java.util.List;
 import bdl.build.GObject;
 import bdl.build.GUIObject;
 import bdl.build.javafx.scene.control.GMenuBar;
-import bdl.build.properties.CanvasSizeProperty;
 import bdl.build.properties.FieldName;
 import bdl.build.properties.GUISizeProperty;
 import bdl.build.properties.LayoutProperty;
@@ -78,8 +77,12 @@ public class PropertyEditPane extends GridPane {
 				PanelProperty panelProperty = (PanelProperty) constructor.newInstance(gObj, property.getName(),property.getObservedProperty(),
 						property.getGetter(), property.getSetter(), property.getFxml(), property.getDefaultValue(),
 						this, currentRow++, settingsNode, historyManager);
-				if (panelProperty instanceof LayoutProperty || panelProperty instanceof StrokeProperty
-						|| panelProperty instanceof CanvasSizeProperty) {
+				if (!property.isGenerateJavaCode()){
+					panelProperty.disableJavaCodeGeneration();
+				}
+				if (panelProperty instanceof LayoutProperty || panelProperty instanceof StrokeProperty						
+						//|| panelProperty instanceof CanvasSizeProperty
+						) {
 					currentRow++;
 				}
 				panelPropertyList.add(panelProperty);

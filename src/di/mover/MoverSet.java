@@ -3,10 +3,10 @@
  */
 package di.mover;
 
-import bdl.build.GUIObject;
 import bdl.view.left.RasterPane;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.SubScene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -146,6 +146,10 @@ public class MoverSet {
 				Canvas canvas = (Canvas) selectedComponent;
 				canvas.setWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));
 				canvas.setHeight(RasterPane.getRasterPosY(ruy) - RasterPane.getRasterPosY(py));
+			} else if (selectedComponent instanceof SubScene) {
+				SubScene subscene = (SubScene) selectedComponent;
+				subscene.setWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));
+				subscene.setHeight(RasterPane.getRasterPosY(ruy) - RasterPane.getRasterPosY(py));
 			}
 		}
 		altx = neux;

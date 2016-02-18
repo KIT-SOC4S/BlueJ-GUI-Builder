@@ -30,7 +30,9 @@ public class CanvasSizeProperty implements PanelProperty {
     private HistoryManager historyManager;
 
     public CanvasSizeProperty(final GObject gnObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
-       // this.node = (Node) gObj;
+       System.out.println("CanvasSizeProperty created" );
+    	
+    	// this.node = (Node) gObj;
     	if (!(gnObj instanceof GCanvas)){
     		return;
     	}

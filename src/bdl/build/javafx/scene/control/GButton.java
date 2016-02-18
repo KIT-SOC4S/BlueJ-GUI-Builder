@@ -26,8 +26,7 @@ public class GButton extends Button implements GObject {
 
     @Override
     public void setFieldName(String fieldName) {
-//    	setStyle("-fx-text-fill: red");
-    	
+   	     setStyle("-fx-text-fill: red");    	
         fieldNameProperty.setValue(fieldName);
     }
 

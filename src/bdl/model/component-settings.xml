@@ -79,6 +79,7 @@
 		<listeners>
 		</listeners>
 	</component>
+	
 	<component>
 		<type>Canvas</type>
 		<enabled>true</enabled>
@@ -1183,6 +1184,76 @@
 			</property>
 		</properties>
 		<listeners>
+		</listeners>
+	</component>
+	<component>
+		<type>SubScene</type>
+		<enabled>true</enabled>
+		<package>javafx.scene</package>
+		<layouttype>ControlLayout</layouttype>
+		<icon>Canvas.png</icon>
+		<properties>
+			<property>
+				<name>Layout</name>
+				<enabled>true</enabled>
+				<pseudotype>Layout</pseudotype>
+				<default></default>
+				<setter></setter>
+				<getter></getter>
+				<fxml></fxml>
+			</property>
+			<property>
+				<name>Width</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>widthProperty</observedProperty>
+				<default>100</default>
+				<setter>setWidth</setter>
+				<getter>getWidth</getter>
+				<fxml>width</fxml>
+				<javaCodeGeneration>false</javaCodeGeneration>
+			</property>
+			<property>
+				<name>Height</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>heightProperty</observedProperty>
+				<default>100</default>
+				<setter>setHeight</setter>
+				<getter>getHeight</getter>
+				<fxml>height</fxml>
+				<javaCodeGeneration>false</javaCodeGeneration>
+			</property>
+		</properties>
+		<listeners>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onMousePressed</name>
+				<method>setOnMousePressed</method>
+				<event>MouseEvent</event>
+			</listener>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onMouseDragged</name>
+				<method>setOnMouseDragged</method>
+				<event>MouseEvent</event>
+			</listener>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onMouseMoved</name>
+				<method>setOnMouseMoved</method>
+				<event>MouseEvent</event>
+			</listener>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onMouseReleased</name>
+				<method>setOnMouseReleased</method>
+				<event>MouseEvent</event>
+			</listener>
 		</listeners>
 	</component>
 	<component>

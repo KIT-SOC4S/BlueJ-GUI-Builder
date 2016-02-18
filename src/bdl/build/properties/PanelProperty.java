@@ -10,5 +10,11 @@ public interface PanelProperty {
     public default String getPackageName(){
     	return "";
     }
+    
+    public default void disableJavaCodeGeneration(){
+    	
+    }
+    
+    
 
 }

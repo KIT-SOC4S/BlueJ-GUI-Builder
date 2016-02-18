@@ -161,6 +161,9 @@ public class Double1DPProperty implements PanelProperty {
 
     @Override
     public String getJavaCode() {
+    	if (!generateJavaCode){
+    		return "";
+    	}
     	if (setter.toLowerCase().contains("height")||setter.toLowerCase().contains("width")){
     		double wert = Double.parseDouble(textField.getText());
     		if (wert <=0 && wert >=-2){
@@ -188,4 +191,9 @@ public class Double1DPProperty implements PanelProperty {
 			return false;
 		}
 	}
+    boolean generateJavaCode = true;
+    @Override
+    public void disableJavaCodeGeneration(){
+    	generateJavaCode=false;
+    }
 }

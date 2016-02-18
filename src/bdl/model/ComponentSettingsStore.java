@@ -123,11 +123,11 @@ public class ComponentSettingsStore {
             String getter = property.getElementsByTagName("getter").item(0).getTextContent();
             String setter = property.getElementsByTagName("setter").item(0).getTextContent();
             String fxml = property.getElementsByTagName("fxml").item(0).getTextContent();
-            NodeList observedPropertyNL = property.getElementsByTagName("observedProperty");
-            
+            NodeList observedPropertyNL = property.getElementsByTagName("observedProperty");            
             String observedProperty = observedPropertyNL.getLength()>0?observedPropertyNL.item(0).getTextContent():"";
-
-            componentSettings.addProperty(name, type, enabled, defaultValue,observedProperty, getter, setter, fxml);
+            NodeList javaCodeGenerationNL = property.getElementsByTagName("javaCodeGeneration");
+            String javaCodeGeneration = javaCodeGenerationNL.getLength()>0?javaCodeGenerationNL.item(0).getTextContent():"";
+            componentSettings.addProperty(name, type, enabled, defaultValue,observedProperty, getter, setter, fxml, javaCodeGeneration);
         }
     }
     

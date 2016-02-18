@@ -91,9 +91,10 @@ public class ComponentSettings {
      * @param defaultValue
      * @param getter
      * @param setter
+     * @param javaCodeGeneration 
      */
-    public void addProperty(String name, String enabled, String type, String defaultValue, String observedProperty, String getter, String setter, String fxml) {
-        properties.add(new Property(name, enabled, type, defaultValue, observedProperty,getter, setter, fxml));
+    public void addProperty(String name, String enabled, String type, String defaultValue, String observedProperty, String getter, String setter, String fxml, String javaCodeGeneration) {
+        properties.add(new Property(name, enabled, type, defaultValue, observedProperty,getter, setter, fxml, javaCodeGeneration));
     }
 
     public void addListenerHint(String name, String method, String event,String defaultValue, String packageName,String listenerType) {
