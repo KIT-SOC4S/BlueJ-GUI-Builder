@@ -28,7 +28,7 @@ public class MiddlePanel extends TabPane {
     private StackPane blankPane;
 
     public Rectangle outline;
-    public Rectangle anfasser;
+//    public Rectangle anfasser;
     public Rectangle highlight;
 
     public MiddlePanel() {

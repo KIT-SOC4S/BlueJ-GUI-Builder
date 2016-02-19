@@ -8,6 +8,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.SubScene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -132,7 +133,11 @@ public class MoverSet {
 		if (wx > 0 && wy > 0) {
 			selectedComponent.setLayoutX(RasterPane.getRasterPosX(px));
 			selectedComponent.setLayoutY(RasterPane.getRasterPosY(py));
-			if (selectedComponent instanceof Region) {
+			if (selectedComponent instanceof AnchorPane) {
+				Region region = (Region) selectedComponent;
+				region.setPrefWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));
+				region.setPrefHeight(RasterPane.getRasterPosY(ruy) - RasterPane.getRasterPosY(py));
+			} else 	if (selectedComponent instanceof Region) {
 				Region region = (Region) selectedComponent;
 				region.setMinWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));
 				region.setMaxWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));
@@ -211,7 +216,7 @@ public class MoverSet {
 		return mover[0].isVisible();
 	}
 
-	private void update() {
+	public void update() {
 
 		try {
 			if (selectedComponent != null) {
@@ -258,9 +263,11 @@ public class MoverSet {
 	}
 
 	public void setNode(Node gObject, Pane parent) {
+		
 
 		if (gObject instanceof Circle) {
 			setVisible(false);
+			this.selectedComponent=null;
 			return;
 		}
 
@@ -275,5 +282,10 @@ public class MoverSet {
 		update();
 		setVisible(true);
 	}
+	
+	public Node getNode(){
+		return this.selectedComponent;
+	}
+	
 
 }

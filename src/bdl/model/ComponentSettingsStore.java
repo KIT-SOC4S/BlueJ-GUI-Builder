@@ -102,20 +102,16 @@ public class ComponentSettingsStore {
         componentSettings.setIcon(element.getElementsByTagName("icon").item(0).getTextContent());
 
         Element propertiesElement = (Element)element.getElementsByTagName("properties").item(0);
-        parseProperties(componentSettings, propertiesElement);
-        
+        parseProperties(componentSettings, propertiesElement);        
         Element listenerElement = (Element)element.getElementsByTagName("listeners").item(0);
         parseListeners(componentSettings, listenerElement);
-
         return true;
     }
 
     private void parseProperties(ComponentSettings componentSettings, Element propertiesElement) {
         NodeList properties = propertiesElement.getElementsByTagName("property");
-
         for (int i = 0; i < properties.getLength(); i++) {
-            Element property = (Element)properties.item(i);
-          
+            Element property = (Element)properties.item(i);          
             String name = property.getElementsByTagName("name").item(0).getTextContent();
             String type = property.getElementsByTagName("enabled").item(0).getTextContent();
             String enabled = property.getElementsByTagName("pseudotype").item(0).getTextContent();

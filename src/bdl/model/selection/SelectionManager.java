@@ -29,10 +29,12 @@ public class SelectionManager {
 
     public void updateSelected(GObject gObject) {
     	if (!enabled){return;}
+    	
         for (SelectionListener selectionListener : selectionListeners) {
             selectionListener.updateSelected(gObject);
         }
         currentlySelected = gObject;
+    	
         
     }
 

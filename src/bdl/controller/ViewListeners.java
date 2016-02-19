@@ -76,7 +76,7 @@ public class ViewListeners {
 				&& mouseEvent.isAltDown()) {
 			if (node instanceof Canvas) {
 				Canvas c = (Canvas) node;
-				System.out.println("breite" + breite);
+//				System.out.println("breite" + breite);
 				breite = breite + mouseEvent.getX() - curX;
 				hoehe = hoehe + mouseEvent.getY() - curY;
 //

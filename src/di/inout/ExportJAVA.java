@@ -48,12 +48,12 @@ public class ExportJAVA {
 				alert.showAndWait();
 			} else {
 				inputOK = true;
-				controller.generateJavaCode(classname);
+				controller.generateJavaCode(classname,false);
 			}
 		}
 		
 		
-		new Dateipfade().erzeugeKlassendatei(basisDirectory.getAbsolutePath(), "", classname, controller.generateJavaCode(classname), true);
+		new Dateipfade().erzeugeKlassendatei(basisDirectory.getAbsolutePath(), "", classname, controller.generateJavaCode(classname,false), true);
 		
 		
 	}

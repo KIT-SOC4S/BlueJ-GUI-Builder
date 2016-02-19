@@ -56,24 +56,24 @@
 				<fxml></fxml>
 			</property>
 			<property>
-				<name>MinWidth</name>
+				<name>PrefWidth</name>
 				<enabled>true</enabled>
 				<pseudotype>DoubleObserved</pseudotype>
-				<observedProperty>minWidthProperty</observedProperty>
+				<observedProperty>prefWidthProperty</observedProperty>
 				<default>100</default>
-				<setter>setMinWidth</setter>
-				<getter>getMinWidth</getter>
-				<fxml>minWidth</fxml>
+				<setter>setPrefWidth</setter>
+				<getter>getPrefWidth</getter>
+				<fxml>prefWidth</fxml>
 			</property>
 			<property>
-				<name>MinHeight</name>
+				<name>PrefHeight</name>
 				<enabled>true</enabled>
 				<pseudotype>DoubleObserved</pseudotype>
-				<observedProperty>minHeightProperty</observedProperty>
+				<observedProperty>prefHeightProperty</observedProperty>
 				<default>100</default>
-				<setter>setMinHeight</setter>
-				<getter>getMinHeight</getter>
-				<fxml>minHeight</fxml>
+				<setter>setPrefHeight</setter>
+				<getter>getPrefHeight</getter>
+				<fxml>prefHeight</fxml>
 			</property>
 		</properties>
 		<listeners>
