@@ -33,6 +33,7 @@ public class FieldName {
 			HistoryManager hm) {
 		gp.add(new Label(LabelGrabber.getLabel("field.name.text") + ":"), 0, row);
 		// textField = new FieldNameTextField();
+		
 		textField = new TextField();
 		this.fieldNames = fieldNames;
 		this.historyManager = hm;

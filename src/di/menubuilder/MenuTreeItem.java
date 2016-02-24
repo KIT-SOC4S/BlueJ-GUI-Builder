@@ -1,24 +1,21 @@
 package di.menubuilder;
 
-import bdl.build.GObject;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import bdl.controller.Controller;
 
 public class MenuTreeItem {
 	static int minr = 0;
-	static int munr = 0;
 	MenuThing menuThing;
 
-	public MenuTreeItem(final MenuThing menuThing) {
+	public MenuTreeItem( MenuThing menuThing) {
 		this.menuThing = menuThing;
-		if (menuThing.getTyp().equals("MenuBar")) {
-			menuThing.setFieldName("menuBar");
-		} else if (menuThing.getTyp().equals("Menu")) {
-			menuThing.setFieldName("menu" + (munr++));
-		} else if (menuThing.getTyp().equals("MenuItem")) {
-			menuThing.setFieldName("menuItem" + (minr++));
+		String name = menuThing.getTyp().substring(0, 1).toLowerCase() + menuThing.getTyp().substring(1);
+		int count = 1;
+		while (Controller.getFieldNames().contains(name + count)) {
+			count++;
 		}
+		Controller.getFieldNames().add(name+count);
+		this.menuThing.setFieldName(name+count);
+	
 	}
 
 	public MenuThing getMenuThing	() {
@@ -31,7 +28,7 @@ public class MenuTreeItem {
 			return "null#null";
 		}
 		if (menuThing.getFieldName() == null || menuThing.getFieldName().equals("")) {
-			menuThing.setFieldName("menufoo" + (minr++));
+			menuThing.setFieldName("menufoo" + (minr++));//should not happen
 		}
 		if (menuThing.getTyp().equals("MenuBar")){
 			return menuThing.getTyp()+ '#' + menuThing.getFieldName();

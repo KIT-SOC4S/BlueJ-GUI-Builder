@@ -1,6 +1,5 @@
 package bdl.build.javafx.scene;
 
-import java.util.HashSet;
 import java.util.List;
 
 import bdl.build.GObject;
@@ -11,7 +10,6 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.Group;
 import javafx.scene.SubScene;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Box;
 
 public class GSubScene extends SubScene implements GObject {
 	private List<PanelProperty> properties;
@@ -71,7 +69,7 @@ public class GSubScene extends SubScene implements GObject {
 	public String getJavaConstructor() {
 		return fieldNameProperty.getValue() + " = new SubScene(new Group()," + this.getWidth() + "," + this.getHeight()
 				+ ",true, SceneAntialiasing.BALANCED);\n" 
-				+ "this.subsceneExample("+fieldNameProperty.getValue()+");\n";
+				+ "    this."+fieldNameProperty.getValue() +"Example("+fieldNameProperty.getValue()+");\n";
 
 	}
 
@@ -92,7 +90,7 @@ public class GSubScene extends SubScene implements GObject {
 		String l4 ="    ";
 		StringBuilder methodsString = new StringBuilder(); 
 		methodsString.append(
-		l4+"public void subsceneExample(SubScene subscene){\n"
+		l4+"public void "+fieldNameProperty.getValue() +"Example(SubScene subscene){\n"
 		        +l6+ "Box box;\n"
 		        +l6+ "Group group;\n"
 		        +l6+ "PerspectiveCamera camera;\n"

@@ -25,10 +25,12 @@ public class GMenuBar extends MenuBar implements GObject {
     	fieldNameProperty.addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {	
+				
 				if (menuBuilder.getFieldName()!=null && menuBuilder.getFieldName().equals(newValue)){
 					return;
 				}
 				menuBuilder.setFieldName(newValue);	
+				
 				
 			}
 		});

@@ -1,22 +1,33 @@
 package bdl.controller;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.SecureClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import javax.tools.FileObject;
+import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
+import javax.tools.JavaFileObject.Kind;
+import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
@@ -51,7 +62,6 @@ import di.errorlog.Fehlerausgabe;
 import di.inout.ExportJAVA;
 import di.inout.LanguageChooser;
 import di.mover.MoverSet;
-import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -132,6 +142,7 @@ public class Controller {
 		setupMiddlePanel();
 		setupRightPanel();
 		setupTopPanel();
+		setNewNodeListeners(viewListeners, view.middleTabPane.viewPane);
 	}
 
 	BProject[] aktuelleBlueJProjekte;
@@ -415,86 +426,90 @@ public class Controller {
 		});
 
 		// Edit Menu > Delete button functionality
-		selectionManager.addSelectionListener(new SelectionListener() {
-			@Override
-			public void updateSelected(final GObject gObject) {
-				view.topPanel.mItmDelete.setDisable(false);
-				view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent actionEvent) {
-						// if (gObject instanceof GMenuBar){
-						// ((GMenuBar)gObject).clearTree();
-						// }
-						view.middleTabPane.viewPane.getChildren().remove(gObject);
-						selectionManager.clearSelection();
-						historyManager.addHistory(new HistoryItem() {
-							@Override
-							public void restore() {
+		selectionManager.addSelectionListener(getDeleteSelectionListener());
 
-								view.middleTabPane.viewPane.getChildren().remove(gObject);
-								selectionManager.clearSelection();
-							}
-
-							@Override
-							public void revert() {
-								view.middleTabPane.viewPane.getChildren().add((Node) gObject);
-								selectionManager.updateSelected(gObject);
-							}
-
-							@Override
-							public String getAppearance() {
-								return gObject.getFieldName() + " deleted";
-							}
-						});
-					}
-				});
-				view.topPanel.mItmClearAll.setDisable(false);
-				view.topPanel.mItmClearAll.setOnAction(new EventHandler<ActionEvent>() {
-					@Override
-					public void handle(ActionEvent actionEvent) {
-						final List<Node> list = new ArrayList<>();
-						list.addAll(view.middleTabPane.viewPane.getChildren());
-						// for (Node n : list) {
-						// if (n instanceof GMenuBar){
-						// ((GMenuBar)n).clearTree();
-						// }
-						// }
-						view.middleTabPane.viewPane.getChildren().clear();
-
-						selectionManager.clearSelection();
-
-						historyManager.addHistory(new HistoryItem() {
-							@Override
-							public void restore() {
-								for (Node n : list) {
-									view.middleTabPane.viewPane.getChildren().remove(n);
-								}
-								selectionManager.clearSelection();
-							}
-
-							@Override
-							public void revert() {
-								for (Node n : list) {
-									view.middleTabPane.viewPane.getChildren().add(n);
-									selectionManager.updateSelected((GObject) n);
-								}
-							}
-
-							@Override
-							public String getAppearance() {
-								return ("Clear All");
-							}
-						});
-					}
-				});
-			}
-
-			@Override
-			public void clearSelection() {
-				view.topPanel.mItmDelete.setDisable(true);
-				// view.topPanel.mItmClearAll.setDisable(true);
-			}
-		});
+		// selectionManager.addSelectionListener(new SelectionListener() {
+		// @Override
+		// public void updateSelected(final GObject gObject) {
+		// view.topPanel.mItmDelete.setDisable(false);
+		// view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>()
+		// {
+		// @Override
+		// public void handle(ActionEvent actionEvent) {
+		// // if (gObject instanceof GMenuBar){
+		// // ((GMenuBar)gObject).clearTree();
+		// // }
+		// view.middleTabPane.viewPane.getChildren().remove(gObject);
+		// selectionManager.clearSelection();
+		// historyManager.addHistory(new HistoryItem() {
+		// @Override
+		// public void restore() {
+		//
+		// view.middleTabPane.viewPane.getChildren().remove(gObject);
+		// selectionManager.clearSelection();
+		// }
+		//
+		// @Override
+		// public void revert() {
+		// view.middleTabPane.viewPane.getChildren().add((Node) gObject);
+		// selectionManager.updateSelected(gObject);
+		// }
+		//
+		// @Override
+		// public String getAppearance() {
+		// return gObject.getFieldName() + " deleted";
+		// }
+		// });
+		// }
+		// });
+		// view.topPanel.mItmClearAll.setDisable(false);
+		// view.topPanel.mItmClearAll.setOnAction(new
+		// EventHandler<ActionEvent>() {
+		// @Override
+		// public void handle(ActionEvent actionEvent) {
+		// final List<Node> list = new ArrayList<>();
+		// list.addAll(view.middleTabPane.viewPane.getChildren());
+		// // for (Node n : list) {
+		// // if (n instanceof GMenuBar){
+		// // ((GMenuBar)n).clearTree();
+		// // }
+		// // }
+		// view.middleTabPane.viewPane.getChildren().clear();
+		//
+		// selectionManager.clearSelection();
+		//
+		// historyManager.addHistory(new HistoryItem() {
+		// @Override
+		// public void restore() {
+		// for (Node n : list) {
+		// view.middleTabPane.viewPane.getChildren().remove(n);
+		// }
+		// selectionManager.clearSelection();
+		// }
+		//
+		// @Override
+		// public void revert() {
+		// for (Node n : list) {
+		// view.middleTabPane.viewPane.getChildren().add(n);
+		// selectionManager.updateSelected((GObject) n);
+		// }
+		// }
+		//
+		// @Override
+		// public String getAppearance() {
+		// return ("Clear All");
+		// }
+		// });
+		// }
+		// });
+		// }
+		//
+		// @Override
+		// public void clearSelection() {
+		// view.topPanel.mItmDelete.setDisable(true);
+		// // view.topPanel.mItmClearAll.setDisable(true);
+		// }
+		// });
 		view.topPanel.mItmLanguage.setOnAction(e -> LanguageChooser.getLanguageByDialog());
 		// View > Show Hierarchy
 		view.topPanel.mItmHierarchy.setOnAction(new EventHandler<ActionEvent>() {
@@ -615,99 +630,76 @@ public class Controller {
 		addPaneListChangeListener(view.middleTabPane.viewPane, view.leftPanel.hierarchyPane.treeRoot);
 
 		// Add selection handlers for Hierarchy Pane
-		selectionManager.addSelectionListener(new SelectionListener() {
-			@Override
-			public void updateSelected(GObject gObject) {
-				update(gObject.getFieldName(), view.leftPanel.hierarchyPane.treeRoot);
-
-			}
-
-			private void update(String fieldName, TreeItem<HierarchyTreeItem> treeRoot) {
-				for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
-					GObject gObject = ti.getValue().getGObject();
-					if (gObject.getFieldName().equals(fieldName)) {
-						view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
-
-					} else if (gObject instanceof Pane) {
-						update(fieldName, ti);
-					}
-
-				}
-			}
-
-			@Override
-			public void clearSelection() {
-				// System.out.println("ClearSelection");
-				view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);
-
-			}
-		});
+		selectionManager.addSelectionListener(getHierachyPanelSelectionistener());
+		// selectionManager.addSelectionListener(new SelectionListener() {
+		// @Override
+		// public void updateSelected(GObject gObject) {
+		// update(gObject.getFieldName(),
+		// view.leftPanel.hierarchyPane.treeRoot);
+		//
+		// }
+		//
+		// private void update(String fieldName, TreeItem<HierarchyTreeItem>
+		// treeRoot) {
+		// for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
+		// GObject gObject = ti.getValue().getGObject();
+		// if (gObject.getFieldName().equals(fieldName)) {
+		// view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
+		//
+		// } else if (gObject instanceof Pane) {
+		// update(fieldName, ti);
+		// }
+		//
+		// }
+		// }
+		//
+		// @Override
+		// public void clearSelection() {
+		// // System.out.println("ClearSelection");
+		// view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);
+		//
+		// }
+		// });
 	}
 
 	private void setupMiddlePanel() {
-
+		selectionManager.addSelectionListener(getMiddlePanelSelectionistener());
 		// Add selection handlers for the outline
-		selectionManager.addSelectionListener(new SelectionListener() {
-			@Override
-			public void updateSelected(GObject gObject) {
-				if (gObject instanceof GUIObject) {
-					return;
-				}
-				Node node = (Node) gObject;
-				Rectangle outline = view.middleTabPane.outline;
-
-				outline.setVisible(true);
-				if (anfasser != null ) {
-				  if (anfasser.getNode()!=gObject){
-					  anfasser.setNode((Node) gObject, (Pane) node.getParent());
-				  } else {
-					  anfasser.update();
-				  }
-				}
-				double nodeX = 0;
-				double nodeY = 0;
-				Node node2 = node;
-				while (!(node2 instanceof GUIObject)) {
-					nodeX += node2.getLayoutX();
-					nodeY += node2.getLayoutY();
-					node2 = node2.getParent();
-				}
-
-				// double nodeX = node.getParent().getLayoutX() +
-				// node.getLayoutX();
-				// double nodeY = node.getParent().getLayoutY() +
-				// node.getLayoutY();
-				
-				Bounds bounds = node.getLayoutBounds();
-				double nodeW = bounds.getWidth();
-				double nodeH = bounds.getHeight();
-				if (node instanceof Circle) {
-					outline.setLayoutX(nodeX - 4 - (nodeW / 2));
-					outline.setLayoutY(nodeY - 4 - (nodeH / 2));
-				} else if (node instanceof Rectangle) {
-					Rectangle r = (Rectangle) node;
-					outline.setLayoutX(nodeX - 4 - (r.getStrokeWidth() / 2));
-					outline.setLayoutY(nodeY - 4 - (r.getStrokeWidth() / 2));
-				} else {
-					outline.setLayoutX(nodeX - 4);
-					outline.setLayoutY(nodeY - 4);
-				}
-				outline.setWidth(nodeW + 8);
-				outline.setHeight(nodeH + 8);
-
-			}
-
-			@Override
-			public void clearSelection() {
-				view.middleTabPane.outline.setVisible(false);
-				if (anfasser != null) {
-					//anfasser.removeFromParent();
-					anfasser.setVisible(false);
-				}
-				// if (anfasser!=null){anfasser.setzeSichtbar(false);}
-			}
-		});
-
+		/*
+		 * selectionManager.addSelectionListener(new SelectionListener() {
+		 * 
+		 * @Override public void updateSelected(GObject gObject) { if (gObject
+		 * instanceof GUIObject) { return; } Node node = (Node) gObject;
+		 * Rectangle outline = view.middleTabPane.outline;
+		 * 
+		 * outline.setVisible(true); if (anfasser != null) { // if
+		 * (anfasser.getNode() != gObject) { anfasser.setNode((Node) gObject,
+		 * (Pane) node.getParent()); // } else { // anfasser.update(); // } }
+		 * double nodeX = 0; double nodeY = 0; Node node2 = node; while (!(node2
+		 * instanceof GUIObject)) { nodeX += node2.getLayoutX(); nodeY +=
+		 * node2.getLayoutY(); node2 = node2.getParent(); }
+		 * 
+		 * // double nodeX = node.getParent().getLayoutX() + //
+		 * node.getLayoutX(); // double nodeY = node.getParent().getLayoutY() +
+		 * // node.getLayoutY();
+		 * 
+		 * Bounds bounds = node.getLayoutBounds(); double nodeW =
+		 * bounds.getWidth(); double nodeH = bounds.getHeight(); if (node
+		 * instanceof Circle) { outline.setLayoutX(nodeX - 4 - (nodeW / 2));
+		 * outline.setLayoutY(nodeY - 4 - (nodeH / 2)); } else if (node
+		 * instanceof Rectangle) { Rectangle r = (Rectangle) node;
+		 * outline.setLayoutX(nodeX - 4 - (r.getStrokeWidth() / 2));
+		 * outline.setLayoutY(nodeY - 4 - (r.getStrokeWidth() / 2)); } else {
+		 * outline.setLayoutX(nodeX - 4); outline.setLayoutY(nodeY - 4); }
+		 * outline.setWidth(nodeW + 8); outline.setHeight(nodeH + 8);
+		 * 
+		 * }
+		 * 
+		 * @Override public void clearSelection() {
+		 * view.middleTabPane.outline.setVisible(false); if (anfasser != null) {
+		 * // anfasser.removeFromParent(); anfasser.setVisible(false); } // if
+		 * (anfasser!=null){anfasser.setzeSichtbar(false);} } });
+		 */
 		view.middleTabPane.viewPane.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
@@ -726,86 +718,98 @@ public class Controller {
 				}
 			}
 		});
-		view.middleTabPane.previewTab.setOnSelectionChanged(new EventHandler<Event>() {
-			@Override
-			public void handle(Event event) {
-				if (view.middleTabPane.previewTab.isSelected()) {
+		view.middleTabPane.previewTab.setOnSelectionChanged(e -> generatePreviewInMemory());
 
-					// Write .java file
-					// Make temporary space in BlueJ user dir for compilation.
-					File fileJava;
-					File fileClass;
-
-					fileJava = new File(view.middleTabPane.viewPane.getClassName() + ".java");
-					fileClass = new File(view.middleTabPane.viewPane.getClassName() + ".class");
-
-					try {
-						BufferedOutputStream cssOutput = new BufferedOutputStream(new FileOutputStream(fileJava));
-						cssOutput.write(generateJavaCode("", true).getBytes());
-						cssOutput.flush();
-						cssOutput.close();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					// Compile class
-					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-					if (compiler == null) {
-						Alert alert = new Alert(AlertType.INFORMATION);
-						alert.setContentText(LabelGrabber.getLabel("controller.nopreview") + "\n"
-								+ LabelGrabber.getLabel("controller.nopreview2") + "\n"
-								+ LabelGrabber.getLabel("controller.nopreview3") + "\n"
-								+ LabelGrabber.getLabel("controller.nopreview4"));
-						alert.showAndWait();
-						throw new RuntimeException("Jar could not be created as Java version requires javac.\n"
-								+ "May solve the problem: Install JDK and copy tools.jar in JDK/lib/ into _all_ existing JRE/lib/");
-					}
-					StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-
-					Iterable<? extends JavaFileObject> compilationUnits1 = fileManager
-							.getJavaFileObjectsFromFiles(Arrays.asList(fileJava));
-
-					// Compiler options
-					// List<String> optionsList = new ArrayList<String>();
-					// File fileJfxrt = new
-					// File(System.getProperty("java.home"), "lib\\jfxrt.jar");
-					// optionsList.add("-classpath
-					// "+fileJfxrt.getAbsolutePath()+":.");
-
-					compiler.getTask(null, fileManager, null, null, null, compilationUnits1).call();
-
-					try {
-						fileManager.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-
-					// Load & run class
-					try {
-						Class guiClass;
-
-						URL[] urls = new URL[] { new File(".").toURI().toURL() };
-						URLClassLoader ucl = new URLClassLoader(urls);
-						guiClass = Class.forName(view.middleTabPane.viewPane.getClassName(), false, ucl);
-
-						Method main = guiClass.getMethod("start", Stage.class);
-						Object obj = guiClass.newInstance();
-						main.invoke(obj, new Stage());
-
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					// Delete created files
-					boolean fJd = fileJava.delete();
-					boolean fCd = fileClass.delete();
-					// Alert alert = new Alert(AlertType.INFORMATION);
-					// alert.setContentText("Files deleted?"+fJd+" "+fCd);
-					// alert.showAndWait();
-					view.middleTabPane.getSelectionModel().select(0);
-				}
-			}
-		});
+		// view.middleTabPane.previewTab.setOnSelectionChanged(new
+		// EventHandler<Event>() {
+		// @Override
+		// public void handle(Event event) {
+		// if (view.middleTabPane.previewTab.isSelected()) {
+		//
+		// // Write .java file
+		// // Make temporary space in BlueJ user dir for compilation.
+		// File fileJava;
+		// File fileClass;
+		//
+		// fileJava = new File(view.middleTabPane.viewPane.getClassName() +
+		// ".java");
+		// fileClass = new File(view.middleTabPane.viewPane.getClassName() +
+		// ".class");
+		//
+		// try {
+		// BufferedOutputStream cssOutput = new BufferedOutputStream(new
+		// FileOutputStream(fileJava));
+		// cssOutput.write(generateJavaCode("", true).getBytes());
+		// cssOutput.flush();
+		// cssOutput.close();
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		//
+		// // Compile class
+		// JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		// if (compiler == null) {
+		// Alert alert = new Alert(AlertType.INFORMATION);
+		// alert.setContentText(LabelGrabber.getLabel("controller.nopreview") +
+		// "\n"
+		// + LabelGrabber.getLabel("controller.nopreview2") + "\n"
+		// + LabelGrabber.getLabel("controller.nopreview3") + "\n"
+		// + LabelGrabber.getLabel("controller.nopreview4"));
+		// alert.showAndWait();
+		// throw new RuntimeException("Jar could not be created as Java version
+		// requires javac.\n"
+		// + "May solve the problem: Install JDK and copy tools.jar in JDK/lib/
+		// into _all_ existing JRE/lib/");
+		// }
+		// StandardJavaFileManager fileManager =
+		// compiler.getStandardFileManager(null, null, null);
+		//
+		// Iterable<? extends JavaFileObject> compilationUnits1 = fileManager
+		// .getJavaFileObjectsFromFiles(Arrays.asList(fileJava));
+		//
+		// // Compiler options
+		// // List<String> optionsList = new ArrayList<String>();
+		// // File fileJfxrt = new
+		// // File(System.getProperty("java.home"), "lib\\jfxrt.jar");
+		// // optionsList.add("-classpath
+		// // "+fileJfxrt.getAbsolutePath()+":.");
+		//
+		// compiler.getTask(null, fileManager, null, null, null,
+		// compilationUnits1).call();
+		//
+		// try {
+		// fileManager.close();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		//
+		// // Load & run class
+		// try {
+		// Class guiClass;
+		//
+		// URL[] urls = new URL[] { new File(".").toURI().toURL() };
+		// URLClassLoader ucl = new URLClassLoader(urls);
+		// guiClass = Class.forName(view.middleTabPane.viewPane.getClassName(),
+		// false, ucl);
+		//
+		// Method main = guiClass.getMethod("start", Stage.class);
+		// Object obj = guiClass.newInstance();
+		// main.invoke(obj, new Stage());
+		//
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		//
+		// // Delete created files
+		// boolean fJd = fileJava.delete();
+		// boolean fCd = fileClass.delete();
+		// // Alert alert = new Alert(AlertType.INFORMATION);
+		// // alert.setContentText("Files deleted?"+fJd+" "+fCd);
+		// // alert.showAndWait();
+		// view.middleTabPane.getSelectionModel().select(0);
+		// }
+		// }
+		// });
 
 		view.middleTabPane.viewPane.setOnDragOver(new EventHandler<DragEvent>() {
 			@Override
@@ -845,36 +849,439 @@ public class Controller {
 	}
 
 	
-	private void setupRightPanel() {
 
-		// Add selection handlers for the Property Edit Pane
-		selectionManager.addSelectionListener(new SelectionListener() {
+	/**
+	 * based on
+	 * http://javapracs.blogspot.de/2011/06/dynamic-in-memory-compilation-using.
+	 * html by Rekha Kumari (June 2011)
+	 */
+	private void generatePreviewInMemory() {
+
+		if (view.middleTabPane.previewTab.isSelected()) {
+			String className = view.middleTabPane.viewPane.getClassName();
+			String javacode = generateJavaCode("", true);
+			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+			if (compiler == null) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setContentText(LabelGrabber.getLabel("controller.nopreview") + "\n"
+						+ LabelGrabber.getLabel("controller.nopreview2") + "\n"
+						+ LabelGrabber.getLabel("controller.nopreview3") + "\n"
+						+ LabelGrabber.getLabel("controller.nopreview4"));
+				alert.showAndWait();
+				throw new RuntimeException("Jar could not be created as Java version requires javac.\n"
+						+ "May solve the problem: Install JDK and copy tools.jar in JDK/lib/ into _all_ existing JRE/lib/");
+			}
+			final JavaFileManager fileManager;
+			URI uri = null;
+			uri = URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension);
+			if (uri != null) {
+				final SimpleJavaFileObject file = new SimpleJavaFileObject(uri, JavaFileObject.Kind.SOURCE) {
+					@Override
+					public CharSequence getCharContent(final boolean ignoreEncodingErrors) {
+						return javacode;
+					}
+				};
+				Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(file);
+				fileManager = new ForwardingJavaFileManager<JavaFileManager>(
+						compiler.getStandardFileManager(null, null, null)) {
+
+					final private Map<String, ByteArrayOutputStream> byteStreams = new HashMap<>();
+
+					@Override
+					public ClassLoader getClassLoader(final Location location) {
+
+						return new SecureClassLoader() {
+
+							@Override
+							protected Class<?> findClass(final String className) throws ClassNotFoundException {
+
+								final ByteArrayOutputStream bos = byteStreams.get(className);
+								if (bos == null) {
+									return null;
+								}
+								final byte[] b = bos.toByteArray();
+								return super.defineClass(className, b, 0, b.length);
+							}
+						};
+					}
+
+					@Override
+					public JavaFileObject getJavaFileForOutput(final Location location, final String className,
+							final JavaFileObject.Kind kind, final FileObject sibling) throws IOException {
+
+						return new SimpleJavaFileObject(
+								URI.create("string:///" + className.replace('.', '/') + kind.extension), kind) {
+
+							@Override
+							public OutputStream openOutputStream() throws IOException {
+
+								ByteArrayOutputStream bos = byteStreams.get(className);
+
+								if (bos == null) {
+									bos = new ByteArrayOutputStream();
+									byteStreams.put(className, bos);
+								}
+								return bos;
+							}
+						};
+					}
+				};
+			
+				final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, null, null,
+						compilationUnits);
+			
+				boolean success = task.call();
+
+				if (success) {
+					final ClassLoader classLoader = fileManager.getClassLoader(null);
+					try {
+						final Class<?> guiClass = classLoader.loadClass(className);
+						Method main = guiClass.getMethod("start", Stage.class);
+						main.invoke(guiClass.newInstance(), new Stage());
+					} catch (ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NoSuchMethodException | SecurityException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InstantiationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+			}
+			view.middleTabPane.getSelectionModel().select(0);
+		}
+	}
+
+	
+	private void generatePreview() {
+		if (view.middleTabPane.previewTab.isSelected()) {
+
+			// Write .java file
+			// Make temporary space in BlueJ user dir for compilation.
+			File fileJava;
+			File fileClass;
+
+			fileJava = new File(view.middleTabPane.viewPane.getClassName() + ".java");
+			fileClass = new File(view.middleTabPane.viewPane.getClassName() + ".class");
+
+			try {
+				BufferedOutputStream cssOutput = new BufferedOutputStream(new FileOutputStream(fileJava));
+				cssOutput.write(generateJavaCode("", true).getBytes());
+				cssOutput.flush();
+				cssOutput.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			// Compile class
+			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+			if (compiler == null) {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setContentText(LabelGrabber.getLabel("controller.nopreview") + "\n"
+						+ LabelGrabber.getLabel("controller.nopreview2") + "\n"
+						+ LabelGrabber.getLabel("controller.nopreview3") + "\n"
+						+ LabelGrabber.getLabel("controller.nopreview4"));
+				alert.showAndWait();
+				throw new RuntimeException("Jar could not be created as Java version requires javac.\n"
+						+ "May solve the problem: Install JDK and copy tools.jar in JDK/lib/ into _all_ existing JRE/lib/");
+			}
+			StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+
+			Iterable<? extends JavaFileObject> compilationUnits1 = fileManager
+					.getJavaFileObjectsFromFiles(Arrays.asList(fileJava));
+
+
+			compiler.getTask(null, fileManager, null, null, null, compilationUnits1).call();
+
+			try {
+				fileManager.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			// Load & run class
+			try {
+				Class guiClass;
+
+				URL[] urls = new URL[] { new File(".").toURI().toURL() };
+				URLClassLoader ucl = new URLClassLoader(urls);
+				guiClass = Class.forName(view.middleTabPane.viewPane.getClassName(), true, ucl);
+
+				Method main = guiClass.getMethod("start", Stage.class);
+				Object obj = guiClass.newInstance();
+				main.invoke(obj, new Stage());
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			// Delete created files
+			boolean fJd = fileJava.delete();
+			boolean fCd = fileClass.delete();
+			// Alert alert = new Alert(AlertType.INFORMATION);
+			// alert.setContentText("Files deleted?"+fJd+" "+fCd);
+			// alert.showAndWait();
+			view.middleTabPane.getSelectionModel().select(0);
+		}
+	}
+
+	private SelectionListener getDeleteSelectionListener() {
+		return new SelectionListener() {
 			@Override
 			public void updateSelected(final GObject gObject) {
+				view.topPanel.mItmDelete.setDisable(false);
+				view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent actionEvent) {
+						final Pane contentpane;
+						if (((Node) gObject).getParent() instanceof Pane) {
+							contentpane = (Pane) ((Node) gObject).getParent();
+						} else {
+							return;
+						}
+						contentpane.getChildren().remove(gObject);
+						// view.middleTabPane.viewPane.getChildren().remove(gObject);
+						selectionManager.clearSelection();
+						historyManager.addHistory(new HistoryItem() {
+							@Override
+							public void restore() {
+								contentpane.getChildren().remove(gObject);
+								// view.middleTabPane.viewPane.getChildren().remove(gObject);
+								selectionManager.clearSelection();
+							}
+
+							@Override
+							public void revert() {
+								contentpane.getChildren().add((Node) gObject);
+								// view.middleTabPane.viewPane.getChildren().add((Node)
+								// gObject);
+								selectionManager.updateSelected(gObject);
+							}
+
+							@Override
+							public String getAppearance() {
+								return gObject.getFieldName() + " deleted";
+							}
+						});
+					}
+				});
+				view.topPanel.mItmClearAll.setDisable(false);
+				view.topPanel.mItmClearAll.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent actionEvent) {
+						// don't remove mover!
+						final List<Node> list = new ArrayList<>();
+						for (Node n : view.middleTabPane.viewPane.getChildren()) {
+							if (n instanceof GObject) {
+								list.add(n);
+							}
+						}
+
+						for (Node n : list) {
+							view.middleTabPane.viewPane.getChildren().remove(n);
+						}
+
+						selectionManager.clearSelection();
+
+						historyManager.addHistory(new HistoryItem() {
+							@Override
+							public void restore() {
+								for (Node n : list) {
+									view.middleTabPane.viewPane.getChildren().remove(n);
+								}
+								selectionManager.clearSelection();
+							}
+
+							@Override
+							public void revert() {
+								for (Node n : list) {
+									view.middleTabPane.viewPane.getChildren().add(n);
+									selectionManager.updateSelected((GObject) n);
+								}
+							}
+
+							@Override
+							public String getAppearance() {
+								return ("Clear All");
+							}
+						});
+					}
+				});
+			}
+
+			@Override
+			public void clearSelection() {
+				view.topPanel.mItmDelete.setDisable(true);
+				// view.topPanel.mItmClearAll.setDisable(true);
+			}
+		};
+	}
+
+	private SelectionListener getHierachyPanelSelectionistener() {
+		return new SelectionListener() {
+			@Override
+			public void updateSelected(GObject gObject) {
+				update(gObject.getFieldName(), view.leftPanel.hierarchyPane.treeRoot);
+
+			}
+
+			private void update(String fieldName, TreeItem<HierarchyTreeItem> treeRoot) {
+				for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
+					GObject gObject = ti.getValue().getGObject();
+					if (gObject.getFieldName().equals(fieldName)) {
+						view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
+
+					} else if (gObject instanceof Pane) {
+						update(fieldName, ti);
+					}
+
+				}
+			}
+
+			@Override
+			public void clearSelection() {
+				// System.out.println("ClearSelection");
+				view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);
+
+			}
+		};
+	}
+
+	private SelectionListener getMiddlePanelSelectionistener() {
+		return new SelectionListener() {
+			@Override
+			public void updateSelected(GObject gObject) {
+				if (gObject instanceof GUIObject) {
+					return;
+				}
+				Node node = (Node) gObject;
+				Rectangle outline = view.middleTabPane.outline;
+
+				outline.setVisible(true);
+				if (anfasser != null) {
+					// if (anfasser.getNode() != gObject) {
+					anfasser.setNode((Node) gObject, (Pane) node.getParent());
+					// } else {
+					// anfasser.update();
+					// }
+				}
+				double nodeX = 0;
+				double nodeY = 0;
+				Node node2 = node;
+				while (!(node2 instanceof GUIObject)) {
+					nodeX += node2.getLayoutX();
+					nodeY += node2.getLayoutY();
+					node2 = node2.getParent();
+				}
+
+				// double nodeX = node.getParent().getLayoutX() +
+				// node.getLayoutX();
+				// double nodeY = node.getParent().getLayoutY() +
+				// node.getLayoutY();
+
+				Bounds bounds = node.getLayoutBounds();
+				double nodeW = bounds.getWidth();
+				double nodeH = bounds.getHeight();
+				if (node instanceof Circle) {
+					outline.setLayoutX(nodeX - 4 - (nodeW / 2));
+					outline.setLayoutY(nodeY - 4 - (nodeH / 2));
+				} else if (node instanceof Rectangle) {
+					Rectangle r = (Rectangle) node;
+					outline.setLayoutX(nodeX - 4 - (r.getStrokeWidth() / 2));
+					outline.setLayoutY(nodeY - 4 - (r.getStrokeWidth() / 2));
+				} else {
+					outline.setLayoutX(nodeX - 4);
+					outline.setLayoutY(nodeY - 4);
+				}
+				outline.setWidth(nodeW + 8);
+				outline.setHeight(nodeH + 8);
+
+			}
+
+			@Override
+			public void clearSelection() {
+				view.middleTabPane.outline.setVisible(false);
+				if (anfasser != null) {
+					// anfasser.removeFromParent();
+					anfasser.setVisible(false);
+				}
+				// if (anfasser!=null){anfasser.setzeSichtbar(false);}
+			}
+		};
+	}
+
+	private SelectionListener getRightPanelSelectionistener() {
+		return new SelectionListener() {
+			@Override
+			public void updateSelected(final GObject gObject) {
+				// Following may be obsolete now:
 				// Yes, it really does make no sense to put this in a
 				// Platform.runLater,
 				// and removing and readding the splitpane makes no sense, but
 				// it fixes
 				// the panel not showing properties when loaded from BlueJ...
 				/*
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						view.rightPanel.propertyScroll.setContent(gObject.getPEP());
-						view.rightPanel.rightSplitPaneTop.getChildren().clear();
-						view.rightPanel.rightSplitPaneTop.getChildren().add(view.rightPanel.propertyScroll);
-					}
-				});
-				*/
-				
-			     view.rightPanel.propertyScroll.setContent(gObject.getPEP());
+				 * Platform.runLater(new Runnable() {
+				 * 
+				 * @Override public void run() {
+				 * view.rightPanel.propertyScroll.setContent(gObject.getPEP());
+				 * view.rightPanel.rightSplitPaneTop.getChildren().clear();
+				 * view.rightPanel.rightSplitPaneTop.getChildren().add(view.
+				 * rightPanel.propertyScroll); } });
+				 */
+
+				view.rightPanel.propertyScroll.setContent(gObject.getPEP());
 			}
 
 			@Override
 			public void clearSelection() {
 				view.rightPanel.propertyScroll.setContent(new PropertyEditPane());
 			}
-		});
+		};
+	}
+
+	private void setupRightPanel() {
+		// Add selection handlers for the Property Edit Pane
+		selectionManager.addSelectionListener(getRightPanelSelectionistener());
+
+		// selectionManager.addSelectionListener(new SelectionListener() {
+		// @Override
+		// public void updateSelected(final GObject gObject) {
+		// // Yes, it really does make no sense to put this in a
+		// // Platform.runLater,
+		// // and removing and readding the splitpane makes no sense, but
+		// // it fixes
+		// // the panel not showing properties when loaded from BlueJ...
+		// /*
+		// * Platform.runLater(new Runnable() {
+		// *
+		// * @Override public void run() {
+		// * view.rightPanel.propertyScroll.setContent(gObject.getPEP());
+		// * view.rightPanel.rightSplitPaneTop.getChildren().clear();
+		// * view.rightPanel.rightSplitPaneTop.getChildren().add(view.
+		// * rightPanel.propertyScroll); } });
+		// */
+		//
+		// view.rightPanel.propertyScroll.setContent(gObject.getPEP());
+		// }
+		//
+		// @Override
+		// public void clearSelection() {
+		// view.rightPanel.propertyScroll.setContent(new PropertyEditPane());
+		// }
+		// });
 
 		// Add history handlers for the History Pane
 		historyManager.addHistoryListener(new HistoryListener() {
@@ -965,10 +1372,10 @@ public class Controller {
 				e.printStackTrace();
 			}
 		}
-		// selectionManager.setEnabled(true);
-		Platform.runLater(() -> {
-			visitTree(view.middleTabPane.viewPane);
-		});// otherwise to early for mover
+
+		// Platform.runLater(() -> {
+		// visitTree(view.middleTabPane.viewPane);
+		// });// otherwise to early for mover
 		isOpeningFile = false;
 		// ausgabe(parent);
 	}
@@ -983,13 +1390,13 @@ public class Controller {
 				node.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
 					@Override
 					public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
-						
-						if (selectionManager.getCurrentlySelected()==node){
-						   selectionManager.updateSelected((GObject) node);
+
+						if (selectionManager.getCurrentlySelected() == node) {
+							selectionManager.updateSelected((GObject) node);
 						} else {
-							if (node instanceof Pane){
-								((Pane)node).setPrefWidth(t1.getWidth());
-								((Pane)node).setPrefHeight(t1.getWidth());
+							if (node instanceof Pane) {
+								((Pane) node).setPrefWidth(t1.getWidth());
+								((Pane) node).setPrefHeight(t1.getWidth());
 							}
 						}
 					}
@@ -1211,107 +1618,156 @@ public class Controller {
 		}
 
 		final Node newNode = (Node) newThing;
+		setNewNodeListeners(viewListeners, newNode);
+		// newNode.layoutBoundsProperty().addListener(new
+		// ChangeListener<Bounds>() {
+		// @Override
+		// public void changed(ObservableValue<? extends Bounds> ov, Bounds t,
+		// Bounds t1) {
+		// if (selectionManager.getCurrentlySelected() == newNode) {
+		// selectionManager.updateSelected((GObject) newNode);
+		// } else {
+		// if (newNode instanceof Pane) {
+		// ((Pane) newNode).setPrefWidth(t1.getWidth());
+		// ((Pane) newNode).setPrefHeight(t1.getHeight());
+		// }
+		// }
+		// }
+		// });
+		//
+		// newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
+		// @Override
+		// public void changed(ObservableValue<? extends Number> ov, Number t,
+		// Number t1) {
+		// if (selectionManager.getCurrentlySelected() == newNode) {
+		// selectionManager.updateSelected((GObject) newNode);
+		// }
+		// }
+		// });
+		//
+		// newNode.layoutYProperty().addListener(new ChangeListener<Number>() {
+		// @Override
+		// public void changed(ObservableValue<? extends Number> ov, Number t,
+		// Number t1) {
+		// if (selectionManager.getCurrentlySelected() == newNode) {
+		// selectionManager.updateSelected((GObject) newNode);
+		// }
+		// }
+		// });
+		//
+		// if (newNode instanceof Pane) {
+		//
+		// newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
+		//
+		// @Override
+		// public void handle(MouseEvent mouseEvent) {
+		// selectionManager.updateSelected((GObject) newNode);
+		// viewListeners.onMousePressed(newNode, mouseEvent);
+		// mouseEvent.consume();// Stops the mouseEvent falling through
+		// // to
+		// // the viewPane which would clear
+		// // selection
+		// }
+		// });
+		// newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
+		// @Override
+		// public void handle(MouseEvent mouseEvent) {
+		// viewListeners.onMouseReleased(newNode, mouseEvent);
+		// mouseEvent.consume();
+		// }
+		// });
+		// newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
+		//
+		// @Override
+		// public void handle(MouseEvent mouseEvent) {
+		// // System.out.println("MouseDragged");
+		// viewListeners.onMouseDragged(newNode, mouseEvent);
+		// selectionManager.updateSelected((GObject) newNode);
+		// mouseEvent.consume();
+		// }
+		// });
+		//
+		// } else {
+		//
+		// newNode.addEventFilter(MouseEvent.MOUSE_PRESSED, new
+		// EventHandler<MouseEvent>() {
+		//
+		// @Override
+		// public void handle(MouseEvent mouseEvent) {
+		// selectionManager.updateSelected((GObject) newNode);
+		// viewListeners.onMousePressed(newNode, mouseEvent);
+		// mouseEvent.consume();// Stops the mouseEvent falling through
+		// // to
+		// // the viewPane which would clear
+		// // selection
+		// }
+		// });
+		// newNode.addEventFilter(MouseEvent.MOUSE_RELEASED, new
+		// EventHandler<MouseEvent>() {
+		// @Override
+		// public void handle(MouseEvent mouseEvent) {
+		// viewListeners.onMouseReleased(newNode, mouseEvent);
+		// mouseEvent.consume();
+		// }
+		// });
+		// newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED, new
+		// EventHandler<MouseEvent>() {
+		//
+		// @Override
+		// public void handle(MouseEvent mouseEvent) {
+		// // System.out.println("MouseDragged");
+		// viewListeners.onMouseDragged(newNode, mouseEvent);
+		// selectionManager.updateSelected((GObject) newNode);
+		// mouseEvent.consume();
+		// }
+		// });
+		// }
+		setNewNodeDeleteButton(destination, newNode);
 
-		newNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
-			@Override
-			public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
-				if (selectionManager.getCurrentlySelected()==newNode){
-				   selectionManager.updateSelected((GObject) newNode);
-				}else {
-					if (newNode instanceof Pane){
-						((Pane)newNode).setPrefWidth(t1.getWidth());
-						((Pane)newNode).setPrefHeight(t1.getHeight());
-					}
-				}
+		destination.getChildren().add(newNode);
+
+		if (settingsNode == null) {
+			if (newNode instanceof Circle) {
+				newNode.setLayoutX((newNode.getLayoutBounds().getWidth() / 2) + 4);
+				newNode.setLayoutY((newNode.getLayoutBounds().getWidth() / 2) + 4);
+			} else {
+				newNode.setLayoutX(newNode.getLayoutX() + 4);
+				newNode.setLayoutY(newNode.getLayoutY() + 4);
 			}
-		});
-
-		newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-				if (selectionManager.getCurrentlySelected()==newNode){
-				 selectionManager.updateSelected((GObject) newNode);
-				}
-			}
-		});
-
-		newNode.layoutYProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-				if (selectionManager.getCurrentlySelected()==newNode){
-				selectionManager.updateSelected((GObject) newNode);
-				}
-			}
-		});
-
-		if (newNode instanceof Pane) {
-
-			newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
-
-				@Override
-				public void handle(MouseEvent mouseEvent) {
-					selectionManager.updateSelected((GObject) newNode);
-					viewListeners.onMousePressed(newNode, mouseEvent);
-					mouseEvent.consume();// Stops the mouseEvent falling through
-											// to
-											// the viewPane which would clear
-											// selection
-				}
-			});
-			newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent mouseEvent) {
-					viewListeners.onMouseReleased(newNode, mouseEvent);
-					mouseEvent.consume();
-				}
-			});
-			newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
-
-				@Override
-				public void handle(MouseEvent mouseEvent) {
-					// System.out.println("MouseDragged");
-					viewListeners.onMouseDragged(newNode, mouseEvent);
-					selectionManager.updateSelected((GObject) newNode);
-					mouseEvent.consume();
-				}
-			});
-
-		} else {
-
-			newNode.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-				@Override
-				public void handle(MouseEvent mouseEvent) {
-					selectionManager.updateSelected((GObject) newNode);
-					viewListeners.onMousePressed(newNode, mouseEvent);
-					mouseEvent.consume();// Stops the mouseEvent falling through
-											// to
-											// the viewPane which would clear
-											// selection
-				}
-			});
-			newNode.addEventFilter(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent mouseEvent) {
-					viewListeners.onMouseReleased(newNode, mouseEvent);
-					mouseEvent.consume();
-				}
-			});
-			newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
-
-				@Override
-				public void handle(MouseEvent mouseEvent) {
-					// System.out.println("MouseDragged");
-					viewListeners.onMouseDragged(newNode, mouseEvent);
-					selectionManager.updateSelected((GObject) newNode);
-					mouseEvent.consume();
-				}
-			});
 		}
+
+		if (x > 0 && y > 0) {
+			newNode.setLayoutX(x);
+			newNode.setLayoutY(y);
+		}
+		setNewNodeToHistory(newThing, destination, newNode);
+		// // Finally, let the history manager know this new thing has happened.
+		// historyManager.addHistory(new HistoryItem() {
+		// @Override
+		// public void restore() {
+		// destination.getChildren().add(newNode);
+		// selectionManager.updateSelected(newThing);
+		// }
+		//
+		// @Override
+		// public void revert() {
+		// destination.getChildren().remove(newThing);
+		// selectionManager.clearSelection();
+		// }
+		//
+		// @Override
+		// public String getAppearance() {
+		// return newThing.getClass().getSuperclass().getSimpleName() + "
+		// added!";
+		// }
+		// });
+	}
+
+	private void setNewNodeDeleteButton(final Pane destination, final Node newNode) {
 		final ContextMenu nodePopUp = new ContextMenu();
 		final MenuItem deletebutton = new MenuItem(LabelGrabber.getLabel("delete.node.text"));
 		nodePopUp.getItems().add(deletebutton);
-		newNode.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+		newNode.setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent t) {
 				if (t.getButton().equals(MouseButton.SECONDARY)) {
@@ -1345,43 +1801,7 @@ public class Controller {
 						}
 					});
 				}
-			}
-		});
 
-		destination.getChildren().add(newNode);
-
-		if (settingsNode == null) {
-			if (newNode instanceof Circle) {
-				newNode.setLayoutX((newNode.getLayoutBounds().getWidth() / 2) + 4);
-				newNode.setLayoutY((newNode.getLayoutBounds().getWidth() / 2) + 4);
-			} else {
-				newNode.setLayoutX(newNode.getLayoutX() + 4);
-				newNode.setLayoutY(newNode.getLayoutY() + 4);
-			}
-		}
-
-		if (x > 0 && y > 0) {
-			newNode.setLayoutX(x);
-			newNode.setLayoutY(y);
-		}
-
-		// Finally, let the history manager know this new thing has happened.
-		historyManager.addHistory(new HistoryItem() {
-			@Override
-			public void restore() {
-				destination.getChildren().add(newNode);
-				selectionManager.updateSelected(newThing);
-			}
-
-			@Override
-			public void revert() {
-				destination.getChildren().remove(newThing);
-				selectionManager.clearSelection();
-			}
-
-			@Override
-			public String getAppearance() {
-				return newThing.getClass().getSuperclass().getSimpleName() + " added!";
 			}
 		});
 	}
@@ -1404,21 +1824,125 @@ public class Controller {
 		Node newNode = (Node) newThing;
 		destination.getChildren().add(newNode);
 
-		// Must run later
-		// newNode.layoutBoundsProperty().addListener(new
-		// ChangeListener<Bounds>() {
+		setNewNodeListeners(viewListeners, newNode);
+		setNewNodeDeleteButton(destination, newNode);
+		// final ContextMenu nodePopUp = new ContextMenu();
+		// final MenuItem deletebutton = new
+		// MenuItem(LabelGrabber.getLabel("delete.node.text"));
+		// nodePopUp.getItems().add(deletebutton);
+		// newNode.addEventFilter(MouseEvent.MOUSE_CLICKED, new
+		// EventHandler<MouseEvent>() {
 		// @Override
-		// public void changed(ObservableValue<? extends Bounds> ov, Bounds t,
-		// Bounds t1) {
+		// public void handle(MouseEvent t) {
+		// if (t.getButton().equals(MouseButton.SECONDARY)) {
+		// nodePopUp.show(newNode, Side.RIGHT, 0, 0);
+		// deletebutton.setOnAction(new EventHandler<ActionEvent>() {
+		// @Override
+		// public void handle(ActionEvent t) {
+		// destination.getChildren().remove(newNode);
+		// selectionManager.clearSelection();
+		// historyManager.addHistory(new HistoryItem() {
+		// @Override
+		// public void revert() {
+		// destination.getChildren().add(newNode);
 		// selectionManager.updateSelected((GObject) newNode);
+		// }
+		//
+		// @Override
+		// public void restore() {
+		// destination.getChildren().remove(newNode);
+		// selectionManager.clearSelection();
+		// }
+		//
+		// @Override
+		// public String getAppearance() {
+		// return ((GObject) newNode).getFieldName() + " deleted!";
+		// }
+		// });
+		// }
+		// });
+		// }
 		// }
 		// });
 
+		setNewNodeToHistory(newThing, destination, newNode);
+
+		if (settingsNode instanceof Pane) {
+
+			Pane newPane = (Pane) settingsNode;
+			for (Node cnode : newPane.getChildren()) {
+				for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
+					ComponentSettings componentSettings2 = componentMenuItem.getComponentSettings();
+					try {
+						// System.out.println(cnode+ "
+						// "+componentSettings2.getType()+"
+						// "+cnode.getClass().getSimpleName());
+						if (componentSettings2.getType().equals(cnode.getClass().getSimpleName())) {
+							Class componentClass = Class.forName("bdl.build." + componentSettings2.getPackageName()
+									+ ".G" + componentSettings2.getType());
+							Constructor constructor = componentClass.getConstructor();
+							GObject verynewThing = (GObject) constructor.newInstance();
+							verynewThing.setFieldName(cnode.getId());
+
+							addGObjectRec(verynewThing, componentSettings2, view, viewListeners, cnode,
+									(Pane) newThing);
+							break;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		if (settingsNode instanceof MenuBar) {
+			((GMenuBar) newThing).getMenuBuilder().buildTreeFromNode(settingsNode);
+		}
+
+	}
+
+	private void setNewNodeToHistory(GObject newThing, Pane destination, Node newNode) {
+		// Finally, let the history manager know this new thing has happened.
+		historyManager.addHistory(new HistoryItem() {
+			@Override
+			public void restore() {
+				destination.getChildren().add(newNode);
+				selectionManager.updateSelected(newThing);
+			}
+
+			@Override
+			public void revert() {
+				destination.getChildren().remove(newThing);
+				selectionManager.clearSelection();
+			}
+
+			@Override
+			public String getAppearance() {
+				return newThing.getClass().getSuperclass().getSimpleName() + " added!";
+			}
+		});
+	}
+
+	private void setNewNodeListeners(ViewListeners viewListeners, Node newNode) {
+		newNode.layoutBoundsProperty().addListener(new ChangeListener<Bounds>() {
+			@Override
+			public void changed(ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) {
+
+				if (selectionManager.getCurrentlySelected() == newNode) {
+					selectionManager.updateSelected((GObject) newNode);
+				} else {
+					if (newNode instanceof Pane) {
+						((Pane) newNode).setPrefWidth(t1.getWidth());
+						((Pane) newNode).setPrefHeight(t1.getHeight());
+					}
+				}
+			}
+		});
 		newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-				if (selectionManager.getCurrentlySelected()==newNode){
-				selectionManager.updateSelected((GObject) newNode);
+				if (selectionManager.getCurrentlySelected() == newNode) {
+					selectionManager.updateSelected((GObject) newNode);
 				}
 			}
 		});
@@ -1426,8 +1950,8 @@ public class Controller {
 		newNode.layoutYProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> ov, Number t, Number t1) {
-				if (selectionManager.getCurrentlySelected()==newNode){
-				selectionManager.updateSelected((GObject) newNode);
+				if (selectionManager.getCurrentlySelected() == newNode) {
+					selectionManager.updateSelected((GObject) newNode);
 				}
 			}
 		});
@@ -1496,96 +2020,6 @@ public class Controller {
 				}
 			});
 		}
-
-		final ContextMenu nodePopUp = new ContextMenu();
-		final MenuItem deletebutton = new MenuItem(LabelGrabber.getLabel("delete.node.text"));
-		nodePopUp.getItems().add(deletebutton);
-		newNode.addEventFilter(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent t) {
-				if (t.getButton().equals(MouseButton.SECONDARY)) {
-					nodePopUp.show(newNode, Side.RIGHT, 0, 0);
-					deletebutton.setOnAction(new EventHandler<ActionEvent>() {
-						@Override
-						public void handle(ActionEvent t) {
-							destination.getChildren().remove(newNode);
-							selectionManager.clearSelection();
-							historyManager.addHistory(new HistoryItem() {
-								@Override
-								public void revert() {
-									destination.getChildren().add(newNode);
-									selectionManager.updateSelected((GObject) newNode);
-								}
-
-								@Override
-								public void restore() {
-									destination.getChildren().remove(newNode);
-									selectionManager.clearSelection();
-								}
-
-								@Override
-								public String getAppearance() {
-									return ((GObject) newNode).getFieldName() + " deleted!";
-								}
-							});
-						}
-					});
-				}
-			}
-		});
-
-		// Finally, let the history manager know this new thing has happened.
-		historyManager.addHistory(new HistoryItem() {
-			@Override
-			public void restore() {
-				destination.getChildren().add(newNode);
-				selectionManager.updateSelected(newThing);
-			}
-
-			@Override
-			public void revert() {
-				destination.getChildren().remove(newThing);
-				selectionManager.clearSelection();
-			}
-
-			@Override
-			public String getAppearance() {
-				return newThing.getClass().getSuperclass().getSimpleName() + " added!";
-			}
-		});
-
-		if (settingsNode instanceof Pane) {
-
-			Pane newPane = (Pane) settingsNode;
-			for (Node cnode : newPane.getChildren()) {
-				for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
-					ComponentSettings componentSettings2 = componentMenuItem.getComponentSettings();
-					try {
-						// System.out.println(cnode+ "
-						// "+componentSettings2.getType()+"
-						// "+cnode.getClass().getSimpleName());
-						if (componentSettings2.getType().equals(cnode.getClass().getSimpleName())) {
-							Class componentClass = Class.forName("bdl.build." + componentSettings2.getPackageName()
-									+ ".G" + componentSettings2.getType());
-							Constructor constructor = componentClass.getConstructor();
-							GObject verynewThing = (GObject) constructor.newInstance();
-							verynewThing.setFieldName(cnode.getId());
-
-							addGObjectRec(verynewThing, componentSettings2, view, viewListeners, cnode,
-									(Pane) newThing);
-							break;
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-
-		if (settingsNode instanceof MenuBar) {
-			((GMenuBar) newThing).getMenuBuilder().buildTreeFromNode(settingsNode);
-		}
-
 	}
 
 	private void dealWithPane(final Pane newThing) {
