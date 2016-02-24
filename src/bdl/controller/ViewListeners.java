@@ -29,7 +29,7 @@ public class ViewListeners {
 	}
 
 	public void onMousePressed(Node node, MouseEvent mouseEvent) {
-		System.out.println(mouseEvent);
+		System.out.println("ViewListeners onMousePressed"+mouseEvent);
 		isMousePressed = true;
 		curX = mouseEvent.getX();
 		curY = mouseEvent.getY();

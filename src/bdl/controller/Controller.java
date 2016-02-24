@@ -142,7 +142,17 @@ public class Controller {
 		setupMiddlePanel();
 		setupRightPanel();
 		setupTopPanel();
-		setNewNodeListeners(viewListeners, view.middleTabPane.viewPane);
+		view.middleTabPane.viewPane.setOnMousePressed(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent mouseEvent) {
+				selectionManager.updateSelected(view.middleTabPane.viewPane);
+				// selectionManager.clearSelection();
+
+				mouseEvent.consume();
+			}
+		});
+
 	}
 
 	BProject[] aktuelleBlueJProjekte;
@@ -848,8 +858,6 @@ public class Controller {
 		});
 	}
 
-	
-
 	/**
 	 * based on
 	 * http://javapracs.blogspot.de/2011/06/dynamic-in-memory-compilation-using.
@@ -926,10 +934,10 @@ public class Controller {
 						};
 					}
 				};
-			
+
 				final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, null, null,
 						compilationUnits);
-			
+
 				boolean success = task.call();
 
 				if (success) {
@@ -964,7 +972,6 @@ public class Controller {
 		}
 	}
 
-	
 	private void generatePreview() {
 		if (view.middleTabPane.previewTab.isSelected()) {
 
@@ -1001,7 +1008,6 @@ public class Controller {
 
 			Iterable<? extends JavaFileObject> compilationUnits1 = fileManager
 					.getJavaFileObjectsFromFiles(Arrays.asList(fileJava));
-
 
 			compiler.getTask(null, fileManager, null, null, null, compilationUnits1).call();
 
@@ -1132,21 +1138,25 @@ public class Controller {
 	private SelectionListener getHierachyPanelSelectionistener() {
 		return new SelectionListener() {
 			@Override
-			public void updateSelected(GObject gObject) {
+			public void updateSelected(GObject gObject) {				
 				update(gObject.getFieldName(), view.leftPanel.hierarchyPane.treeRoot);
-
 			}
 
 			private void update(String fieldName, TreeItem<HierarchyTreeItem> treeRoot) {
-				for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
-					GObject gObject = ti.getValue().getGObject();
-					if (gObject.getFieldName().equals(fieldName)) {
-						view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
+				if (treeRoot.getValue().getGObject().getFieldName().equals(fieldName)) {
+					view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(treeRoot);
+				} else {
+					
+					for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
+						GObject gObject = ti.getValue().getGObject();
+						if (gObject.getFieldName().equals(fieldName)) {
+							view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
 
-					} else if (gObject instanceof Pane) {
-						update(fieldName, ti);
+						} else if (gObject instanceof Pane) {
+							update(fieldName, ti);
+						}
+
 					}
-
 				}
 			}
 
@@ -1163,51 +1173,52 @@ public class Controller {
 		return new SelectionListener() {
 			@Override
 			public void updateSelected(GObject gObject) {
-				if (gObject instanceof GUIObject) {
-					return;
-				}
 				Node node = (Node) gObject;
 				Rectangle outline = view.middleTabPane.outline;
-
-				outline.setVisible(true);
-				if (anfasser != null) {
-					// if (anfasser.getNode() != gObject) {
-					anfasser.setNode((Node) gObject, (Pane) node.getParent());
-					// } else {
-					// anfasser.update();
-					// }
-				}
-				double nodeX = 0;
-				double nodeY = 0;
-				Node node2 = node;
-				while (!(node2 instanceof GUIObject)) {
-					nodeX += node2.getLayoutX();
-					nodeY += node2.getLayoutY();
-					node2 = node2.getParent();
-				}
-
-				// double nodeX = node.getParent().getLayoutX() +
-				// node.getLayoutX();
-				// double nodeY = node.getParent().getLayoutY() +
-				// node.getLayoutY();
-
-				Bounds bounds = node.getLayoutBounds();
-				double nodeW = bounds.getWidth();
-				double nodeH = bounds.getHeight();
-				if (node instanceof Circle) {
-					outline.setLayoutX(nodeX - 4 - (nodeW / 2));
-					outline.setLayoutY(nodeY - 4 - (nodeH / 2));
-				} else if (node instanceof Rectangle) {
-					Rectangle r = (Rectangle) node;
-					outline.setLayoutX(nodeX - 4 - (r.getStrokeWidth() / 2));
-					outline.setLayoutY(nodeY - 4 - (r.getStrokeWidth() / 2));
+				if (gObject instanceof GUIObject) {
+					outline.setVisible(false);
+					if (anfasser != null) {
+						anfasser.setVisible(false);
+					}
 				} else {
-					outline.setLayoutX(nodeX - 4);
-					outline.setLayoutY(nodeY - 4);
-				}
-				outline.setWidth(nodeW + 8);
-				outline.setHeight(nodeH + 8);
+					outline.setVisible(true);
 
+					if (anfasser != null) {
+
+						anfasser.setNode((Node) gObject, (Pane) node.getParent());
+
+					}
+					double nodeX = 0;
+					double nodeY = 0;
+					Node node2 = node;
+					while (!(node2 instanceof GUIObject)) {
+						nodeX += node2.getLayoutX();
+						nodeY += node2.getLayoutY();
+						node2 = node2.getParent();
+					}
+
+					// double nodeX = node.getParent().getLayoutX() +
+					// node.getLayoutX();
+					// double nodeY = node.getParent().getLayoutY() +
+					// node.getLayoutY();
+
+					Bounds bounds = node.getLayoutBounds();
+					double nodeW = bounds.getWidth();
+					double nodeH = bounds.getHeight();
+					if (node instanceof Circle) {
+						outline.setLayoutX(nodeX - 4 - (nodeW / 2));
+						outline.setLayoutY(nodeY - 4 - (nodeH / 2));
+					} else if (node instanceof Rectangle) {
+						Rectangle r = (Rectangle) node;
+						outline.setLayoutX(nodeX - 4 - (r.getStrokeWidth() / 2));
+						outline.setLayoutY(nodeY - 4 - (r.getStrokeWidth() / 2));
+					} else {
+						outline.setLayoutX(nodeX - 4);
+						outline.setLayoutY(nodeY - 4);
+					}
+					outline.setWidth(nodeW + 8);
+					outline.setHeight(nodeH + 8);
+				}
 			}
 
 			@Override
