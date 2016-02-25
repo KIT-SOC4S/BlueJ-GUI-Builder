@@ -50,7 +50,7 @@ public class MenuExtensionGUIDesignerFXMAIN extends Extension {
 					});
 					
 					/*
-					 * JOptionPane.showInputDialog("Start");
+					 * 
 					 * Application.launch(Main.class);
 					 */
 				} catch (Exception e) {

@@ -59,7 +59,17 @@ public class CodeGenerator {
 		}
 		code.append(declarationString);
 		code.append('\n');
+		if (!forPreview) {
+			// Add Constructor and go method
 
+			code.append("    public " + clName + "(){\n" + "        this.go();\n" + "    }\n\n");
+
+			code.append("   // If used from within the constructor, BlueJ can inspect the application\n"
+					+ "    public void go() {\n" + "        new JFXPanel();\n"
+					+ "        Platform.runLater(new Runnable() {\n" + "            @Override\n"
+					+ "            public void run() {\n" + "                start(new Stage());\n" + "            }\n"
+					+ "        });\n" + "    }\n\n");
+		}
 		// Add properties
 		code.append("    private Parent getRoot() {\n");
 		code.append("        AnchorPane root = new AnchorPane();\n");
@@ -108,14 +118,16 @@ public class CodeGenerator {
 		code.append("    }\n\n");
 
 		// Add show method
-		code.append("// May be deleted if no Swing-Components are used\n" + "    public void show() {\n"
-				+ "        new JFXPanel();\n" + "        Platform.runLater(new Runnable() {\n"
-				+ "            @Override\n" + "            public void run() {\n"
-				+ "                start(new Stage());\n" + "            }\n" + "        });\n" + "    }\n\n");
+
+		// code.append("// May be deleted if no Swing-Components are used\n" + "
+		// public void show() {\n"
+		// + " new JFXPanel();\n" + " Platform.runLater(new Runnable() {\n"
+		// + " @Override\n" + " public void run() {\n"
+		// + " start(new Stage());\n" + " }\n" + " });\n" + " }\n\n");
 
 		// Add start method
 		String stPreview = forPreview ? ""
-				: "        primaryStage.setOnCloseRequest(e->System.exit(0));//needed for (helps)BlueJ\n";
+				: "        primaryStage.setOnCloseRequest(e->System.exit(0));//should be used in BlueJ. Otherwise you have to reset the VM manually after closing\n";
 
 		code.append("    @Override\n" + "    public void start(Stage primaryStage) {\n"
 				+ "        Scene scene = new Scene(getRoot(), " + guiObject.getWidth() + ", " + guiObject.getHeight()
@@ -133,20 +145,13 @@ public class CodeGenerator {
 			code.append(additionalMethods(node));
 		}
 
-		// Add main method
-		// code.append(" /**\n" + " * The main() method is ignored in correctly
-		// deployed JavaFX application.\n"
-		// + " * main() serves only as fallback in case the application can not
-		// be\n"
-		// + " * launched through deployment artifacts, e.g., in IDEs with
-		// limited FX\n"
-		// + " * support. NetBeans ignores main().\n" + " *\n"
 		// + " * @param args the command line arguments\n" + " */\n"
 		// + " public static void main(String[] args) {\n" + " launch(args);\n"
 		// + " }\n");
 		// ;
 		code.append("     /* @param args the command line arguments\n" + "     */\n"
-				+ "    public static void main(String[] args) {\n" + "        launch(args);\n" + "    }\n");
+				+ "    public static void main(String[] args) {\n" + "//        launch(args);\n" + "        new "
+				+ clName + "();\n" + "    }\n");
 		;
 		code.append('}');// Close class tag
 		return code.toString();
