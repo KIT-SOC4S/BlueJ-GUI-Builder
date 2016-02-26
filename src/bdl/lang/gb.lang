@@ -36,6 +36,7 @@ field.name.text=Field Name
 hint.template.warning=This code template is for suggestion only
 no.component.text=No component selected.
 properties.text=Properties
+events.text=Events
 editor.view.tab=Editor View
 code.view.tab=Code View
 preview.gui.tab=Preview GUI

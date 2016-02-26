@@ -37,6 +37,7 @@ field.name.text=Variablenname
 hint.template.warning=Quelltext als Vorschlag
 no.component.text=Es ist keine Komponente ausgew\u00e4hlt
 properties.text=Eigenschaften
+events.text=Ereignisse
 editor.view.tab=Editoranzeige
 code.view.tab=Quelltextanzeige
 preview.gui.tab=GUI Vorschau

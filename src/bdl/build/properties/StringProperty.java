@@ -31,6 +31,7 @@ public class StringProperty implements PanelProperty {
 
         gp.add(new Label(name + ":"), 0, row);
         textField = new TextField();
+       
 
         //Grab value from settingsNode if given
         if (settingsNode != null) {
