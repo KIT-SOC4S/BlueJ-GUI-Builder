@@ -30,10 +30,11 @@ public class ListenerEnabledProperty implements PanelProperty {
         gp.add(new Label(listenerMethod + ":"), 0, row);
         checkBox = new CheckBox();
         if (implementIt!=null){
-        checkBox.setSelected(Boolean.parseBoolean(implementIt));//TODO - Handle bad defaultValue values
+           checkBox.setSelected(Boolean.parseBoolean(implementIt));
         } else {
         	checkBox.setSelected(false);
         } 
+        
         setToImplement(checkBox.isSelected());
         checkBox.setOnAction(e->handleCheckboxevent(e));
         gp.add(checkBox, 1, row);      

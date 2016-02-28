@@ -128,18 +128,27 @@ public class ComponentSettingsStore {
     }
     
     private void parseListeners(ComponentSettings componentSettings, Element listenerElement) {
+    	
         NodeList listeners = listenerElement.getElementsByTagName("listener");
         for (int i = 0; i < listeners.getLength(); i++) {
-            Element listener = (Element)listeners.item(i);
-            NodeList pack = listener.getElementsByTagName("package");
-            String packageName = pack.getLength()>0?pack.item(0).getTextContent():"";
-            String name = listener.getElementsByTagName("name").item(0).getTextContent();
-            String method = listener.getElementsByTagName("method").item(0).getTextContent();
-            String event = listener.getElementsByTagName("event").item(0).getTextContent();
+        	  Element listener = (Element)listeners.item(i);
+             NodeList pack = listener.getElementsByTagName("package");
+             String packageName = pack.getLength()>0?pack.item(0).getTextContent():"";
+             NodeList levent = listener.getElementsByTagName("event");
+        	 String event = levent.getLength()>0?levent.item(0).getTextContent():"";
             String isActive = listener.getElementsByTagName("isActive").item(0).getTextContent();
             NodeList ltype = listener.getElementsByTagName("listenertype");
-            String listenerType = ltype.getLength()>0?ltype.item(0).getTextContent():"standard";
-            componentSettings.addListenerHint(name, method, event, isActive,packageName,listenerType);
+             String listenerType = ltype.getLength()>0?ltype.item(0).getTextContent():"standard";
+            NodeList lname = listener.getElementsByTagName("name");
+            String name = lname.getLength()>0?lname.item(0).getTextContent():"";
+            NodeList lmethod = listener.getElementsByTagName("method");
+            String method = lmethod.getLength()>0?lmethod.item(0).getTextContent():"";
+            NodeList lpropertyname = listener.getElementsByTagName("propertyname");
+            String propertyname = lpropertyname.getLength()>0?lpropertyname.item(0).getTextContent():"";            
+            NodeList lpropertytype = listener.getElementsByTagName("propertytype");
+            String propertytype = lpropertytype.getLength()>0?lpropertytype.item(0).getTextContent():"";
+            componentSettings.addListenerHint(name, method, event, isActive,packageName,listenerType, propertyname, propertytype);
         }
+       
     }
 }

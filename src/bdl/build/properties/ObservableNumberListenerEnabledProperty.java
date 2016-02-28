@@ -15,7 +15,7 @@ public class ObservableNumberListenerEnabledProperty extends ListenerEnabledProp
 
     public ObservableNumberListenerEnabledProperty(final GObject gObj, String listenerMethod,String eventname, String eventtype, String implementIt, String packageName, GridPane gp, int row)  {
     	super(gObj,listenerMethod,eventname,eventtype,implementIt,packageName,gp,row);
-       
+       System.out.println(eventname+" "+eventtype);
     }
  
     @Override

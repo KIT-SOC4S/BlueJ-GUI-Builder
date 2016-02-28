@@ -11,10 +11,10 @@ import bdl.build.properties.FieldName;
 import bdl.build.properties.GUISizeProperty;
 import bdl.build.properties.LayoutProperty;
 import bdl.build.properties.ListenerEnabledProperty;
-import bdl.build.properties.ListenerHintProperty;
 import bdl.build.properties.ObservableBooleanListenerEnabledProperty;
 import bdl.build.properties.ObservableNumberListenerEnabledProperty;
 import bdl.build.properties.PanelProperty;
+import bdl.build.properties.PropertyListenerEnabledProperty;
 import bdl.build.properties.StrokeProperty;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
@@ -117,6 +117,10 @@ public class PropertyEditPane extends GridPane {
 							currentRow++);
 				} else if (lhint.getListenertype().equals("observableBoolean")) {
 					panelProperty = new ObservableBooleanListenerEnabledProperty(gObj, lhint.getListenerMethod(), name,
+							lhint.getListenerEvent(), lhint.getDefaultValue(), lhint.getPackageName(), this,
+							currentRow++);
+				} else if (lhint.getListenertype().equals("propertyChange")) {
+					panelProperty = new PropertyListenerEnabledProperty(gObj, lhint.getPropertyname(), lhint.getPropertytype(),
 							lhint.getListenerEvent(), lhint.getDefaultValue(), lhint.getPackageName(), this,
 							currentRow++);
 				}

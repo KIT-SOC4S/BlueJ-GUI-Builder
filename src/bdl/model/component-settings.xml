@@ -77,6 +77,7 @@
 			</property>
 		</properties>
 		<listeners>
+		   
 		</listeners>
 	</component>
 	
@@ -222,14 +223,14 @@
 				<method>setOnAction</method>
 				<event>ActionEvent</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
+			<listener>		
+			    <package>javafx.beans.value</package>
 				<isActive>false</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>			   
 		</listeners>
 	</component>
 	<component>
@@ -353,14 +354,14 @@
 				<method>setOnKeyTyped</method>
 				<event>KeyEvent</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
-				<isActive>true</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+			<listener>		
+			    <package>javafx.beans.value</package>
+				<isActive>false</isActive>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>
@@ -435,14 +436,14 @@
 				<method>setOnKeyTyped</method>
 				<event>KeyEvent</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
-				<isActive>true</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+			<listener>		
+			    <package>javafx.beans.value</package>
+				<isActive>false</isActive>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>
@@ -517,14 +518,14 @@
 				<method>setOnAction</method>
 				<event>ActionEvent</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
+			<listener>		
+			    <package>javafx.beans.value</package>
 				<isActive>false</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>
@@ -599,14 +600,14 @@
 				<method>setOnAction</method>
 				<event>ActionEvent</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
+			<listener>		
+			    <package>javafx.beans.value</package>
 				<isActive>false</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>
@@ -720,14 +721,14 @@
 				<method>setOnAction</method>
 				<event>Event</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
+			<listener>		
+			    <package>javafx.beans.value</package>
 				<isActive>false</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>
@@ -851,21 +852,22 @@
 		</properties>
 		<listeners>
 			<listener>
-				<listenertype>observableNumber</listenertype>
-				<package>javafx.beans.value</package>
+			    <package>javafx.beans.value</package>
 				<isActive>true</isActive>
-				<name>valueChanged</name>
-				<method>valueProperty().addListener</method>
-				<event>valueChanged</event>
+				<propertyname>valueProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Number</propertytype>
+				<event>valueChanged</event>	
+			
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
-				<isActive>false</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+			<listener>		
+			    <package>javafx.beans.value</package>
+				<isActive>true</isActive>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>
@@ -985,14 +987,14 @@
 				<method>setOnAction</method>
 				<event>ActionEvent</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
+			<listener>		
+			    <package>javafx.beans.value</package>
 				<isActive>false</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>
@@ -1151,14 +1153,14 @@
 				<method>setOnKeyTyped</method>
 				<event>KeyEvent</event>
 			</listener>
-			<listener>
-				<package>javafx.beans.value</package>
+			<listener>		
+			    <package>javafx.beans.value</package>
 				<isActive>false</isActive>
-				<name>focusedProperty</name>
-				<method>focusedProperty().addListener</method>
-				<listenertype>observableBoolean</listenertype>
-				<event>changeEvent</event>
-			</listener>
+				<propertyname>focusedProperty</propertyname>
+				<listenertype>propertyChange</listenertype>
+				<propertytype>Boolean</propertytype>
+				<event>focusChanged</event>	
+			</listener>		
 		</listeners>
 	</component>
 	<component>

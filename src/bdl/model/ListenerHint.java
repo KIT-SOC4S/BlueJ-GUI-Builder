@@ -25,21 +25,31 @@ public class ListenerHint {
     //as is by example setOnAction for Button 
     private String packageName="";
     private String listenertype="standard";
+	private String propertytype;
+	private String propertyname;
     
-    public String getListenertype() {
+    public String getPropertyname() {
+		return propertyname;
+	}
+
+	public String getPropertytype() {
+		return propertytype;
+	}
+
+	public String getListenertype() {
 		return listenertype;
 	}
 
-	public ListenerHint(String name, String method, String event, String defaultValue, String packageName) {    	
-        listenerName = name;
-        listenerMethod = method;
-        listenerEvent = event;
-        listenerText = buildText();
-        this.defaultValue=defaultValue;
-        this.packageName=packageName;
-    }
+//	public ListenerHint(String name, String method, String event, String defaultValue, String packageName) {    	
+//        listenerName = name;
+//        listenerMethod = method;
+//        listenerEvent = event;
+//        listenerText = buildText();
+//        this.defaultValue=defaultValue;
+//        this.packageName=packageName;
+//    }
     
-    public ListenerHint(String name, String method, String event, String defaultValue, String packageName, String listenerType) {    	
+    public ListenerHint(String name, String method, String event, String defaultValue, String packageName, String listenerType, String propertyName, String propertyType) {    	
         listenerName = name;
         listenerMethod = method;
         listenerEvent = event;
@@ -47,6 +57,8 @@ public class ListenerHint {
         this.defaultValue=defaultValue;
         this.packageName=packageName;
         this.listenertype=listenerType;
+        this.propertyname = propertyName;
+        this.propertytype =propertyType; 
     }
     
     public String getPackageName() {
