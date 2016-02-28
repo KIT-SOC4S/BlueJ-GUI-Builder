@@ -11,14 +11,12 @@ import bdl.build.properties.FieldName;
 import bdl.build.properties.GUISizeProperty;
 import bdl.build.properties.LayoutProperty;
 import bdl.build.properties.ListenerEnabledProperty;
-import bdl.build.properties.ObservableBooleanListenerEnabledProperty;
-import bdl.build.properties.ObservableNumberListenerEnabledProperty;
 import bdl.build.properties.PanelProperty;
 import bdl.build.properties.PropertyListenerEnabledProperty;
 import bdl.build.properties.StrokeProperty;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
-import bdl.model.ListenerHint;
+import bdl.model.ListenerProperty;
 import bdl.model.Property;
 import bdl.model.history.HistoryManager;
 import di.menubuilder.MenuBuilder;
@@ -92,43 +90,33 @@ public class PropertyEditPane extends GridPane {
 				e.printStackTrace();
 			}
 		}
-		if (componentSettings.getListenerHints().size() > 0) {
+		if (componentSettings.getListenerProperties().size() > 0) {
 			Label eventsHeading = new Label(LabelGrabber.getLabel("events.text") + ":");
 			eventsHeading.setMinWidth(120);
 			eventsHeading.setFont(Font.font(eventsHeading.getFont().getFamily(), FontWeight.BOLD,
 					propertiesHeading.getFont().getSize() + 0.5));
 			add(eventsHeading, 0, currentRow++);
 		}
-		for (ListenerHint lhint : componentSettings.getListenerHints()) {
-			String name = lhint.getName();
-			String text = lhint.getText();
+		for (ListenerProperty lprop : componentSettings.getListenerProperties()) {
 			try {
 				PanelProperty panelProperty = null;
 				// panelProperty = new ListenerHintProperty(gObj, guiObject,
-				// name, text, this, currentRow++);
+				// lprop.getName(), lprop.getText(), this, currentRow++);
 				// panelPropertyList.add(panelProperty);
-				if (lhint.getListenertype().equals("standard")) {
-					panelProperty = new ListenerEnabledProperty(gObj, lhint.getListenerMethod(), name,
-							lhint.getListenerEvent(), lhint.getDefaultValue(), lhint.getPackageName(), this,
+				if (lprop.getListenertype().equals("standard")) {
+					panelProperty = new ListenerEnabledProperty(gObj, lprop.getListenerMethod(), lprop.getName(),
+							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
 							currentRow++);
-				} else if (lhint.getListenertype().equals("observableNumber")) {
-					panelProperty = new ObservableNumberListenerEnabledProperty(gObj, lhint.getListenerMethod(), name,
-							lhint.getListenerEvent(), lhint.getDefaultValue(), lhint.getPackageName(), this,
-							currentRow++);
-				} else if (lhint.getListenertype().equals("observableBoolean")) {
-					panelProperty = new ObservableBooleanListenerEnabledProperty(gObj, lhint.getListenerMethod(), name,
-							lhint.getListenerEvent(), lhint.getDefaultValue(), lhint.getPackageName(), this,
-							currentRow++);
-				} else if (lhint.getListenertype().equals("propertyChange")) {
-					panelProperty = new PropertyListenerEnabledProperty(gObj, lhint.getPropertyname(), lhint.getPropertytype(),
-							lhint.getListenerEvent(), lhint.getDefaultValue(), lhint.getPackageName(), this,
+				} 	else if (lprop.getListenertype().equals("propertyChange")) {
+					panelProperty = new PropertyListenerEnabledProperty(gObj, lprop.getPropertyname(), lprop.getPropertytype(),
+							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
 							currentRow++);
 				}
 				if (panelProperty != null) {
 					panelPropertyList.add(panelProperty);
 				}
 			} catch (Exception e) {
-				System.out.println(name + "Listener failed.");
+				System.out.println(lprop.getName() + "ListenerProperty failed.");
 				e.printStackTrace();
 			}
 		}

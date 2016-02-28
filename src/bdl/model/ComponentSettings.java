@@ -17,7 +17,7 @@ public class ComponentSettings {
     private String layoutType;
     private String icon;
     private List<Property> properties = new ArrayList<>();
-    private List<ListenerHint> listenerHints = new ArrayList<>();
+    private List<ListenerProperty> listenerProperties = new ArrayList<>();
     
     /**
      * Returns a collection of Properties properties associated with the this
@@ -35,8 +35,8 @@ public class ComponentSettings {
      * 
      * @return A collection of ListenerHint objects associated with this component
      */
-    public List<ListenerHint> getListenerHints() {
-        return listenerHints;
+    public List<ListenerProperty> getListenerProperties() {
+        return listenerProperties;
     }
 
     /**
@@ -97,8 +97,8 @@ public class ComponentSettings {
         properties.add(new Property(name, enabled, type, defaultValue, observedProperty,getter, setter, fxml, javaCodeGeneration));
     }
 
-    public void addListenerHint(String name, String method, String event,String defaultValue, String packageName,String listenerType, String propertyName, String propertyType) {
-        listenerHints.add(new ListenerHint(name, method, event,defaultValue,packageName,listenerType, propertyName, propertyType));
+    public void addListenerProperty(String name, String method, String event,String defaultValue, String packageName,String listenerType, String propertyName, String propertyType) {
+        listenerProperties.add(new ListenerProperty(name, method, event,defaultValue,packageName,listenerType, propertyName, propertyType));
     }
     
 

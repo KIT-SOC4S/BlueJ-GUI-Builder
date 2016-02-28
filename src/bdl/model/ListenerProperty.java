@@ -4,7 +4,7 @@ package bdl.model;
  *
  * @author Ben Goodwin
  */
-public class ListenerHint {
+public class ListenerProperty {
     public String getListenerName() {
 		return listenerName;
 	}
@@ -49,7 +49,7 @@ public class ListenerHint {
 //        this.packageName=packageName;
 //    }
     
-    public ListenerHint(String name, String method, String event, String defaultValue, String packageName, String listenerType, String propertyName, String propertyType) {    	
+    public ListenerProperty(String name, String method, String event, String defaultValue, String packageName, String listenerType, String propertyName, String propertyType) {    	
         listenerName = name;
         listenerMethod = method;
         listenerEvent = event;

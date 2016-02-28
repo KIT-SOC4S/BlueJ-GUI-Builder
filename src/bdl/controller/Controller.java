@@ -38,7 +38,7 @@ import bdl.build.javafx.scene.control.GMenuBar;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
 import bdl.model.ComponentSettingsStore;
-import bdl.model.ListenerHint;
+import bdl.model.ListenerProperty;
 import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryListener;
 import bdl.model.history.HistoryManager;
@@ -1590,8 +1590,8 @@ public class Controller {
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
 			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
 			imports.put(componentSettings.getType(), componentSettings.getPackageName());
-			if (componentSettings.getListenerHints() != null && componentSettings.getListenerHints().size() > 0) {
-				for (ListenerHint lh : componentSettings.getListenerHints()) {
+			if (componentSettings.getListenerProperties() != null && componentSettings.getListenerProperties().size() > 0) {
+				for (ListenerProperty lh : componentSettings.getListenerProperties()) {
 					if (!imports.containsKey(lh.getListenerEvent())) {
 						imports.put(lh.getListenerEvent(), lh.getPackageName());
 					}

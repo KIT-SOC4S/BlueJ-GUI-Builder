@@ -39,7 +39,7 @@ public class FieldName {
 		this.historyManager = hm;
 		this.gObj = gObj;
 
-		// Grab the fieldname if already set (which is the case when loading
+		// Grab the fieldname if already set (which should be the case when loading
 		// from FXML).
 		if (gObj.getFieldName() != null) {
 			textField.setText(gObj.getFieldName());

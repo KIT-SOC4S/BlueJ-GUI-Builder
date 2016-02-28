@@ -1,13 +1,5 @@
 package bdl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-
 import bdl.controller.Controller;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettingsStore;
@@ -19,17 +11,17 @@ import di.inout.LanguageChooser;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
- * Main class.
+ * Main class 
+ * but use di.bluejLink.MenuExtensionGUIDesignerFXMAIN to start!
  */
 public class Main extends Application implements Runnable {    
-
+//use MenuExtensionGUIDesignerFXMAIN to start!
     private BlueJ blueJ;
-	private BlueJInterface blueJInterface2;
+	private BlueJInterface blueJInterfaceDi;
 	public static String language="english";
     public void run() {
         launch();
@@ -65,9 +57,9 @@ public class Main extends Application implements Runnable {
             //System.exit(1); - We don't want to kill BlueJ! The user might lose all their work!
             throw new Exception("GUI Builder: Problem with component settings");
         }
-        final View view = new View(stage, blueJInterface2 != null);
-        new Controller(view, model, blueJInterface2);
-        if (blueJInterface2 != null) {           
+        final View view = new View(stage, blueJInterfaceDi != null);
+        new Controller(view, model, blueJInterfaceDi);
+        if (blueJInterfaceDi != null) {           
             Platform.setImplicitExit(false);
         }
 
@@ -94,6 +86,6 @@ public class Main extends Application implements Runnable {
     }
     public void setBlueJ(BlueJ bluej) {
 		this.blueJ = bluej;
-		blueJInterface2 = new BlueJProjektVerwalter(bluej);
+		blueJInterfaceDi = new BlueJProjektVerwalter(bluej);
 	}
 }
