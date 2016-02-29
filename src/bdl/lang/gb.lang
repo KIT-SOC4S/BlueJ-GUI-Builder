@@ -33,6 +33,7 @@ bluejexport.condialog3=Replace existing?
 output.fileexists.question=File exists. Replace existing
 javaexport.directory=Please choose Directory for Java-Export
 field.name.text=Field Name
+menu.text=Text
 hint.template.warning=This code template is for suggestion only
 no.component.text=No component selected.
 properties.text=Properties

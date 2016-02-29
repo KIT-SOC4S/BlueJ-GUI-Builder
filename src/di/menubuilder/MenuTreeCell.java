@@ -317,7 +317,7 @@ public class MenuTreeCell extends TreeCell<MenuTreeItem> {
 		}
 
 		Dialog<String[]> dialog = new Dialog<>();
-		dialog.setTitle("Input Dialog");
+		dialog.setTitle(LabelGrabber.getLabel("input.dialog"));
 
 		dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -331,9 +331,9 @@ public class MenuTreeCell extends TreeCell<MenuTreeItem> {
 		TextField fieldnameInput = new TextField();
 		fieldnameInput.setText(fieldnameVorgabe);
 
-		grid.add(new Label("Text"), 0, 0);
+		grid.add(new Label(LabelGrabber.getLabel("menu.text")+":"), 0, 0);
 		grid.add(textInput, 1, 0);
-		grid.add(new Label("Fieldname:"), 0, 1);
+		grid.add(new Label(LabelGrabber.getLabel("field.name.text")+":"), 0, 1);
 		grid.add(fieldnameInput, 1, 1);
 		dialog.getDialogPane().setContent(grid);
 

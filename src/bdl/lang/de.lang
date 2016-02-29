@@ -34,6 +34,7 @@ bluejexport.condialog3=Soll sie \u00fcberschrieben werden?
 output.fileexists.question=Die Datei ist bereits vorhanden. Soll sie \u00fberschrieben werden
 javaexport.directory=Legen Sie den Zielordner für den Java-Export fest
 field.name.text=Variablenname
+menu.text=Beschriftung
 hint.template.warning=Quelltext als Vorschlag
 no.component.text=Es ist keine Komponente ausgew\u00e4hlt
 properties.text=Eigenschaften

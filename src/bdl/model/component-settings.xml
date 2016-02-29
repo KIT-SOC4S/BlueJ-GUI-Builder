@@ -758,7 +758,7 @@
 				<fxml>orientation</fxml>
 			</property>
 			<property>
-				<name>min</name>
+				<name>Min</name>
 				<enabled>true</enabled>
 				<pseudotype>Double1DP</pseudotype>
 				<default>0</default>
@@ -767,7 +767,7 @@
 				<fxml>min</fxml>
 			</property>
 			<property>
-				<name>max</name>
+				<name>Max</name>
 				<enabled>true</enabled>
 				<pseudotype>Double1DP</pseudotype>
 				<default>100</default>
@@ -776,7 +776,7 @@
 				<fxml>max</fxml>
 			</property>
 			<property>
-				<name>value</name>
+				<name>Value</name>
 				<enabled>true</enabled>
 				<pseudotype>Double1DP</pseudotype>
 				<default>10</default>
@@ -785,13 +785,49 @@
 				<fxml>value</fxml>
 			</property>
 			<property>
-				<name>minTicksVisible</name>
+				<name>Show Tick Marks</name>
 				<enabled>true</enabled>
 				<pseudotype>StandardBoolean</pseudotype>
 				<default>false</default>
 				<setter>setShowTickMarks</setter>
-				<getter>isShowTickMarks</getter>
+				<getter>isShowTickMarks</getter>				
+				<fxml>showTickLabels</fxml>
+			</property>
+			<property>
+				<name>Show Tick Label</name>
+				<enabled>true</enabled>
+				<pseudotype>StandardBoolean</pseudotype>
+				<default>false</default>
+				<setter>setShowTickLabels</setter>
+				<getter>isShowTickLabels</getter>
 				<fxml>showTickMarks</fxml>
+			</property>
+			<property>
+				<name>Major Tick Unit</name>
+				<enabled>true</enabled>
+				<pseudotype>Double1DP</pseudotype>
+				<default>25</default>
+				<setter>setMajorTickUnit</setter>
+				<getter>getMajorTickUnit</getter>
+				<fxml>majorTickUnit</fxml>
+			</property>
+			<property>
+				<name>Minor Tick Count</name>
+				<enabled>true</enabled>
+				<pseudotype>Double1DP</pseudotype>
+				<default>3</default>
+				<setter>setMinorTickCount</setter>
+				<getter>getMinorTickCount</getter>
+				<fxml>minorTickCount</fxml>
+			</property>
+			<property>
+				<name>Snap To Ticks</name>
+				<enabled>true</enabled>
+				<pseudotype>StandardBoolean</pseudotype>
+				<default>false</default>
+				<setter>setSnapToTicks</setter>
+				<getter>isSnapToTicks</getter>
+				<fxml>snapToTicks</fxml>
 			</property>
 			<property>
 				<name>MinWidth</name>
@@ -857,12 +893,11 @@
 				<propertyname>valueProperty</propertyname>
 				<listenertype>propertyChange</listenertype>
 				<propertytype>Number</propertytype>
-				<event>valueChanged</event>	
-			
+				<event>valueChanged</event>				
 			</listener>
 			<listener>		
 			    <package>javafx.beans.value</package>
-				<isActive>true</isActive>
+				<isActive>false</isActive>
 				<propertyname>focusedProperty</propertyname>
 				<listenertype>propertyChange</listenertype>
 				<propertytype>Boolean</propertytype>
