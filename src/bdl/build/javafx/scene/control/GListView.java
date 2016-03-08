@@ -52,4 +52,17 @@ public class GListView extends ListView implements GObject {
     public PropertyEditPane getPEP() {
         return pep;
     }
+    
+    public String getJavaConstructor() {
+  		return fieldNameProperty.getValue() + " = new ListView<String>();\n" ;
+
+  	}
+    @Override
+   	public StringBuilder getAdditionalMethodInvokations(){
+   		StringBuilder methodsString = new StringBuilder(); 
+   		methodsString.append("        //simple samplecode ListView\n"+
+   		"        this."+fieldNameProperty.getValue() +".getItems().addAll(\"listItem A\",\"listItem B\");\n");
+   		return methodsString;
+   	}
+   
 }

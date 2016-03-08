@@ -142,6 +142,7 @@ public class Controller {
 		setupMiddlePanel();
 		setupRightPanel();
 		setupTopPanel();
+		toggleHistory();
 		view.middleTabPane.viewPane.setOnMousePressed(new EventHandler<MouseEvent>() {
 
 			@Override
@@ -254,7 +255,7 @@ public class Controller {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void exportJavaToBlueJ(BProject aktuellesBlueJProjekt) {
 
@@ -438,88 +439,6 @@ public class Controller {
 		// Edit Menu > Delete button functionality
 		selectionManager.addSelectionListener(getDeleteSelectionListener());
 
-		// selectionManager.addSelectionListener(new SelectionListener() {
-		// @Override
-		// public void updateSelected(final GObject gObject) {
-		// view.topPanel.mItmDelete.setDisable(false);
-		// view.topPanel.mItmDelete.setOnAction(new EventHandler<ActionEvent>()
-		// {
-		// @Override
-		// public void handle(ActionEvent actionEvent) {
-		// // if (gObject instanceof GMenuBar){
-		// // ((GMenuBar)gObject).clearTree();
-		// // }
-		// view.middleTabPane.viewPane.getChildren().remove(gObject);
-		// selectionManager.clearSelection();
-		// historyManager.addHistory(new HistoryItem() {
-		// @Override
-		// public void restore() {
-		//
-		// view.middleTabPane.viewPane.getChildren().remove(gObject);
-		// selectionManager.clearSelection();
-		// }
-		//
-		// @Override
-		// public void revert() {
-		// view.middleTabPane.viewPane.getChildren().add((Node) gObject);
-		// selectionManager.updateSelected(gObject);
-		// }
-		//
-		// @Override
-		// public String getAppearance() {
-		// return gObject.getFieldName() + " deleted";
-		// }
-		// });
-		// }
-		// });
-		// view.topPanel.mItmClearAll.setDisable(false);
-		// view.topPanel.mItmClearAll.setOnAction(new
-		// EventHandler<ActionEvent>() {
-		// @Override
-		// public void handle(ActionEvent actionEvent) {
-		// final List<Node> list = new ArrayList<>();
-		// list.addAll(view.middleTabPane.viewPane.getChildren());
-		// // for (Node n : list) {
-		// // if (n instanceof GMenuBar){
-		// // ((GMenuBar)n).clearTree();
-		// // }
-		// // }
-		// view.middleTabPane.viewPane.getChildren().clear();
-		//
-		// selectionManager.clearSelection();
-		//
-		// historyManager.addHistory(new HistoryItem() {
-		// @Override
-		// public void restore() {
-		// for (Node n : list) {
-		// view.middleTabPane.viewPane.getChildren().remove(n);
-		// }
-		// selectionManager.clearSelection();
-		// }
-		//
-		// @Override
-		// public void revert() {
-		// for (Node n : list) {
-		// view.middleTabPane.viewPane.getChildren().add(n);
-		// selectionManager.updateSelected((GObject) n);
-		// }
-		// }
-		//
-		// @Override
-		// public String getAppearance() {
-		// return ("Clear All");
-		// }
-		// });
-		// }
-		// });
-		// }
-		//
-		// @Override
-		// public void clearSelection() {
-		// view.topPanel.mItmDelete.setDisable(true);
-		// // view.topPanel.mItmClearAll.setDisable(true);
-		// }
-		// });
 		view.topPanel.mItmLanguage.setOnAction(e -> LanguageChooser.getLanguageByDialog());
 		// View > Show Hierarchy
 		view.topPanel.mItmHierarchy.setOnAction(new EventHandler<ActionEvent>() {
@@ -628,9 +547,7 @@ public class Controller {
 				if (item != null) {
 					selectionManager.updateSelected(item.getValue().getGObject());
 					selectionManager.updateSelected(item.getValue().getGObject());
-					// view.leftPanel.hierarchyPane.treeView.requestFocus();
-					// popupTree.getSelectionModel().select(5);
-					// popupTree.getFocusModel().focus(5);
+
 				}
 
 			}
@@ -641,75 +558,32 @@ public class Controller {
 
 		// Add selection handlers for Hierarchy Pane
 		selectionManager.addSelectionListener(getHierachyPanelSelectionistener());
-		// selectionManager.addSelectionListener(new SelectionListener() {
-		// @Override
-		// public void updateSelected(GObject gObject) {
-		// update(gObject.getFieldName(),
-		// view.leftPanel.hierarchyPane.treeRoot);
-		//
-		// }
-		//
-		// private void update(String fieldName, TreeItem<HierarchyTreeItem>
-		// treeRoot) {
-		// for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
-		// GObject gObject = ti.getValue().getGObject();
-		// if (gObject.getFieldName().equals(fieldName)) {
-		// view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(ti);
-		//
-		// } else if (gObject instanceof Pane) {
-		// update(fieldName, ti);
-		// }
-		//
-		// }
-		// }
-		//
-		// @Override
-		// public void clearSelection() {
-		// // System.out.println("ClearSelection");
-		// view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(-1);
-		//
-		// }
-		// });
+
 	}
 
 	private void setupMiddlePanel() {
+		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
+			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
+			try {
+				if (componentSettings.getType().equals(view.middleTabPane.viewPane.getNodeClassName())) {
+					historyManager.pause();
+
+					PropertyEditPane propertyEditPane = new PropertyEditPane(view.middleTabPane.viewPane,
+							componentSettings, fieldNames, view.middleTabPane.viewPane, null, historyManager);
+
+					view.middleTabPane.viewPane
+							.setPEP(new PropertyEditPane(view.middleTabPane.viewPane, componentSettings));
+					historyManager.unpause();
+
+					break;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		selectionManager.addSelectionListener(getMiddlePanelSelectionistener());
-		// Add selection handlers for the outline
-		/*
-		 * selectionManager.addSelectionListener(new SelectionListener() {
-		 * 
-		 * @Override public void updateSelected(GObject gObject) { if (gObject
-		 * instanceof GUIObject) { return; } Node node = (Node) gObject;
-		 * Rectangle outline = view.middleTabPane.outline;
-		 * 
-		 * outline.setVisible(true); if (anfasser != null) { // if
-		 * (anfasser.getNode() != gObject) { anfasser.setNode((Node) gObject,
-		 * (Pane) node.getParent()); // } else { // anfasser.update(); // } }
-		 * double nodeX = 0; double nodeY = 0; Node node2 = node; while (!(node2
-		 * instanceof GUIObject)) { nodeX += node2.getLayoutX(); nodeY +=
-		 * node2.getLayoutY(); node2 = node2.getParent(); }
-		 * 
-		 * // double nodeX = node.getParent().getLayoutX() + //
-		 * node.getLayoutX(); // double nodeY = node.getParent().getLayoutY() +
-		 * // node.getLayoutY();
-		 * 
-		 * Bounds bounds = node.getLayoutBounds(); double nodeW =
-		 * bounds.getWidth(); double nodeH = bounds.getHeight(); if (node
-		 * instanceof Circle) { outline.setLayoutX(nodeX - 4 - (nodeW / 2));
-		 * outline.setLayoutY(nodeY - 4 - (nodeH / 2)); } else if (node
-		 * instanceof Rectangle) { Rectangle r = (Rectangle) node;
-		 * outline.setLayoutX(nodeX - 4 - (r.getStrokeWidth() / 2));
-		 * outline.setLayoutY(nodeY - 4 - (r.getStrokeWidth() / 2)); } else {
-		 * outline.setLayoutX(nodeX - 4); outline.setLayoutY(nodeY - 4); }
-		 * outline.setWidth(nodeW + 8); outline.setHeight(nodeH + 8);
-		 * 
-		 * }
-		 * 
-		 * @Override public void clearSelection() {
-		 * view.middleTabPane.outline.setVisible(false); if (anfasser != null) {
-		 * // anfasser.removeFromParent(); anfasser.setVisible(false); } // if
-		 * (anfasser!=null){anfasser.setzeSichtbar(false);} } });
-		 */
+
 		view.middleTabPane.viewPane.setOnMousePressed(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
@@ -729,97 +603,6 @@ public class Controller {
 			}
 		});
 		view.middleTabPane.previewTab.setOnSelectionChanged(e -> generatePreviewInMemory());
-
-		// view.middleTabPane.previewTab.setOnSelectionChanged(new
-		// EventHandler<Event>() {
-		// @Override
-		// public void handle(Event event) {
-		// if (view.middleTabPane.previewTab.isSelected()) {
-		//
-		// // Write .java file
-		// // Make temporary space in BlueJ user dir for compilation.
-		// File fileJava;
-		// File fileClass;
-		//
-		// fileJava = new File(view.middleTabPane.viewPane.getClassName() +
-		// ".java");
-		// fileClass = new File(view.middleTabPane.viewPane.getClassName() +
-		// ".class");
-		//
-		// try {
-		// BufferedOutputStream cssOutput = new BufferedOutputStream(new
-		// FileOutputStream(fileJava));
-		// cssOutput.write(generateJavaCode("", true).getBytes());
-		// cssOutput.flush();
-		// cssOutput.close();
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-		//
-		// // Compile class
-		// JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		// if (compiler == null) {
-		// Alert alert = new Alert(AlertType.INFORMATION);
-		// alert.setContentText(LabelGrabber.getLabel("controller.nopreview") +
-		// "\n"
-		// + LabelGrabber.getLabel("controller.nopreview2") + "\n"
-		// + LabelGrabber.getLabel("controller.nopreview3") + "\n"
-		// + LabelGrabber.getLabel("controller.nopreview4"));
-		// alert.showAndWait();
-		// throw new RuntimeException("Jar could not be created as Java version
-		// requires javac.\n"
-		// + "May solve the problem: Install JDK and copy tools.jar in JDK/lib/
-		// into _all_ existing JRE/lib/");
-		// }
-		// StandardJavaFileManager fileManager =
-		// compiler.getStandardFileManager(null, null, null);
-		//
-		// Iterable<? extends JavaFileObject> compilationUnits1 = fileManager
-		// .getJavaFileObjectsFromFiles(Arrays.asList(fileJava));
-		//
-		// // Compiler options
-		// // List<String> optionsList = new ArrayList<String>();
-		// // File fileJfxrt = new
-		// // File(System.getProperty("java.home"), "lib\\jfxrt.jar");
-		// // optionsList.add("-classpath
-		// // "+fileJfxrt.getAbsolutePath()+":.");
-		//
-		// compiler.getTask(null, fileManager, null, null, null,
-		// compilationUnits1).call();
-		//
-		// try {
-		// fileManager.close();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		//
-		// // Load & run class
-		// try {
-		// Class guiClass;
-		//
-		// URL[] urls = new URL[] { new File(".").toURI().toURL() };
-		// URLClassLoader ucl = new URLClassLoader(urls);
-		// guiClass = Class.forName(view.middleTabPane.viewPane.getClassName(),
-		// false, ucl);
-		//
-		// Method main = guiClass.getMethod("start", Stage.class);
-		// Object obj = guiClass.newInstance();
-		// main.invoke(obj, new Stage());
-		//
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-		//
-		// // Delete created files
-		// boolean fJd = fileJava.delete();
-		// boolean fCd = fileClass.delete();
-		// // Alert alert = new Alert(AlertType.INFORMATION);
-		// // alert.setContentText("Files deleted?"+fJd+" "+fCd);
-		// // alert.showAndWait();
-		// view.middleTabPane.getSelectionModel().select(0);
-		// }
-		// }
-		// });
 
 		view.middleTabPane.viewPane.setOnDragOver(new EventHandler<DragEvent>() {
 			@Override
@@ -1138,7 +921,7 @@ public class Controller {
 	private SelectionListener getHierachyPanelSelectionistener() {
 		return new SelectionListener() {
 			@Override
-			public void updateSelected(GObject gObject) {				
+			public void updateSelected(GObject gObject) {
 				update(gObject.getFieldName(), view.leftPanel.hierarchyPane.treeRoot);
 			}
 
@@ -1146,7 +929,7 @@ public class Controller {
 				if (treeRoot.getValue().getGObject().getFieldName().equals(fieldName)) {
 					view.leftPanel.hierarchyPane.treeView.getSelectionModel().select(treeRoot);
 				} else {
-					
+
 					for (TreeItem<HierarchyTreeItem> ti : treeRoot.getChildren()) {
 						GObject gObject = ti.getValue().getGObject();
 						if (gObject.getFieldName().equals(fieldName)) {
@@ -1245,7 +1028,7 @@ public class Controller {
 				// the panel not showing properties when loaded from BlueJ...
 				/*
 				 * Platform.runLater(new Runnable() {
-				 * 
+				 *
 				 * @Override public void run() {
 				 * view.rightPanel.propertyScroll.setContent(gObject.getPEP());
 				 * view.rightPanel.rightSplitPaneTop.getChildren().clear();
@@ -1266,33 +1049,6 @@ public class Controller {
 	private void setupRightPanel() {
 		// Add selection handlers for the Property Edit Pane
 		selectionManager.addSelectionListener(getRightPanelSelectionistener());
-
-		// selectionManager.addSelectionListener(new SelectionListener() {
-		// @Override
-		// public void updateSelected(final GObject gObject) {
-		// // Yes, it really does make no sense to put this in a
-		// // Platform.runLater,
-		// // and removing and readding the splitpane makes no sense, but
-		// // it fixes
-		// // the panel not showing properties when loaded from BlueJ...
-		// /*
-		// * Platform.runLater(new Runnable() {
-		// *
-		// * @Override public void run() {
-		// * view.rightPanel.propertyScroll.setContent(gObject.getPEP());
-		// * view.rightPanel.rightSplitPaneTop.getChildren().clear();
-		// * view.rightPanel.rightSplitPaneTop.getChildren().add(view.
-		// * rightPanel.propertyScroll); } });
-		// */
-		//
-		// view.rightPanel.propertyScroll.setContent(gObject.getPEP());
-		// }
-		//
-		// @Override
-		// public void clearSelection() {
-		// view.rightPanel.propertyScroll.setContent(new PropertyEditPane());
-		// }
-		// });
 
 		// Add history handlers for the History Pane
 		historyManager.addHistoryListener(new HistoryListener() {
@@ -1327,7 +1083,7 @@ public class Controller {
 
 	/**
 	 * Open the specified FXML file.
-	 * 
+	 *
 	 * @param file
 	 *            the File referencing the FXML file.
 	 */
@@ -1336,10 +1092,11 @@ public class Controller {
 		Parent parent = null;
 		if (file != null) {
 			view.middleTabPane.viewPane.getChildren().clear();
-
 			selectionManager.clearSelection();
 			// selectionManager.setEnabled(false);
 			historyManager.clearHistory();
+			fieldNames.clear();
+			fieldNames.add("root");
 
 			try {
 				parent = FXMLLoader.load(file.toURI().toURL());
@@ -1349,6 +1106,20 @@ public class Controller {
 				String className = parent.getId();
 				if (className != null && !className.isEmpty()) {
 					view.middleTabPane.viewPane.setClassName(className);
+				}
+				for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
+					ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
+					try {
+						if (componentSettings.getType().equals(parent.getClass().getSimpleName())) {
+							historyManager.pause();
+							view.middleTabPane.viewPane
+									.setPEP(new PropertyEditPane(view.middleTabPane.viewPane, componentSettings));
+							historyManager.unpause();
+							break;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 
 				for (Node node : parent.getChildrenUnmodifiable()) {
@@ -1386,7 +1157,7 @@ public class Controller {
 
 		// Platform.runLater(() -> {
 		// visitTree(view.middleTabPane.viewPane);
-		// });// otherwise to early for mover
+		// });// otherwise to early for mover (seems now to be unnecessary)
 		isOpeningFile = false;
 		// ausgabe(parent);
 	}
@@ -1420,6 +1191,7 @@ public class Controller {
 
 	}
 
+	// for debugging only
 	private void ausgabe(Parent parent) {
 		if (parent == null) {
 			return;
@@ -1453,7 +1225,7 @@ public class Controller {
 
 	/**
 	 * Reset the workspace and set the new GUI's name to className.
-	 * 
+	 *
 	 * @param className
 	 *            the desired name of the new GUI
 	 */
@@ -1532,12 +1304,12 @@ public class Controller {
 	 * Toggle the history panel's visibility.
 	 */
 	public void toggleHistory() {
-		if (!view.rightPanel.getItems().contains(view.rightPanel.historyPanel)) {
-			view.topPanel.mItmHistory.setSelected(true);
-			view.rightPanel.getItems().add(view.rightPanel.historyPanel);
-			view.rightPanel.setDividerPosition(0, 0.6);
+		if (view.topPanel.mItmHistory.isSelected()) {
+			if (!view.rightPanel.getItems().contains(view.rightPanel.historyPanel)) {
+				view.rightPanel.getItems().add(view.rightPanel.historyPanel);
+				view.rightPanel.setDividerPosition(0, 0.6);
+			}
 		} else {
-			view.topPanel.mItmHistory.setSelected(false);
 			view.rightPanel.getItems().remove(view.rightPanel.historyPanel);
 		}
 	}
@@ -1564,33 +1336,14 @@ public class Controller {
 		view.getStage().hide();
 	}
 
-	/**
-	 * Generates the full Java code for middlepane and preview
-	 */
-	/*
-	 * private String generateJavaCode(boolean forPreview) { HashMap<String,
-	 * String> imports = new HashMap<>(); for (ComponentMenuItem
-	 * componentMenuItem : view.leftPanel.leftList.getItems()) {
-	 * ComponentSettings componentSettings =
-	 * componentMenuItem.getComponentSettings();
-	 * imports.put(componentSettings.getType(),
-	 * componentSettings.getPackageName()); if
-	 * (componentSettings.getListenerHints() != null &&
-	 * componentSettings.getListenerHints().size() > 0) { for (ListenerHint lh :
-	 * componentSettings.getListenerHints()) { if
-	 * (!imports.containsKey(lh.getListenerEvent())) {
-	 * imports.put(lh.getListenerEvent(), lh.getPackageName()); } } } } return
-	 * CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports,
-	 * forPreview); }
-	 */
-
 	/** Generates the full Java code */
 	public String generateJavaCode(String className, boolean forPreview) {
 		HashMap<String, String> imports = new HashMap<>();
 		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
 			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
 			imports.put(componentSettings.getType(), componentSettings.getPackageName());
-			if (componentSettings.getListenerProperties() != null && componentSettings.getListenerProperties().size() > 0) {
+			if (componentSettings.getListenerProperties() != null
+					&& componentSettings.getListenerProperties().size() > 0) {
 				for (ListenerProperty lh : componentSettings.getListenerProperties()) {
 					if (!imports.containsKey(lh.getListenerEvent())) {
 						imports.put(lh.getListenerEvent(), lh.getPackageName());
@@ -1624,115 +1377,13 @@ public class Controller {
 
 		newThing.setPEP(propertyEditPane);
 
-		if (componentSettings.getLayoutType().equals("anchorpane")) {
+		if (newThing instanceof AnchorPane) {
 			dealWithPane((Pane) newThing);
 		}
 
 		final Node newNode = (Node) newThing;
 		setNewNodeListeners(viewListeners, newNode);
-		// newNode.layoutBoundsProperty().addListener(new
-		// ChangeListener<Bounds>() {
-		// @Override
-		// public void changed(ObservableValue<? extends Bounds> ov, Bounds t,
-		// Bounds t1) {
-		// if (selectionManager.getCurrentlySelected() == newNode) {
-		// selectionManager.updateSelected((GObject) newNode);
-		// } else {
-		// if (newNode instanceof Pane) {
-		// ((Pane) newNode).setPrefWidth(t1.getWidth());
-		// ((Pane) newNode).setPrefHeight(t1.getHeight());
-		// }
-		// }
-		// }
-		// });
-		//
-		// newNode.layoutXProperty().addListener(new ChangeListener<Number>() {
-		// @Override
-		// public void changed(ObservableValue<? extends Number> ov, Number t,
-		// Number t1) {
-		// if (selectionManager.getCurrentlySelected() == newNode) {
-		// selectionManager.updateSelected((GObject) newNode);
-		// }
-		// }
-		// });
-		//
-		// newNode.layoutYProperty().addListener(new ChangeListener<Number>() {
-		// @Override
-		// public void changed(ObservableValue<? extends Number> ov, Number t,
-		// Number t1) {
-		// if (selectionManager.getCurrentlySelected() == newNode) {
-		// selectionManager.updateSelected((GObject) newNode);
-		// }
-		// }
-		// });
-		//
-		// if (newNode instanceof Pane) {
-		//
-		// newNode.setOnMousePressed(new EventHandler<MouseEvent>() {
-		//
-		// @Override
-		// public void handle(MouseEvent mouseEvent) {
-		// selectionManager.updateSelected((GObject) newNode);
-		// viewListeners.onMousePressed(newNode, mouseEvent);
-		// mouseEvent.consume();// Stops the mouseEvent falling through
-		// // to
-		// // the viewPane which would clear
-		// // selection
-		// }
-		// });
-		// newNode.setOnMouseReleased(new EventHandler<MouseEvent>() {
-		// @Override
-		// public void handle(MouseEvent mouseEvent) {
-		// viewListeners.onMouseReleased(newNode, mouseEvent);
-		// mouseEvent.consume();
-		// }
-		// });
-		// newNode.setOnMouseDragged(new EventHandler<MouseEvent>() {
-		//
-		// @Override
-		// public void handle(MouseEvent mouseEvent) {
-		// // System.out.println("MouseDragged");
-		// viewListeners.onMouseDragged(newNode, mouseEvent);
-		// selectionManager.updateSelected((GObject) newNode);
-		// mouseEvent.consume();
-		// }
-		// });
-		//
-		// } else {
-		//
-		// newNode.addEventFilter(MouseEvent.MOUSE_PRESSED, new
-		// EventHandler<MouseEvent>() {
-		//
-		// @Override
-		// public void handle(MouseEvent mouseEvent) {
-		// selectionManager.updateSelected((GObject) newNode);
-		// viewListeners.onMousePressed(newNode, mouseEvent);
-		// mouseEvent.consume();// Stops the mouseEvent falling through
-		// // to
-		// // the viewPane which would clear
-		// // selection
-		// }
-		// });
-		// newNode.addEventFilter(MouseEvent.MOUSE_RELEASED, new
-		// EventHandler<MouseEvent>() {
-		// @Override
-		// public void handle(MouseEvent mouseEvent) {
-		// viewListeners.onMouseReleased(newNode, mouseEvent);
-		// mouseEvent.consume();
-		// }
-		// });
-		// newNode.addEventFilter(MouseEvent.MOUSE_DRAGGED, new
-		// EventHandler<MouseEvent>() {
-		//
-		// @Override
-		// public void handle(MouseEvent mouseEvent) {
-		// // System.out.println("MouseDragged");
-		// viewListeners.onMouseDragged(newNode, mouseEvent);
-		// selectionManager.updateSelected((GObject) newNode);
-		// mouseEvent.consume();
-		// }
-		// });
-		// }
+
 		setNewNodeDeleteButton(destination, newNode);
 
 		destination.getChildren().add(newNode);
@@ -1752,26 +1403,7 @@ public class Controller {
 			newNode.setLayoutY(y);
 		}
 		setNewNodeToHistory(newThing, destination, newNode);
-		// // Finally, let the history manager know this new thing has happened.
-		// historyManager.addHistory(new HistoryItem() {
-		// @Override
-		// public void restore() {
-		// destination.getChildren().add(newNode);
-		// selectionManager.updateSelected(newThing);
-		// }
-		//
-		// @Override
-		// public void revert() {
-		// destination.getChildren().remove(newThing);
-		// selectionManager.clearSelection();
-		// }
-		//
-		// @Override
-		// public String getAppearance() {
-		// return newThing.getClass().getSuperclass().getSimpleName() + "
-		// added!";
-		// }
-		// });
+
 	}
 
 	private void setNewNodeDeleteButton(final Pane destination, final Node newNode) {
@@ -1828,7 +1460,10 @@ public class Controller {
 
 		newThing.setPEP(propertyEditPane);
 
-		if (componentSettings.getLayoutType().equals("anchorpane")) {
+		// if (componentSettings.getLayoutType().equals("anchorpane")) {
+		// dealWithPane((Pane) newThing);
+		// }
+		if (newThing instanceof AnchorPane) {
 			dealWithPane((Pane) newThing);
 		}
 
@@ -1837,44 +1472,6 @@ public class Controller {
 
 		setNewNodeListeners(viewListeners, newNode);
 		setNewNodeDeleteButton(destination, newNode);
-		// final ContextMenu nodePopUp = new ContextMenu();
-		// final MenuItem deletebutton = new
-		// MenuItem(LabelGrabber.getLabel("delete.node.text"));
-		// nodePopUp.getItems().add(deletebutton);
-		// newNode.addEventFilter(MouseEvent.MOUSE_CLICKED, new
-		// EventHandler<MouseEvent>() {
-		// @Override
-		// public void handle(MouseEvent t) {
-		// if (t.getButton().equals(MouseButton.SECONDARY)) {
-		// nodePopUp.show(newNode, Side.RIGHT, 0, 0);
-		// deletebutton.setOnAction(new EventHandler<ActionEvent>() {
-		// @Override
-		// public void handle(ActionEvent t) {
-		// destination.getChildren().remove(newNode);
-		// selectionManager.clearSelection();
-		// historyManager.addHistory(new HistoryItem() {
-		// @Override
-		// public void revert() {
-		// destination.getChildren().add(newNode);
-		// selectionManager.updateSelected((GObject) newNode);
-		// }
-		//
-		// @Override
-		// public void restore() {
-		// destination.getChildren().remove(newNode);
-		// selectionManager.clearSelection();
-		// }
-		//
-		// @Override
-		// public String getAppearance() {
-		// return ((GObject) newNode).getFieldName() + " deleted!";
-		// }
-		// });
-		// }
-		// });
-		// }
-		// }
-		// });
 
 		setNewNodeToHistory(newThing, destination, newNode);
 
@@ -2077,7 +1674,6 @@ public class Controller {
 				ComponentSettings componentSettings = cmj.getComponentSettings();
 				if (componentSettings != null) {
 					GObject newnewThing = null;
-
 					historyManager.pause();
 					try {
 						Class panelPropertyClass = Class.forName(

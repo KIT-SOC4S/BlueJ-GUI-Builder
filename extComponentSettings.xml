@@ -1,0 +1,155 @@
+<components>
+	
+	<component>
+		<type>AnchorPane</type>
+		
+		<listeners>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onKeyPressed</name>
+				<method>setOnKeyPressed</method>
+				<event>KeyEvent</event>
+			</listener>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onKeyReleased</name>
+				<method>setOnKeyReleased</method>
+				<event>KeyEvent</event>
+			</listener>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onKeyTyped</name>
+				<method>setOnKeyTyped</method>
+				<event>KeyEvent</event>
+			</listener>
+			
+		</listeners>
+	</component>
+	
+	<component>
+		<type>Canvas</type>
+		<listeners>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onKeyPressed</name>
+				<method>setOnKeyPressed</method>
+				<event>KeyEvent</event>
+			</listener>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onKeyReleased</name>
+				<method>setOnKeyReleased</method>
+				<event>KeyEvent</event>
+			</listener>
+			<listener>
+				<package>javafx.scene.input</package>
+				<isActive>false</isActive>
+				<name>onKeyTyped</name>
+				<method>setOnKeyTyped</method>
+				<event>KeyEvent</event>
+			</listener>
+			
+		</listeners>
+	</component>
+	<component>
+		<type>Button</type>
+		
+	</component>
+	<component>
+		<type>Label</type>
+		
+	</component>
+	<component>
+		<type>TextField</type>
+		
+	</component>
+	<component>
+		<type>TextArea</type>
+		
+	</component>
+	<component>
+		<type>CheckBox</type>
+	
+	</component>
+	<component>
+		<type>RadioButton</type>
+		
+	</component>
+	<component>
+		<type>ListView</type>
+		
+	</component>
+	<component>
+		<type>ComboBox</type>
+		
+	</component>
+	<component>
+		<type>Slider</type>
+		
+	</component>
+	<component>
+		<type>ColorPicker</type>
+		
+	</component>
+	<component>
+		<type>Hyperlink</type>
+	
+	</component>
+	<component>
+		<type>ScrollPane</type>
+	
+	</component>
+	<component>
+		<type>SplitPane</type>
+		<enabled>false</enabled>
+		<package>javafx.scene.layout</package>
+		<icon>SplitPane-h.png</icon>
+		<properties>
+			<property>
+				<name>MinWidth</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>minWidthProperty</observedProperty>
+				<default>100</default>
+				<setter>setMinWidth</setter>
+				<getter>getMinWidth</getter>
+				<fxml>minWidth</fxml>
+			</property>
+			<property>
+				<name>MinHeight</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>minHeightProperty</observedProperty>
+				<default>100</default>
+				<setter>setMinHeight</setter>
+				<getter>getMinHeight</getter>
+				<fxml>minHeight</fxml>
+			</property>
+		</properties>
+		<listeners>
+		</listeners>
+	</component>
+	<component>
+		<type>PasswordField</type>
+		
+	</component>
+	<component>
+		<type>Rectangle</type>
+		
+	</component>
+	<component>
+		<type>Circle</type>
+	
+	</component>
+	<component>
+		<type>SubScene</type>
+	
+	</component>
+	
+</components>
+

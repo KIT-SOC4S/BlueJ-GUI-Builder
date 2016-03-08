@@ -35,7 +35,7 @@ public class PropertyEditPane extends GridPane {
 		add(new Label(LabelGrabber.getLabel("no.component.text")), 0, 0);
 	}
 
-	public PropertyEditPane(GUIObject guiObj) {
+	public PropertyEditPane(GUIObject guiObj, ComponentSettings componentSettings) {
 		int currentRow = 0;
 		this.getChildren().clear();
 		// this.setMaxWidth(200);
@@ -45,6 +45,40 @@ public class PropertyEditPane extends GridPane {
 				propertiesHeading.getFont().getSize() + 0.5));
 		add(propertiesHeading, 0, currentRow++);
 		GUISizeProperty guisp = new GUISizeProperty(guiObj, guiObj.getGUITitle(), this, currentRow);
+		currentRow+=3;
+		List<PanelProperty> panelPropertyList = new ArrayList<>();
+		if (componentSettings.getListenerProperties().size() > 0) {
+			Label eventsHeading = new Label(LabelGrabber.getLabel("events.text") + ":");
+			eventsHeading.setMinWidth(120);
+			eventsHeading.setFont(Font.font(eventsHeading.getFont().getFamily(), FontWeight.BOLD,
+					propertiesHeading.getFont().getSize() + 0.5));
+			add(eventsHeading, 0, currentRow++);
+		}
+		for (ListenerProperty lprop : componentSettings.getListenerProperties()) {
+			try {
+				PanelProperty panelProperty = null;
+				// panelProperty = new ListenerHintProperty(gObj, guiObject,
+				// lprop.getName(), lprop.getText(), this, currentRow++);
+				// panelPropertyList.add(panelProperty);
+				if (lprop.getListenertype().equals("standard")) {
+					panelProperty = new ListenerEnabledProperty(guiObj, lprop.getListenerMethod(), lprop.getName(),
+							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
+							currentRow++);
+				} 	else if (lprop.getListenertype().equals("propertyChange")) {
+					panelProperty = new PropertyListenerEnabledProperty(guiObj, lprop.getPropertyname(), lprop.getPropertytype(),
+							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
+							currentRow++);
+				}
+				if (panelProperty != null) {
+					panelPropertyList.add(panelProperty);
+				}
+			} catch (Exception e) {
+				System.out.println(lprop.getName() + "ListenerProperty failed.");
+				e.printStackTrace();
+			}
+		}
+
+		guiObj.setPanelProperties(panelPropertyList);
 	}
 
 	/**

@@ -63,7 +63,7 @@ public class TopPanel extends MenuBar {
 
 		menuView = new Menu(LabelGrabber.getLabel("menu.view"));
 		mItmHistory = new CheckMenuItem(LabelGrabber.getLabel("menu.view.history"));
-		mItmHistory.setSelected(true);
+		mItmHistory.setSelected(false);
 		mItmHierarchy = new CheckMenuItem(LabelGrabber.getLabel("menu.view.hierarchy"));
 		mItmHierarchy.setSelected(true);
 		mItmErrorlog = new MenuItem(LabelGrabber.getLabel("menu.view.errorlog"));

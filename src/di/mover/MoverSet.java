@@ -8,6 +8,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.SubScene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -137,6 +138,10 @@ public class MoverSet {
 				Region region = (Region) selectedComponent;
 				region.setPrefWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));
 				region.setPrefHeight(RasterPane.getRasterPosY(ruy) - RasterPane.getRasterPosY(py));
+			} else if (selectedComponent instanceof ListView) {
+				ListView lview = (ListView) selectedComponent;
+				lview.setPrefWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));
+				lview.setPrefHeight(RasterPane.getRasterPosY(ruy) - RasterPane.getRasterPosY(py));
 			} else 	if (selectedComponent instanceof Region) {
 				Region region = (Region) selectedComponent;
 				region.setMinWidth(RasterPane.getRasterPosX(rux) - RasterPane.getRasterPosX(px));

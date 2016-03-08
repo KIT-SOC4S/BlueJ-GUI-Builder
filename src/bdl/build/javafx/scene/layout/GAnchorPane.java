@@ -5,6 +5,7 @@ import bdl.view.right.PropertyEditPane;
 import bdl.build.properties.PanelProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 
 import java.util.List;
@@ -22,12 +23,17 @@ public class GAnchorPane extends AnchorPane implements GObject {
     @Override
     public void setFieldName(String fieldName) {
 //    	setStyle("-fx-background-color: #F0F0F0;-fx-border-color:green;-fx-border-width:4");
-        
+       this.setOnKeyPressed(e->handle(e));
     	setStyle("-fx-background-color: #F0F0F0");
         fieldNameProperty.setValue(fieldName);
     }
 
-    @Override
+    private Object handle(KeyEvent e) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
     public StringProperty fieldNameProperty() {
         return fieldNameProperty;
     }

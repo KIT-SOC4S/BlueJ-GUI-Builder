@@ -65,16 +65,22 @@ public class GSubScene extends SubScene implements GObject {
 	public String getNodeClassName() {
 		return "SubScene";
 	}
-
+	
 	public String getJavaConstructor() {
 		return fieldNameProperty.getValue() + " = new SubScene(new Group()," + this.getWidth() + "," + this.getHeight()
 				+ ",true, SceneAntialiasing.BALANCED);\n" 
-				+ "    this."+fieldNameProperty.getValue() +"Example("+fieldNameProperty.getValue()+");\n";
+//				+ "    this."+fieldNameProperty.getValue() +"Example("+fieldNameProperty.getValue()+");\n"
+				;
 
 	}
 
 	
-
+	@Override
+	public StringBuilder getAdditionalMethodInvokations(){
+		StringBuilder methodsString = new StringBuilder(); 
+		methodsString.append("      //samplecode\n"+"      this."+fieldNameProperty.getValue() +"Example("+fieldNameProperty.getValue()+");\n");
+		return methodsString;
+	}
 	
 
 	@Override

@@ -22,17 +22,17 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-public class DoubleObservedProperty implements PanelProperty {
+public class IntegerObservedProperty implements PanelProperty {
 
     private GObject gObj;
     private String setter;
     private String getter;
     private String fxml;
     private TextField textField;
-    private DecimalFormat format = new DecimalFormat("#.##",new DecimalFormatSymbols(Locale.US));
+    private DecimalFormat format = new DecimalFormat("#",new DecimalFormatSymbols(Locale.US));
     private final HistoryManager historyManager;
 
-    public DoubleObservedProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public IntegerObservedProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
         this.setter = setter;
         this.getter = getter;
@@ -77,7 +77,7 @@ public class DoubleObservedProperty implements PanelProperty {
         
         
         
-        textField.setText(format.format(Double.parseDouble(defaultValue))); //TODO - Handle bad defaultValue values
+        textField.setText(format.format(Integer.parseInt(defaultValue))); //TODO - Handle bad defaultValue values
 
         setValue();
         textField.setOnAction(e -> {
@@ -121,7 +121,7 @@ public class DoubleObservedProperty implements PanelProperty {
         textField.textProperty().addListener(new ChangeListener<String>() {
 	        @Override
 	        public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-	        	if (!(istZahl(newValue)||newValue.equals("")||newValue.equals("-"))){
+	        	if (!(istGanzZahl(newValue)||newValue.equals("")||newValue.equals("-"))){
 	        		textField.setText(oldValue);
 	        	}
 	           
@@ -132,13 +132,13 @@ public class DoubleObservedProperty implements PanelProperty {
 
     private void setValue() {
         try {
-            final double dValue = (double) ((int) (0.5 + (Double.parseDouble(textField.getText()) * 10))) / 10;
-            textField.setText(format.format(dValue));
+            final int iValue = Integer.parseInt(textField.getText());
+            textField.setText(format.format(iValue));
 
-            final Method setMethod = gObj.getClass().getMethod(setter, double.class);
+            final Method setMethod = gObj.getClass().getMethod(setter, int.class);
             final Method getMethod = gObj.getClass().getMethod(getter);
-            final double old = (double) getMethod.invoke(gObj);
-            final double nnew = dValue;
+            final int old = (int) getMethod.invoke(gObj);
+            final int nnew = iValue;
             if (old != nnew && !historyManager.isPaused()) {
                 historyManager.addHistory(new HistoryItem() {
                     @Override
@@ -161,11 +161,11 @@ public class DoubleObservedProperty implements PanelProperty {
 
                     @Override
                     public String getAppearance() {
-                        return gObj.getFieldName() + " double changed!";
+                        return gObj.getFieldName() + " int changed!";
                     }
                 });
             }
-            setMethod.invoke(gObj, dValue);
+            setMethod.invoke(gObj, iValue);
         } catch (Exception e) {
             // If value entered is not a double, then revert to the previous value
             Method method;
@@ -195,18 +195,12 @@ public class DoubleObservedProperty implements PanelProperty {
     @Override
     public String getFXMLCode() {
     	
-    	if (setter.toLowerCase().contains("height")||setter.toLowerCase().contains("width")){
-    		double wert = Double.parseDouble(textField.getText());
-    		if (wert <=0 && wert >=-2){
-    			return "";
-    		}
-    	}
         return fxml + "=\"" + textField.getText() + "\"";
     }
     
-    private boolean istZahl(String s) {
+    private boolean istGanzZahl(String s) {
 		try {
-			Double.valueOf(s).doubleValue();
+			Integer.valueOf(s).intValue();
 			return true;
 		} catch (Exception nfe) {
 			return false;

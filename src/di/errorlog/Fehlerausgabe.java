@@ -32,6 +32,7 @@ public class Fehlerausgabe {
 		alert.getDialogPane().setContent(content);
 		PrintStream out = new PrintStream(new StringOutputStream(this));
 		System.setErr(out);
+		
 	}
 
 	public void show(){

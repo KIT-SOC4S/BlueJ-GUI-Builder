@@ -42,4 +42,8 @@ public interface GObject {
     public default HashSet<String> getAdditionalDeclaration(){
     	return null;
     }
+
+	public default StringBuilder getAdditionalMethodInvokations(){
+		return null;
+	}
 }

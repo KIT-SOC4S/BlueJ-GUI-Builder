@@ -1,6 +1,7 @@
 package bdl.build;
 
 import bdl.build.javafx.scene.layout.GAnchorPane;
+import bdl.controller.Controller;
 import bdl.lang.LabelGrabber;
 import javafx.scene.layout.AnchorPane;
 
@@ -13,7 +14,8 @@ public class GUIObject extends GAnchorPane {
 	private AnchorPane setVPD;
 
     public GUIObject() {
-        setFieldName(title);
+        setFieldName("root");
+        Controller.getFieldNames().add("root");
     }
 
     public String getGUITitle() {

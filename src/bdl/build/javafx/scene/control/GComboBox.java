@@ -58,4 +58,15 @@ public class GComboBox extends ComboBox implements GObject{
 	public String getNodeClassName() {		
 		return "ComboBox";
 	}
+    public String getJavaConstructor() {
+		return fieldNameProperty.getValue() + " = new ComboBox<String>();\n" ;
+
+	}
+    @Override
+	public StringBuilder getAdditionalMethodInvokations(){
+		StringBuilder methodsString = new StringBuilder(); 
+		methodsString.append("        //simple samplecode ComboBox\n"+
+		"        this."+fieldNameProperty.getValue() +".getItems().addAll(\"Item A\",\"Item B\",\"Item C\");\n");
+		return methodsString;
+	}
 }

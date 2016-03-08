@@ -14,15 +14,80 @@ import java.util.Collection;
  * This class will parse the xml file that provides the configuration for every
  * component that the GUI will support, and provides static methods to return
  * all or individual settings per component
- * 
+ *
  */
 public class ComponentSettingsStore {
 
 	private Collection<ComponentSettings> allComponentSettings;
+	private Collection<ComponentSettings> externalComponentSettings;
+
+	private void addExternalSettingsToAllSettings() {
+		for (ComponentSettings cs : externalComponentSettings) {
+			ComponentSettings internCS = findSettings(cs.getType());
+			if (internCS != null) {
+				this.addSettings(internCS, cs);
+			} else {
+				System.out.println("+");
+				allComponentSettings.add(cs);
+			}
+		}
+
+	}
+
+	private void addSettings(ComponentSettings internCS, ComponentSettings cs) {
+		for (Property pr : cs.getProperties()) {
+			if (!containsProperty(internCS, pr)) {
+				System.out.println("+");
+				internCS.getProperties().add(pr);
+			}
+		}
+
+		for (ListenerProperty pr : cs.getListenerProperties()) {
+			if (!containsListenerProperty(internCS, pr)) {
+				System.out.println("+");
+				internCS.getListenerProperties().add(pr);
+			}
+		}
+
+	}
+
+	boolean containsListenerProperty(ComponentSettings internCS, ListenerProperty property) {
+		for (ListenerProperty pr : internCS.getListenerProperties()) {
+			if (pr.getName().equals(property.getName())) {
+				return true;
+			}
+
+		}
+		return false;
+	}
+
+	boolean containsProperty(ComponentSettings internCS, Property property) {
+		for (Property pr : internCS.getProperties()) {
+			if (pr.getName().equals(property.getName())) {
+				return true;
+			}
+
+		}
+		return false;
+	}
+
+	private ComponentSettings findSettings(String type) {
+		for (ComponentSettings ac : allComponentSettings) {
+			String alltype = ac.getType();
+			if (alltype.equals(type)) {
+				return ac;
+			}
+		}
+		return null;
+	}
 
 	public ComponentSettingsStore(String path) throws Exception {
 		allComponentSettings = new ArrayList<>();
-		parseComponentSettings(path);
+		externalComponentSettings = new ArrayList<>();
+		parseComponentSettings(path, allComponentSettings);
+		parseExternalComponentSettings(externalComponentSettings);
+		addExternalSettingsToAllSettings();
+
 	}
 
 	/**
@@ -66,24 +131,23 @@ public class ComponentSettingsStore {
 		return al;
 	}
 
-	/**
-	 * Reads in the xml properties file located at
-	 * bdl.model.component-settings.xml and parses the file creating a list of
-	 * Component with all properties initialised.
-	 */
-	private void parseComponentSettings(String path) throws Exception {
-		// File settings = new File(path);
-		// if (!settings.exists()) {
-		// throw new RuntimeException("File " + path + " does not exist, could
-		// not load ComponentSettings.");
-		// }
+	private void parseExternalComponentSettings(Collection<ComponentSettings> csettings) throws Exception {
 
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		Document d = db.parse(getClass().getResourceAsStream(path));
+		File file = new File("extComponentSettings.xml");
+		if (!file.exists()) {
+			System.out.println("keine externen Settings");
+			return;
+		}
+		Document document;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
 
-		Element root = d.getDocumentElement();
+		document = builder.parse(file);
+
+		Element root = document.getDocumentElement();
+
 		root.normalize();
+		// System.out.print(root);
 
 		NodeList components = root.getElementsByTagName("component");
 
@@ -91,19 +155,53 @@ public class ComponentSettingsStore {
 			ComponentSettings componentSettings = new ComponentSettings();
 			boolean enabled = parseComponent(componentSettings, (Element) components.item(i));
 			if (enabled)
-				allComponentSettings.add(componentSettings);
+				csettings.add(componentSettings);
 		}
 	}
 
+	/**
+	 * Reads in the xml properties file located at
+	 * bdl.model.component-settings.xml and parses the file creating a list of
+	 * Component with all properties initialised.
+	 * 
+	 * @param csettings
+	 *            TODO
+	 */
+	private void parseComponentSettings(String path, Collection<ComponentSettings> csettings) throws Exception {
+
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		Document d = db.parse(getClass().getResourceAsStream(path));
+
+		Element root = d.getDocumentElement();
+
+		root.normalize();
+		// System.out.print(root);
+
+		NodeList components = root.getElementsByTagName("component");
+
+		for (int i = 0; i < components.getLength(); i++) {
+			ComponentSettings componentSettings = new ComponentSettings();
+			boolean enabled = parseComponent(componentSettings, (Element) components.item(i));
+			if (enabled)
+				csettings.add(componentSettings);
+		}
+	}
+
+	private String getString(Element element, String tagname, String defaultText) {
+		NodeList nlist = element.getElementsByTagName(tagname);
+		return nlist.getLength() > 0 ? nlist.item(0).getTextContent() : defaultText;
+	}
+
 	private boolean parseComponent(ComponentSettings componentSettings, Element element) {
-		if (!element.getElementsByTagName("enabled").item(0).getTextContent().equals("true")) {
+		String enabled = getString(element, "enabled", "true");
+		if (!getString(element, "enabled", "true").equals("true")) {
 			return false;
 		}
 
-		componentSettings.setType(element.getElementsByTagName("type").item(0).getTextContent());
-		componentSettings.setPackageName(element.getElementsByTagName("package").item(0).getTextContent());
-		componentSettings.setLayoutType(element.getElementsByTagName("layouttype").item(0).getTextContent());
-		componentSettings.setIcon(element.getElementsByTagName("icon").item(0).getTextContent());
+		componentSettings.setType(getString(element, "type", "UnknownType"));
+		componentSettings.setPackageName(getString(element, "package", ""));
+		componentSettings.setIcon(getString(element, "icon", ""));
 
 		Element propertiesElement = (Element) element.getElementsByTagName("properties").item(0);
 		parseProperties(componentSettings, propertiesElement);
@@ -113,49 +211,47 @@ public class ComponentSettingsStore {
 	}
 
 	private void parseProperties(ComponentSettings componentSettings, Element propertiesElement) {
+        if (propertiesElement==null){
+        	return;
+        }
 		NodeList properties = propertiesElement.getElementsByTagName("property");
-		for (int i = 0; i < properties.getLength(); i++) {
-			Element property = (Element) properties.item(i);
-			String name = property.getElementsByTagName("name").item(0).getTextContent();
-			String type = property.getElementsByTagName("enabled").item(0).getTextContent();
-			String enabled = property.getElementsByTagName("pseudotype").item(0).getTextContent();
-			String defaultValue = property.getElementsByTagName("default").item(0).getTextContent();
-			String getter = property.getElementsByTagName("getter").item(0).getTextContent();
-			String setter = property.getElementsByTagName("setter").item(0).getTextContent();
-			String fxml = property.getElementsByTagName("fxml").item(0).getTextContent();
-			NodeList observedPropertyNL = property.getElementsByTagName("observedProperty");
-			String observedProperty = observedPropertyNL.getLength() > 0 ? observedPropertyNL.item(0).getTextContent()
-					: "";
-			NodeList javaCodeGenerationNL = property.getElementsByTagName("javaCodeGeneration");
-			String javaCodeGeneration = javaCodeGenerationNL.getLength() > 0
-					? javaCodeGenerationNL.item(0).getTextContent() : "";
-			componentSettings.addProperty(name, type, enabled, defaultValue, observedProperty, getter, setter, fxml,
-					javaCodeGeneration);
+		if (properties.getLength() > 0) {
+			for (int i = 0; i < properties.getLength(); i++) {
+				Element property = (Element) properties.item(i);
+				String name = getString(property, "name", "");
+				String enabled = getString(property, "enabled", "true");
+				String type = getString(property, "pseudotype", "");
+				String defaultValue = getString(property, "default", "");
+				String getter = getString(property, "getter", "");
+				String setter = getString(property, "setter", "");
+				String fxml = getString(property, "fxml", "");
+				String observedProperty = getString(property, "observedProperty", "");
+				String javaCodeGeneration = getString(property, "javaCodeGeneration", "");
+				componentSettings.addProperty(name, enabled, type, defaultValue, observedProperty, getter, setter, fxml,
+						javaCodeGeneration);
+			}
 		}
 	}
 
 	private void parseListeners(ComponentSettings componentSettings, Element listenerElement) {
-
+		 if (listenerElement==null){
+	        	return;
+	        }
 		NodeList listeners = listenerElement.getElementsByTagName("listener");
-		for (int i = 0; i < listeners.getLength(); i++) {
-			Element listener = (Element) listeners.item(i);
-			NodeList pack = listener.getElementsByTagName("package");
-			String packageName = pack.getLength() > 0 ? pack.item(0).getTextContent() : "";
-			NodeList levent = listener.getElementsByTagName("event");
-			String event = levent.getLength() > 0 ? levent.item(0).getTextContent() : "";
-			String isActive = listener.getElementsByTagName("isActive").item(0).getTextContent();
-			NodeList ltype = listener.getElementsByTagName("listenertype");
-			String listenerType = ltype.getLength() > 0 ? ltype.item(0).getTextContent() : "standard";
-			NodeList lname = listener.getElementsByTagName("name");
-			String name = lname.getLength() > 0 ? lname.item(0).getTextContent() : "";
-			NodeList lmethod = listener.getElementsByTagName("method");
-			String method = lmethod.getLength() > 0 ? lmethod.item(0).getTextContent() : "";
-			NodeList lpropertyname = listener.getElementsByTagName("propertyname");
-			String propertyname = lpropertyname.getLength() > 0 ? lpropertyname.item(0).getTextContent() : "";
-			NodeList lpropertytype = listener.getElementsByTagName("propertytype");
-			String propertytype = lpropertytype.getLength() > 0 ? lpropertytype.item(0).getTextContent() : "";
-			componentSettings.addListenerProperty(name, method, event, isActive, packageName, listenerType, propertyname,
-					propertytype);
+		if (listeners.getLength() > 0) {
+			for (int i = 0; i < listeners.getLength(); i++) {
+				Element listener = (Element) listeners.item(i);
+				String packageName = getString(listener, "package", "");
+				String event = getString(listener, "event", "");
+				String isActive = getString(listener, "isActive", "");
+				String listenerType = getString(listener, "listenertype", "standard");
+				String name = getString(listener, "name", "");
+				String method = getString(listener, "method", "");
+				String propertyname = getString(listener, "propertyname", "");
+				String propertytype = getString(listener, "propertytype", "");
+				componentSettings.addListenerProperty(name, method, event, isActive, packageName, listenerType,
+						propertyname, propertytype);
+			}
 		}
 
 	}

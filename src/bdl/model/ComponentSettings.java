@@ -14,7 +14,6 @@ public class ComponentSettings {
 
     private String type;
     private String packageName;
-    private String layoutType;
     private String icon;
     private List<Property> properties = new ArrayList<>();
     private List<ListenerProperty> listenerProperties = new ArrayList<>();
@@ -65,13 +64,7 @@ public class ComponentSettings {
         this.packageName = packageName;
     }
 
-    public String getLayoutType() {
-        return layoutType;
-    }
-
-    public void setLayoutType(String layoutType) {
-        this.layoutType = layoutType;
-    }
+  
 
     public String getIcon() {
         return icon;
@@ -94,7 +87,10 @@ public class ComponentSettings {
      * @param javaCodeGeneration 
      */
     public void addProperty(String name, String enabled, String type, String defaultValue, String observedProperty, String getter, String setter, String fxml, String javaCodeGeneration) {
-        properties.add(new Property(name, enabled, type, defaultValue, observedProperty,getter, setter, fxml, javaCodeGeneration));
+//       for (Property p: properties){
+//    	  System.out.println( p.getName());
+//       }
+       properties.add(new Property(name, enabled, type, defaultValue, observedProperty,getter, setter, fxml, javaCodeGeneration));
     }
 
     public void addListenerProperty(String name, String method, String event,String defaultValue, String packageName,String listenerType, String propertyName, String propertyType) {
