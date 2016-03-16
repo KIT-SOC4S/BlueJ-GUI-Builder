@@ -699,6 +699,16 @@
 				<fxml>minHeight</fxml>
 			</property>
 			<property>
+				<name>ToggleGroup</name>
+				<enabled>true</enabled>
+				<pseudotype>ToggleGroupObserved</pseudotype>
+				<observedProperty>toggleGroupProperty</observedProperty>
+				<default></default>
+				<setter>setToggleGroup</setter>
+				<getter>getToggleGroup</getter>
+				<fxml>toggleGroup</fxml>
+			</property>
+			<property>
 				<name>Tooltip</name>
 				<enabled>true</enabled>
 				<pseudotype>Tooltip</pseudotype>

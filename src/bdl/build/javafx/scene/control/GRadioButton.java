@@ -1,13 +1,14 @@
 package bdl.build.javafx.scene.control;
 
+import java.util.List;
+
 import bdl.build.GObject;
-import bdl.view.right.PropertyEditPane;
 import bdl.build.properties.PanelProperty;
+import bdl.build.properties.ToggleGroupObservedProperty;
+import bdl.view.right.PropertyEditPane;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.RadioButton;
-
-import java.util.List;
 
 public class GRadioButton extends RadioButton implements GObject {
     private String fieldName;
@@ -58,4 +59,22 @@ public class GRadioButton extends RadioButton implements GObject {
    	public String getNodeClassName() {		
    		return "RadioButton";
    	}
+
+	public String getToggleGroupName() {
+		for (PanelProperty pp:properties){
+			if (pp instanceof ToggleGroupObservedProperty){
+				return ((ToggleGroupObservedProperty)pp).getToggleGroupName();
+			}
+		}
+		return "";
+	}
+	public void setToggleGroupName(String value) {
+		for (PanelProperty pp:properties){
+			if (pp instanceof ToggleGroupObservedProperty){
+				 ((ToggleGroupObservedProperty)pp).setToggleGroupName(value);
+				 return;
+			}
+		}
+	
+	}
 }

@@ -30,11 +30,20 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import bdl.build.CodeGenerator;
 import bdl.build.GObject;
 import bdl.build.GUIObject;
 import bdl.build.javafx.scene.control.GMenuBar;
+import bdl.build.javafx.scene.control.GRadioButton;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
 import bdl.model.ComponentSettingsStore;
@@ -1081,6 +1090,50 @@ public class Controller {
 
 	}
 
+	private void openFileAsXML(File file,HashMap<String,String> rbTn) {
+		Document document;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder;
+		try {
+			builder = factory.newDocumentBuilder();
+			document = builder.parse(file);
+			document.normalize();
+			Element root = document.getDocumentElement();
+			readXML(root,rbTn);
+
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (SAXException | IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	private void readXML(Element e, HashMap<String,String> rbTn) {
+		String nodename = e.getNodeName();
+		System.out.println(e.getNodeName());
+		if (e != null) {
+			if (nodename.equals("RadioButton")) {
+				String rbname = e.getAttribute("fx:id");
+//				System.out.println(rbname);
+				String toggleName = e.getAttribute("toggleGroup");
+//				System.out.println(toggleName);
+				if (rbname!=null && !rbname.isEmpty()){
+					if (toggleName!=null && !toggleName.isEmpty()){
+						rbTn.put(rbname, toggleName);
+					}
+				}
+			}
+
+			NodeList childs = e.getChildNodes();
+			for (int k = 0; k < childs.getLength(); k++) {
+				if (childs.item(k) instanceof Element) {
+					readXML((Element) childs.item(k),rbTn);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Open the specified FXML file.
 	 *
@@ -1088,9 +1141,12 @@ public class Controller {
 	 *            the File referencing the FXML file.
 	 */
 	public void openFile(File file) {
+		HashMap<String,String> radiobuttonsToggleGroupNames = new HashMap<>();
 		isOpeningFile = true;
 		Parent parent = null;
+		
 		if (file != null) {
+			openFileAsXML(file,radiobuttonsToggleGroupNames);
 			view.middleTabPane.viewPane.getChildren().clear();
 			selectionManager.clearSelection();
 			// selectionManager.setEnabled(false);
@@ -1139,7 +1195,7 @@ public class Controller {
 								newThing.setFieldName(node.getId());
 
 								addGObjectRec(newThing, componentSettings, view, viewListeners, node,
-										view.middleTabPane.viewPane);
+										view.middleTabPane.viewPane,radiobuttonsToggleGroupNames);
 								historyManager.unpause();
 
 								break;
@@ -1451,7 +1507,7 @@ public class Controller {
 
 	// x and y are initial layout positions. To be used only with drag and drop.
 	private void addGObjectRec(GObject newThing, ComponentSettings componentSettings, View view,
-			ViewListeners viewListeners, Node settingsNode, Pane destination) {
+			ViewListeners viewListeners, Node settingsNode, Pane destination,HashMap<String,String> rbTn) {
 
 		// Sets the default settings on the gObject and creates the property
 		// edit pane
@@ -1466,7 +1522,16 @@ public class Controller {
 		if (newThing instanceof AnchorPane) {
 			dealWithPane((Pane) newThing);
 		}
-
+		if (newThing instanceof GRadioButton) {
+			String tgn = rbTn.get(newThing.getFieldName());
+			if (tgn!=null && !tgn.isEmpty()){
+				if (tgn.startsWith("$")){
+					tgn=tgn.substring(1);
+					((GRadioButton)newThing).setToggleGroupName(tgn);
+				}
+			}
+			
+		}
 		Node newNode = (Node) newThing;
 		destination.getChildren().add(newNode);
 
@@ -1493,7 +1558,7 @@ public class Controller {
 							verynewThing.setFieldName(cnode.getId());
 
 							addGObjectRec(verynewThing, componentSettings2, view, viewListeners, cnode,
-									(Pane) newThing);
+									(Pane) newThing,rbTn);
 							break;
 						}
 					} catch (Exception e) {

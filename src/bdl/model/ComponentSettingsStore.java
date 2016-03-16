@@ -84,9 +84,13 @@ public class ComponentSettingsStore {
 	public ComponentSettingsStore(String path) throws Exception {
 		allComponentSettings = new ArrayList<>();
 		externalComponentSettings = new ArrayList<>();
-		parseComponentSettings(path, allComponentSettings);
-		parseExternalComponentSettings(externalComponentSettings);
-		addExternalSettingsToAllSettings();
+		if (!parseExternalComponentSettings(allComponentSettings)) {
+			parseComponentSettings(path, allComponentSettings);
+			parseAdditionalExternalComponentSettings(externalComponentSettings);
+			if (!externalComponentSettings.isEmpty()) {
+				addExternalSettingsToAllSettings();
+			}
+		}
 
 	}
 
@@ -131,11 +135,40 @@ public class ComponentSettingsStore {
 		return al;
 	}
 
-	private void parseExternalComponentSettings(Collection<ComponentSettings> csettings) throws Exception {
+	private boolean parseExternalComponentSettings(Collection<ComponentSettings> csettings) throws Exception {
 
-		File file = new File("extComponentSettings.xml");
+		File file = new File("externalComponentSettings.xml");
 		if (!file.exists()) {
 			System.out.println("keine externen Settings");
+			return false;
+		}
+		Document document;
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+
+		document = builder.parse(file);
+
+		Element root = document.getDocumentElement();
+
+		root.normalize();
+		// System.out.print(root);
+
+		NodeList components = root.getElementsByTagName("component");
+
+		for (int i = 0; i < components.getLength(); i++) {
+			ComponentSettings componentSettings = new ComponentSettings();
+			boolean enabled = parseComponent(componentSettings, (Element) components.item(i));
+			if (enabled)
+				csettings.add(componentSettings);
+		}
+		return true;
+	}
+
+	private void parseAdditionalExternalComponentSettings(Collection<ComponentSettings> csettings) throws Exception {
+
+		File file = new File("additionalComponentSettings.xml");
+		if (!file.exists()) {
+			System.out.println("keine weiteren externen Settings");
 			return;
 		}
 		Document document;
@@ -211,9 +244,9 @@ public class ComponentSettingsStore {
 	}
 
 	private void parseProperties(ComponentSettings componentSettings, Element propertiesElement) {
-        if (propertiesElement==null){
-        	return;
-        }
+		if (propertiesElement == null) {
+			return;
+		}
 		NodeList properties = propertiesElement.getElementsByTagName("property");
 		if (properties.getLength() > 0) {
 			for (int i = 0; i < properties.getLength(); i++) {
@@ -234,9 +267,9 @@ public class ComponentSettingsStore {
 	}
 
 	private void parseListeners(ComponentSettings componentSettings, Element listenerElement) {
-		 if (listenerElement==null){
-	        	return;
-	        }
+		if (listenerElement == null) {
+			return;
+		}
 		NodeList listeners = listenerElement.getElementsByTagName("listener");
 		if (listeners.getLength() > 0) {
 			for (int i = 0; i < listeners.getLength(); i++) {

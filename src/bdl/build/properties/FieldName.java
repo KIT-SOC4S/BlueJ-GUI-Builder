@@ -59,7 +59,6 @@ public class FieldName {
 		gp.add(textField, 1, row);
 
 		gObj.fieldNameProperty().addListener(new ChangeListener<String>() {
-
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (newValue.equals(textField.getText())) {
@@ -68,7 +67,6 @@ public class FieldName {
 				textField.setText(newValue);
 				handleChangeHistory(oldValue);
 			}
-
 		});
 
 		textField.setOnAction(e -> {

@@ -9,6 +9,7 @@ import bdl.build.javafx.scene.GSubScene;
 import bdl.build.javafx.scene.control.GComboBox;
 import bdl.build.javafx.scene.control.GListView;
 import bdl.build.javafx.scene.control.GMenuBar;
+import bdl.build.javafx.scene.control.GRadioButton;
 import bdl.build.properties.ListenerEnabledProperty;
 import bdl.build.properties.PanelProperty;
 import bdl.controller.Controller;
@@ -20,6 +21,26 @@ import javafx.scene.layout.Pane;
 
 public class CodeGenerator {
 
+	public static HashSet<String> collectToggleGroups(Node node) {
+		HashSet<String> toggleGroups = new HashSet<String>();
+		if (!(node instanceof GObject)) {
+			return toggleGroups;
+		}
+
+		if ((node instanceof GRadioButton)) {
+			String name = ((GRadioButton) node).getToggleGroupName();
+			if (!name.isEmpty()) {
+				toggleGroups.add(name);
+			}
+		}
+		if (node instanceof Pane) {
+			for (Node node2 : ((Pane) node).getChildren()) {
+				toggleGroups.addAll(collectToggleGroups(node2));
+			}
+		}
+		return toggleGroups;
+	}
+
 	public static String generateJavaCode(GUIObject guiObject, HashMap<String, String> allImports, boolean forPreview) {
 		HashSet<String> imports = getJavaImports(guiObject, allImports);
 		StringBuilder code = new StringBuilder();
@@ -27,7 +48,6 @@ public class CodeGenerator {
 		for (String s : imports) {
 			importsString.append(s);
 		}
-
 		code.append(importsString).append('\n');// Add
 												// imports
 
@@ -46,13 +66,10 @@ public class CodeGenerator {
 		 */
 		HashSet<String> declarations = new HashSet<>();
 		declarations.addAll(declarationOnly(guiObject));
-//		for (Node node : guiObject.getChildren()) {
-//			if (node instanceof GObject) {
-//				// declarationOnly(node, code);
-//				// declarations=declarationOnly(node, declarations);
-//				declarations.addAll(declarationOnly(node));
-//			}
-//		}
+		HashSet<String> toggleGroupNames = collectToggleGroups(guiObject);
+		for (String name : toggleGroupNames) {
+			declarations.add("    private ToggleGroup " + name + ";\n");
+		}
 
 		StringBuilder declarationString = new StringBuilder();
 		for (String s : declarations) {
@@ -73,17 +90,21 @@ public class CodeGenerator {
 		}
 		// Add properties
 		code.append("    private Parent getRoot() {\n");
-//		code.append("        AnchorPane root = new AnchorPane();\n");
-		
-		code.append(construction(guiObject));
-//		for (Node node : guiObject.getChildren()) {
-//			if (node instanceof GObject) {
-//				// construction(node, code);
-//				code.append(construction(node));
-//			}
-//		}
+		// code.append(" AnchorPane root = new AnchorPane();\n");
 
-		code.append("        "+guiObject.getFieldName()+".getChildren().addAll(");
+		for (String name : toggleGroupNames) {
+			code.append("        " + name + " = new ToggleGroup();\n");
+		}
+		code.append(construction(guiObject));
+
+		// for (Node node : guiObject.getChildren()) {
+		// if (node instanceof GObject) {
+		// // construction(node, code);
+		// code.append(construction(node));
+		// }
+		// }
+
+		code.append("        " + guiObject.getFieldName() + ".getChildren().addAll(");
 		String prefix = "";
 		for (Node node : guiObject.getChildren()) {
 			if (node instanceof GObject) {
@@ -113,15 +134,15 @@ public class CodeGenerator {
 		}
 		code.append("\n");
 		code.append(panelProperties(guiObject));
-//		for (Node node : guiObject.getChildren()) {
-//			// panelProperties(node, code);
-//			code.append(panelProperties(node));
-//		}
-		
+		// for (Node node : guiObject.getChildren()) {
+		// // panelProperties(node, code);
+		// code.append(panelProperties(node));
+		// }
+
 		for (Node node : guiObject.getChildren()) {
 			code.append(additionalMethodInvokations(node));
 		}
-		code.append("        return "+guiObject.getFieldName()+";\n");
+		code.append("        return " + guiObject.getFieldName() + ";\n");
 		code.append("    }\n\n");
 
 		// Add show method
@@ -143,10 +164,10 @@ public class CodeGenerator {
 				+ "    }\n\n");
 		// Add eventHandler
 		code.append(listenerProperties(guiObject));
-//		for (Node node : guiObject.getChildren()) {
-//			
-//			code.append(listenerProperties(node));
-//		}
+		// for (Node node : guiObject.getChildren()) {
+		//
+		// code.append(listenerProperties(node));
+		// }
 
 		for (Node node : guiObject.getChildren()) {
 			code.append(additionalMethods(node));
@@ -163,33 +184,6 @@ public class CodeGenerator {
 		code.append('}');// Close class tag
 		return code.toString();
 	}
-
-	/*
-	 * public static String generateFXMLCode(GUIObject guiObject,
-	 * HashMap<String, String> allImports) {
-	 * 
-	 * StringBuilder code = new StringBuilder(); code.append(
-	 * "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n");
-	 * 
-	 * code.append(getFXMLImports(guiObject, allImports)).append('\n');
-	 * 
-	 * code.append("<AnchorPane fx:id=\"");
-	 * code.append(guiObject.getClassName()); code.append("\" prefWidth=\"");
-	 * code.append(guiObject.getGUIWidth()); code.append("\" prefHeight=\"");
-	 * code.append(guiObject.getGUIHeight()); // code.append(
-	 * "\" xmlns:fx=\"http://javafx.com/fxml/1\" //
-	 * xmlns=\"http://javafx.com/javafx/2.2\" //
-	 * fx:controller=\"DummyController\">\n"); code.append(
-	 * "\" xmlns:fx=\"http://javafx.com/fxml/1\" xmlns=\"http://javafx.com/javafx/2.2\">\n"
-	 * );
-	 * 
-	 * code.append("    <children>\n");
-	 * 
-	 * for (Node node : guiObject.getChildren()) { fxmlOutput(node, code); }
-	 * 
-	 * code.append("    </children>\n"); code.append("</AnchorPane>"); return
-	 * code.toString(); }
-	 */
 
 	public static String generateFXMLCode(GUIObject guiObject, Controller c) {
 
@@ -208,9 +202,9 @@ public class CodeGenerator {
 		code.append("\" xmlns:fx=\"http://javafx.com/fxml/1\" xmlns=\"http://javafx.com/javafx/2.2\">\n");
 
 		code.append("    <children>\n");
-
+		HashSet<String> usedTGNames = new HashSet<String>();
 		for (Node node : guiObject.getChildren()) {
-			fxmlOutput(node, code);
+			fxmlOutput(node, code, usedTGNames);
 		}
 
 		code.append("    </children>\n");
@@ -230,15 +224,7 @@ public class CodeGenerator {
 		imports.add("import javafx.scene.control.*;\n");
 		imports.add("import javafx.scene.shape.*;\n");
 		imports.addAll(javaImports(guiObject, allImports));
-//		for (Node node : guiObject.getChildren()) {
-//			// javaImports(node, imports, allImports);
-//			imports.addAll(javaImports(node, allImports));
-//		}
-		// StringBuilder importsString = new StringBuilder();
-		// for (String s : imports) {
-		// importsString.append(s);
-		// }
-		// return importsString.toString();
+
 		return imports;
 	}
 
@@ -268,82 +254,19 @@ public class CodeGenerator {
 		return importsString.toString();
 	}
 
-	/*
-	 * private static String getFXMLImports(GUIObject guiObject, HashMap<String,
-	 * String> allImports) {
-	 * 
-	 * StringBuilder importsString = new StringBuilder();
-	 * 
-	 * importsString.append("<?import java.lang.*?>\n").append(
-	 * "<?import java.util.*?>\n") .append("<?import javafx.scene.control.*?>\n"
-	 * ).append("<?import javafx.scene.layout.*?>\n") .append(
-	 * "<?import javafx.scene.paint.*?>\n").append(
-	 * "<?import javafx.scene.shape.*?>\n") .append(
-	 * "<?import javafx.scene.canvas.*?>\n");
-	 * 
-	 * 
-	 * return importsString.toString(); }
-	 */
-	/*
-	 * private static void declaration(Node node, StringBuilder code) {
-	 * 
-	 * GObject gObj = (GObject) node; String nodeType =
-	 * node.getClass().getSimpleName().substring(1); if (!(node instanceof
-	 * GMenuBar)) { code.append("    private ").append(nodeType).append(" "
-	 * ).append(gObj.getFieldName()).append(" = new ")
-	 * .append(nodeType).append("();\n"); } if (node instanceof Pane) { for
-	 * (Node node2 : ((Pane) node).getChildren()) { declaration(node2, code); }
-	 * } if (node instanceof GMenuBar) { MenuBuilder mb = ((GMenuBar)
-	 * node).getMenuBuilder(); if (mb != null) { code.append("    "
-	 * ).append(mb.getJAVADeclaration().replace("\n", "\n    ")).append("\n");
-	 * 
-	 * } } }
-	 */
-	/*
-	 * private static void declarationOnly(Node node, StringBuilder code) { if
-	 * (!(node instanceof GObject)) { return ; } GObject gObj = (GObject) node;
-	 * String nodeType = node.getClass().getSimpleName().substring(1); if
-	 * (!(node instanceof GMenuBar)) { code.append("    private "
-	 * ).append(nodeType).append(" ").append(gObj.getFieldName()).append(";\n");
-	 * } if (node instanceof Pane) { for (Node node2 : ((Pane)
-	 * node).getChildren()) { declarationOnly(node2, code); } } if (node
-	 * instanceof GMenuBar) { MenuBuilder mb = ((GMenuBar)
-	 * node).getMenuBuilder(); if (mb != null) { code.append("    "
-	 * ).append(mb.getJAVADeclarationOnly().replace("\n", "\n    "
-	 * )).append("\n");
-	 * 
-	 * } } }
-	 */
-	/*
-	 * private static HashSet<String> declarationOnly(Node node, HashSet<String>
-	 * declarations) {
-	 * 
-	 * if (!(node instanceof GObject)) { return declarations; } GObject gObj =
-	 * (GObject) node; String nodeType =
-	 * node.getClass().getSimpleName().substring(1); if (!(node instanceof
-	 * GMenuBar)) { declarations.add("    private "+nodeType+" "
-	 * +gObj.getFieldName()+";\n"); } if (node instanceof Pane) { for (Node
-	 * node2 : ((Pane) node).getChildren()) { declarations =
-	 * declarationOnly(node2, declarations); } } if (node instanceof GMenuBar) {
-	 * MenuBuilder mb = ((GMenuBar) node).getMenuBuilder(); if (mb != null) {
-	 * declarations.add("    "+(mb.getJAVADeclarationOnly().replace("\n",
-	 * "\n    "))+"\n"); } }
-	 * 
-	 * return declarations; }
-	 */
 	private static HashSet<String> declarationOnly(Node node) {
 		HashSet<String> declarations = new HashSet<String>();
 		if (!(node instanceof GObject)) {
 			return declarations;
 		}
 		GObject gObj = (GObject) node;
-//		String nodeType = node.getClass().getSimpleName().substring(1);
-		String nodeType =gObj.getNodeClassName();
+		// String nodeType = node.getClass().getSimpleName().substring(1);
+		String nodeType = gObj.getNodeClassName();
 		if (!(node instanceof GMenuBar)) {
-			if (node instanceof GComboBox || node instanceof GListView){
+			if (node instanceof GComboBox || node instanceof GListView) {
 				declarations.add("    private " + nodeType + "<String> " + gObj.getFieldName() + ";\n");
 			} else {
-			    declarations.add("    private " + nodeType + " " + gObj.getFieldName() + ";\n");
+				declarations.add("    private " + nodeType + " " + gObj.getFieldName() + ";\n");
 			}
 		}
 		if (node instanceof Pane) {
@@ -383,7 +306,7 @@ public class CodeGenerator {
 			return code;
 		}
 		GObject gObj = (GObject) node;
-		
+
 		String nodeType = gObj.getNodeClassName();
 		if (node instanceof GSubScene) {
 			GSubScene subscNode = (GSubScene) node;
@@ -448,14 +371,14 @@ public class CodeGenerator {
 			return code;
 		}
 		GObject gObj = (GObject) node;
-		if (gObj.getPanelProperties()!=null){
-		for (PanelProperty property : gObj.getPanelProperties()) {
-			String javaCode = property.getJavaCode();
-			if (!javaCode.isEmpty()) {
-				code.append("        ").append(javaCode.replace("\n", "\n        ")).append("\n");
+		if (gObj.getPanelProperties() != null) {
+			for (PanelProperty property : gObj.getPanelProperties()) {
+				String javaCode = property.getJavaCode();
+				if (!javaCode.isEmpty()) {
+					code.append("        ").append(javaCode.replace("\n", "\n        ")).append("\n");
+				}
 			}
-		}
-		code.append('\n');
+			code.append('\n');
 		}
 		if (node instanceof Pane) {
 			for (Node node2 : ((Pane) node).getChildren()) {
@@ -524,16 +447,16 @@ public class CodeGenerator {
 			return code;
 		}
 		GObject gObj = (GObject) node;
-		if (gObj.getPanelProperties()!=null){
-		for (PanelProperty property : gObj.getPanelProperties()) {
-			if (property instanceof ListenerEnabledProperty) {
+		if (gObj.getPanelProperties() != null) {
+			for (PanelProperty property : gObj.getPanelProperties()) {
+				if (property instanceof ListenerEnabledProperty) {
 
-				String javaCode = ((ListenerEnabledProperty) property).getJavaCodeHandler();
-				if (!javaCode.isEmpty()) {
-					code.append("     ").append(javaCode.replace("\n", "\n   ")).append("\n");
+					String javaCode = ((ListenerEnabledProperty) property).getJavaCodeHandler();
+					if (!javaCode.isEmpty()) {
+						code.append("     ").append(javaCode.replace("\n", "\n   ")).append("\n");
+					}
 				}
 			}
-		}
 		}
 		code.append('\n');
 		if (node instanceof Pane) {
@@ -572,7 +495,7 @@ public class CodeGenerator {
 	 * )).append("\n"); } } }
 	 */
 
-	private static void fxmlOutput(Node node, StringBuilder code) {
+	private static void fxmlOutput(Node node, StringBuilder code, HashSet<String> usedTGNames) {
 		String nodeClass = node.getClass().getSuperclass().getSimpleName();
 		if (node instanceof GObject) {
 			GObject gObj = (GObject) node;
@@ -588,13 +511,32 @@ public class CodeGenerator {
 				code.append(">\n");
 				code.append("<children>\n");
 				for (Node node2 : ((Pane) node).getChildren()) {
-					fxmlOutput(node2, code);
+					fxmlOutput(node2, code, usedTGNames);
 				}
 				code.append("</children>\n");
 				code.append("</" + nodeClass + ">\n");
 			} else if (node instanceof GMenuBar) {
 				MenuBuilder mb = ((GMenuBar) node).getMenuBuilder();
 				code.append(mb.getFXML());
+			} else if (node instanceof GRadioButton) {
+				GRadioButton rb = (GRadioButton) node;
+				String toggleGroupName = rb.getToggleGroupName();
+				if (!toggleGroupName.isEmpty() && !usedTGNames.contains(toggleGroupName)) {
+					usedTGNames.add(toggleGroupName);
+					code.append("        <fx:define>\n");
+					code.append("           <ToggleGroup fx:id=\"" + toggleGroupName + "\"/>\n");
+					code.append("        </fx:define> \n");
+					code.append("        <RadioButton");
+					code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
+					for (PanelProperty property : gObj.getPanelProperties()) {
+						String fxmlCode = property.getFXMLCode();
+						if (!fxmlCode.isEmpty()) {
+							code.append(fxmlCode).append(' ');
+						}
+					}
+					code.append("/>\n");
+				}
+
 			} else if (node instanceof GSubScene) {
 				code.append("        <").append(nodeClass);
 				code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
