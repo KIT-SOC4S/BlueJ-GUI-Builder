@@ -6,8 +6,6 @@ package di.blueJLink;
 import java.io.FileWriter;
 import java.util.Optional;
 
-import javax.swing.SwingUtilities;
-
 import bdl.lang.LabelGrabber;
 import bluej.extensions.BClass;
 import bluej.extensions.BPackage;
@@ -18,9 +16,12 @@ import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 import bluej.extensions.editor.Editor;
 import bluej.extensions.editor.TextLocation;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
+import javafx.stage.Stage;
 
 /**
  * @author Georg Dick
@@ -199,14 +200,51 @@ public class BlueJExporter {
 			// alert.setContentText("Editor " + aktuell);
 			// alert.showAndWait();
 			// Ohne Runnable gehts nicht sauber
-			SwingUtilities.invokeLater(new Runnable() {
+
+			Platform.runLater(new Runnable() {
+				// getLineColumnFromOffset(getTextLength())
 				@Override
 				public void run() {
+//					aktuell.setVisible(true);
+//
+//					Alert alert = new Alert(AlertType.ERROR);
+//					alert.setContentText(aktuell.getTextLength() + " lang");
+//					alert.showAndWait();
+//					String text = aktuell.getText(new TextLocation(0, 0),
+//							aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
+//					alert = new Alert(AlertType.ERROR);
+//					alert.setContentText(text);
+//					alert.showAndWait();
+
 					aktuell.setText(new TextLocation(0, 0), new TextLocation(0, 0), source);
 					aktuell.setVisible(true);
+//					text = aktuell.getText(new TextLocation(0, 0),
+//							aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
+//					alert = new Alert(AlertType.ERROR);
+//					alert.setContentText(text);
+//					alert.showAndWait();
+//					aktuell.setText(new TextLocation(0, 0), new TextLocation(0, 0), "otto");
+//					text = aktuell.getText(new TextLocation(0, 0),
+//							aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
+//					alert = new Alert(AlertType.ERROR);
+//					alert.setContentText(text);
+//					alert.showAndWait();
 				}
 
 			});
+
+			// SwingUtilities.invokeLater(new Runnable() {
+			// public void run() {
+			//
+			//
+			//
+			// aktuell.setText(new TextLocation(0, 0), new TextLocation(0, 0),
+			// source);
+			// aktuell.setVisible(true);
+			//
+			// }
+			//
+			// });
 
 		} catch (Exception e) {
 			Alert alert = new Alert(AlertType.ERROR);
@@ -224,6 +262,15 @@ public class BlueJExporter {
 			BClass aktKlasse = bpaket.getBClass(klasse);
 
 			Editor aktuell = aktKlasse.getEditor();
+			String text = (aktuell.getText(new TextLocation(0, 0),
+					new TextLocation(aktuell.getLineCount(), aktuell.getLineLength(aktuell.getLineCount()))));
+
+			// Alert alert = new Alert(AlertType.ERROR);
+			// alert.setContentText(text);
+			// alert.showAndWait();
+			// System.err.println(aktuell.getText(new TextLocation(0, 0), new
+			// TextLocation(aktuell.getLineCount(),
+			// aktuell.getLineLength(aktuell.getLineCount()))));
 			aktuell.setText(new TextLocation(0, 0),
 					new TextLocation(aktuell.getLineCount(), aktuell.getLineLength(aktuell.getLineCount())), "");
 			aktuell.setText(new TextLocation(0, 0), new TextLocation(0, 0), source);
