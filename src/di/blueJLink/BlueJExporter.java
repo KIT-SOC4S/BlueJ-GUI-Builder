@@ -17,11 +17,10 @@ import bluej.extensions.ProjectNotOpenException;
 import bluej.extensions.editor.Editor;
 import bluej.extensions.editor.TextLocation;
 import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Stage;
 
 /**
  * @author Georg Dick
@@ -49,7 +48,8 @@ public class BlueJExporter {
 		// JOptionPane.showMessageDialog(null, klasse);
 		boolean vorhanden = false;
 		boolean ueberschreiben = false;
-		BClass gefunden = null;
+		boolean modifizieren = false;
+		BClass gefundeneKlasse = null;
 		try {
 
 			BPackage bpaket = blueJProjekt.getPackage("");
@@ -59,20 +59,34 @@ public class BlueJExporter {
 				for (BClass kl : vorhandeneKlassen) {
 					if (kl.getName().equals(klasse)) {
 						vorhanden = true;
-						gefunden = kl;
+						gefundeneKlasse = kl;
 						Alert alert = new Alert(AlertType.CONFIRMATION);
 						alert.setContentText(LabelGrabber.getLabel("bluejexport.condialog1") + " " + klasse + " "
 								+ LabelGrabber.getLabel("bluejexport.condialog2") + "\n"
 								+ LabelGrabber.getLabel("bluejexport.condialog3"));
 
+						ButtonType buttonTypeOverwrite = new ButtonType(
+								LabelGrabber.getLabel("bluejexport.button.replace"));
+						ButtonType buttonTypeModify = new ButtonType(
+								LabelGrabber.getLabel("bluejexport.button.modify"));
+						ButtonType buttonTypeCancel = new ButtonType(LabelGrabber.getLabel("bluejexport.button.cancel"),
+								ButtonData.CANCEL_CLOSE);
+
+						alert.getButtonTypes().setAll(buttonTypeOverwrite, buttonTypeModify, buttonTypeCancel);
+
 						Optional<ButtonType> result = alert.showAndWait();
-						ueberschreiben = result.get() == ButtonType.OK;
+						if (result.get() == buttonTypeOverwrite) {
+							ueberschreiben = true;
+						} else if (result.get() == buttonTypeModify) {
+							modifizieren = true;
+						}
 						break;
 					}
 				}
-				if (vorhanden && !ueberschreiben) {
+				if (vorhanden && !ueberschreiben && !modifizieren) {
 					return false;
 				}
+
 			} catch (PackageNotFoundException e2) {
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setContentText(e2.getMessage());
@@ -80,97 +94,90 @@ public class BlueJExporter {
 				e2.printStackTrace();
 			}
 
-			// if (!(vorhanden && ueberschreiben)) {
-			// JOptionPane.showMessageDialog(null, gefunden == null);
-			try {
-				if (gefunden != null) {
+			if (vorhanden && modifizieren) {
+
+				if (gefundeneKlasse != null) {
 					Dateipfade dp = new Dateipfade();
 					try {
-						// Alert alert = new Alert(AlertType.INFORMATION);
-						// alert.setTitle("Info");
-						// alert.setContentText("Sicherheitskopie wird
-						// angelegt");
-						// alert.showAndWait();
 						dp.erzeugeSicherungskopie(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
-						// alert = new Alert(AlertType.INFORMATION);
-						// alert.setTitle("Info");
-						// alert.setContentText("Sicherheitskopie wurde
-						// angelegt");
-						// alert.showAndWait();
 					} catch (PackageNotFoundException e) {
-						// TODO Auto-generated catch block
-						// JOptionPane.showMessageDialog(null, "Fehler 0");
-						// e.printStackTrace();
+
 					}
-					try {
-						gefunden.remove();
-						// Alert alert = new Alert(AlertType.INFORMATION);
-						// alert.setTitle("Info");
-						// alert.setContentText("Klasse wurde entfernt");
-						// alert.showAndWait();
-					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						// e.printStackTrace();
-					}
+					this.schreibeInEditor(gefundeneKlasse.getName(), source);
 				}
-				FileWriter fi;
-				try {
-					// JOptionPane.showMessageDialog(null, "Neue datei wird
-					// erzeugt:"+bpaket.getDir().getAbsolutePath()
-					// + "\\" + klasse + ".java");
-					fi = new FileWriter(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
-					fi.close();
-					// Alert alert = new Alert(AlertType.INFORMATION);
-					// alert.setTitle("Info");
-					// alert.setContentText("Klassendatei wurde angelegt");
-					// alert.showAndWait();
-				} catch (Exception e1) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setContentText("Fehler!" + e1.getMessage());
-					alert.showAndWait();
-					e1.printStackTrace();
-					return false;
-				}
-
-				// Alert alert = new Alert(AlertType.INFORMATION);
-				// alert.setContentText("Neue Klasse wird erzeugt");
-				// alert.showAndWait();
-				bpaket.newClass(klasse);
-				// alert = new Alert(AlertType.INFORMATION);
-				// alert.setContentText("Neue Klasse wurde erzeugt");
-				// alert.showAndWait();
-
-				this.schreibeInEditor(klasse, source);
-
-			} catch (PackageNotFoundException e) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setContentText(
-						"Klasse " + klasse + " wurde nicht angelegt: PackageNotFoundException" + e.getMessage());
-				alert.showAndWait();
-
-			} catch (MissingJavaFileException e) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setContentText(
-						"Klasse " + klasse + " wurde nicht angelegt: MissingJavaFileException" + e.getMessage());
-				alert.showAndWait();
+				
 
 			}
-			// }
-			// else {
-			// Dateipfade dp = new Dateipfade();
-			// try {
-			// dp.erzeugeSicherungskopie(bpaket.getDir().getAbsolutePath()
-			// + "\\" + klasse.getBezeichner() + ".java");
-			// } catch (PackageNotFoundException e) {
-			// // TODO Auto-generated catch block
-			// JOptionPane.showMessageDialog(null, "Fehler 0");
-			// e.printStackTrace();
-			// }
-			//
-			// JOptionPane.showMessageDialog(null, "loesche Editor 0");
-			// this.loescheUndSchreibeInEditor(klasse);
-			//
-			// }
+			if (vorhanden && ueberschreiben) {
+				try {
+					if (gefundeneKlasse != null) {
+						Dateipfade dp = new Dateipfade();
+						try {
+							// Alert alert = new Alert(AlertType.INFORMATION);
+							// alert.setTitle("Info");
+							// alert.setContentText("Sicherheitskopie wird
+							// angelegt");
+							// alert.showAndWait();
+							dp.erzeugeSicherungskopie(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
+							// alert = new Alert(AlertType.INFORMATION);
+							// alert.setTitle("Info");
+							// alert.setContentText("Sicherheitskopie wurde
+							// angelegt");
+							// alert.showAndWait();
+						} catch (PackageNotFoundException e) {
+
+						}
+						try {
+							gefundeneKlasse.remove();
+							// Alert alert = new Alert(AlertType.INFORMATION);
+							// alert.setTitle("Info");
+							// alert.setContentText("Klasse wurde entfernt");
+							// alert.showAndWait();
+						} catch (ClassNotFoundException e) {
+
+						}
+					}
+					FileWriter fi;
+					try {
+
+						fi = new FileWriter(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
+						fi.close();
+						// Alert alert = new Alert(AlertType.INFORMATION);
+						// alert.setTitle("Info");
+						// alert.setContentText("Klassendatei wurde angelegt");
+						// alert.showAndWait();
+					} catch (Exception e1) {
+						Alert alert = new Alert(AlertType.ERROR);
+						alert.setContentText("Fehler!" + e1.getMessage());
+						alert.showAndWait();
+						e1.printStackTrace();
+						return false;
+					}
+
+					// Alert alert = new Alert(AlertType.INFORMATION);
+					// alert.setContentText("Neue Klasse wird erzeugt");
+					// alert.showAndWait();
+					bpaket.newClass(klasse);
+					// alert = new Alert(AlertType.INFORMATION);
+					// alert.setContentText("Neue Klasse wurde erzeugt");
+					// alert.showAndWait();
+
+					this.schreibeInEditor(klasse, source);
+
+				} catch (PackageNotFoundException e) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setContentText(
+							"Klasse " + klasse + " wurde nicht angelegt: PackageNotFoundException" + e.getMessage());
+					alert.showAndWait();
+
+				} catch (MissingJavaFileException e) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setContentText(
+							"Klasse " + klasse + " wurde nicht angelegt: MissingJavaFileException" + e.getMessage());
+					alert.showAndWait();
+
+				}
+			}
 		} catch (ProjectNotOpenException e) {
 			e.printStackTrace();
 			Alert alert = new Alert(AlertType.ERROR);
@@ -179,6 +186,7 @@ public class BlueJExporter {
 			alert.showAndWait();
 
 		}
+
 		return false;
 	}
 
@@ -205,30 +213,31 @@ public class BlueJExporter {
 				// getLineColumnFromOffset(getTextLength())
 				@Override
 				public void run() {
-//					aktuell.setVisible(true);
-//
-//					Alert alert = new Alert(AlertType.ERROR);
-//					alert.setContentText(aktuell.getTextLength() + " lang");
-//					alert.showAndWait();
-//					String text = aktuell.getText(new TextLocation(0, 0),
-//							aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
-//					alert = new Alert(AlertType.ERROR);
-//					alert.setContentText(text);
-//					alert.showAndWait();
+					// aktuell.setVisible(true);
+					//
+					// Alert alert = new Alert(AlertType.ERROR);
+					// alert.setContentText(aktuell.getTextLength() + " lang");
+					// alert.showAndWait();
+					// String text = aktuell.getText(new TextLocation(0, 0),
+					// aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
+					// alert = new Alert(AlertType.ERROR);
+					// alert.setContentText(text);
+					// alert.showAndWait();
 
 					aktuell.setText(new TextLocation(0, 0), new TextLocation(0, 0), source);
 					aktuell.setVisible(true);
-//					text = aktuell.getText(new TextLocation(0, 0),
-//							aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
-//					alert = new Alert(AlertType.ERROR);
-//					alert.setContentText(text);
-//					alert.showAndWait();
-//					aktuell.setText(new TextLocation(0, 0), new TextLocation(0, 0), "otto");
-//					text = aktuell.getText(new TextLocation(0, 0),
-//							aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
-//					alert = new Alert(AlertType.ERROR);
-//					alert.setContentText(text);
-//					alert.showAndWait();
+					// text = aktuell.getText(new TextLocation(0, 0),
+					// aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
+					// alert = new Alert(AlertType.ERROR);
+					// alert.setContentText(text);
+					// alert.showAndWait();
+					// aktuell.setText(new TextLocation(0, 0), new
+					// TextLocation(0, 0), "otto");
+					// text = aktuell.getText(new TextLocation(0, 0),
+					// aktuell.getTextLocationFromOffset(aktuell.getTextLength()));
+					// alert = new Alert(AlertType.ERROR);
+					// alert.setContentText(text);
+					// alert.showAndWait();
 				}
 
 			});

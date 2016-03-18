@@ -333,7 +333,31 @@ public class MenuBuilder {
 		}
 		return declaration;
 	}
-
+	
+	public String getAdditionalActionListenerMethods(String existing) {
+		String declaration = "";
+		TreeItem<MenuTreeItem> root = tree.getRoot();
+		for (TreeItem<MenuTreeItem> menuItem : root.getChildren()) {
+			declaration += getAdditionalActionListenerMethods(menuItem,existing);
+		}
+		return declaration;
+	}
+	private String getAdditionalActionListenerMethods(TreeItem<MenuTreeItem> mi, String existing) {
+		String declaration = "";
+		for (TreeItem<MenuTreeItem> menuItem : mi.getChildren()) {
+			if (menuItem.getValue().getMenuThing().getTyp().equals("Menu")) {
+				declaration += getAdditionalActionListenerMethods(menuItem,existing);//Sinn???
+			} else if (menuItem.getValue().getMenuThing().getTyp().equals("MenuItem")) {
+				String itemname = menuItem.getValue().getMenuThing().getFieldName();
+				String handlerprefix = "public void handleOnAction" + firstLetterUpcase(itemname);				
+				if (!existing.contains(handlerprefix)){
+				declaration += handlerprefix+ "(ActionEvent a){\n    //TODO\n}\n";
+				}
+			}
+		}
+		return declaration;
+	}
+	
 	private String getActionListenerMethods(TreeItem<MenuTreeItem> mi) {
 		String declaration = "";
 		for (TreeItem<MenuTreeItem> menuItem : mi.getChildren()) {
@@ -341,6 +365,7 @@ public class MenuBuilder {
 				declaration += getActionListenerMethods(menuItem);
 			} else if (menuItem.getValue().getMenuThing().getTyp().equals("MenuItem")) {
 				String itemname = menuItem.getValue().getMenuThing().getFieldName();
+				
 				declaration += "public void handleOnAction" + firstLetterUpcase(itemname) + "(ActionEvent a){\n"
 						+ "    //TODO\n}\n";
 			}
