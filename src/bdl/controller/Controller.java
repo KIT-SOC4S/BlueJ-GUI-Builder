@@ -333,7 +333,7 @@ public class Controller {
 					alert.showAndWait();
 				} else {
 					inputOK = true;
-					new BlueJExporter(aktuellesBlueJProjekt, result.get(), generateJavaCode(result.get(), false));
+					new BlueJExporter(aktuellesBlueJProjekt, result.get(), generateJavaCode(result.get(), false),this);
 				}
 			}
 
@@ -1391,7 +1391,10 @@ public class Controller {
 	public void hideStage() {
 		view.getStage().hide();
 	}
-
+	public  String getModifiedJavaCode(String className,String existingCode){
+		return	CodeGenerator.getModifiedJavaCode(className,view.leftPanel.leftList,existingCode,view.middleTabPane.viewPane);
+	}
+	
 	/** Generates the full Java code */
 	public String generateJavaCode(String className, boolean forPreview) {
 	return	CodeGenerator.generateJavaCode(className,view.leftPanel.leftList,view.middleTabPane.viewPane,  forPreview);

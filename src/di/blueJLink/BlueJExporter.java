@@ -6,6 +6,7 @@ package di.blueJLink;
 import java.io.FileWriter;
 import java.util.Optional;
 
+import bdl.controller.Controller;
 import bdl.lang.LabelGrabber;
 import bluej.extensions.BClass;
 import bluej.extensions.BPackage;
@@ -28,12 +29,13 @@ import javafx.scene.control.ButtonType;
  */
 public class BlueJExporter {
 	BProject blueJProjekt;
+	private Controller controller;
 
 	/**
 	 * @param blueJProjekt
 	 */
-	public BlueJExporter(BProject blueJProjekt, String klassenname, String source) {
-		super();
+	public BlueJExporter(BProject blueJProjekt, String klassenname, String source, Controller controller) {
+		this.controller = controller;
 		this.blueJProjekt = blueJProjekt;
 
 		this.exportiereKlasse(klassenname, source);
@@ -64,7 +66,6 @@ public class BlueJExporter {
 						alert.setContentText(LabelGrabber.getLabel("bluejexport.condialog1") + " " + klasse + " "
 								+ LabelGrabber.getLabel("bluejexport.condialog2") + "\n"
 								+ LabelGrabber.getLabel("bluejexport.condialog3"));
-
 						ButtonType buttonTypeOverwrite = new ButtonType(
 								LabelGrabber.getLabel("bluejexport.button.replace"));
 						ButtonType buttonTypeModify = new ButtonType(
@@ -83,9 +84,14 @@ public class BlueJExporter {
 						break;
 					}
 				}
+
 				if (vorhanden && !ueberschreiben && !modifizieren) {
 					return false;
 				}
+//				Alert alert = new Alert(AlertType.INFORMATION);
+//				alert.setTitle("Info 1");
+//				alert.setContentText(vorhanden + " " + ueberschreiben + " " + modifizieren);
+//				alert.showAndWait();
 
 			} catch (PackageNotFoundException e2) {
 				Alert alert = new Alert(AlertType.ERROR);
@@ -94,91 +100,94 @@ public class BlueJExporter {
 				e2.printStackTrace();
 			}
 
-			if (vorhanden && modifizieren) {
+			try {
 
 				if (gefundeneKlasse != null) {
 					Dateipfade dp = new Dateipfade();
 					try {
+						// Alert alert = new Alert(AlertType.INFORMATION);
+						// alert.setTitle("Info");
+						// alert.setContentText("Sicherheitskopie wird
+						// angelegt");
+						// alert.showAndWait();
 						dp.erzeugeSicherungskopie(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
+						// alert = new Alert(AlertType.INFORMATION);
+						// alert.setTitle("Info");
+						// alert.setContentText("Sicherheitskopie wurde
+						// angelegt");
+						// alert.showAndWait();
 					} catch (PackageNotFoundException e) {
 
 					}
-					this.schreibeInEditor(gefundeneKlasse.getName(), source);
-				}
-				
-
-			}
-			if (vorhanden && ueberschreiben) {
-				try {
-					if (gefundeneKlasse != null) {
-						Dateipfade dp = new Dateipfade();
+					if (modifizieren) {
+						Editor aktuell;
 						try {
-							// Alert alert = new Alert(AlertType.INFORMATION);
-							// alert.setTitle("Info");
-							// alert.setContentText("Sicherheitskopie wird
-							// angelegt");
-							// alert.showAndWait();
-							dp.erzeugeSicherungskopie(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
-							// alert = new Alert(AlertType.INFORMATION);
-							// alert.setTitle("Info");
-							// alert.setContentText("Sicherheitskopie wurde
-							// angelegt");
-							// alert.showAndWait();
+							aktuell = gefundeneKlasse.getEditor();
+							String existingCode = (aktuell.getText(new TextLocation(0, 0),
+									aktuell.getTextLocationFromOffset(aktuell.getTextLength())));
+							source = controller.getModifiedJavaCode(klasse, existingCode);							
+//							Alert alert = new Alert(AlertType.INFORMATION);
+//							alert.setTitle("Info");
+//							alert.setContentText(source);
+//							alert.showAndWait();
 						} catch (PackageNotFoundException e) {
-
+							e.printStackTrace();
 						}
-						try {
-							gefundeneKlasse.remove();
-							// Alert alert = new Alert(AlertType.INFORMATION);
-							// alert.setTitle("Info");
-							// alert.setContentText("Klasse wurde entfernt");
-							// alert.showAndWait();
-						} catch (ClassNotFoundException e) {
 
-						}
 					}
-					FileWriter fi;
-					try {
 
-						fi = new FileWriter(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
-						fi.close();
+					try {
+						gefundeneKlasse.remove();
 						// Alert alert = new Alert(AlertType.INFORMATION);
 						// alert.setTitle("Info");
-						// alert.setContentText("Klassendatei wurde angelegt");
+						// alert.setContentText("Klasse wurde entfernt");
 						// alert.showAndWait();
-					} catch (Exception e1) {
-						Alert alert = new Alert(AlertType.ERROR);
-						alert.setContentText("Fehler!" + e1.getMessage());
-						alert.showAndWait();
-						e1.printStackTrace();
-						return false;
+					} catch (ClassNotFoundException e) {
+
 					}
-
-					// Alert alert = new Alert(AlertType.INFORMATION);
-					// alert.setContentText("Neue Klasse wird erzeugt");
-					// alert.showAndWait();
-					bpaket.newClass(klasse);
-					// alert = new Alert(AlertType.INFORMATION);
-					// alert.setContentText("Neue Klasse wurde erzeugt");
-					// alert.showAndWait();
-
-					this.schreibeInEditor(klasse, source);
-
-				} catch (PackageNotFoundException e) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setContentText(
-							"Klasse " + klasse + " wurde nicht angelegt: PackageNotFoundException" + e.getMessage());
-					alert.showAndWait();
-
-				} catch (MissingJavaFileException e) {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setContentText(
-							"Klasse " + klasse + " wurde nicht angelegt: MissingJavaFileException" + e.getMessage());
-					alert.showAndWait();
-
 				}
+
+				FileWriter fi;
+				try {
+
+					fi = new FileWriter(bpaket.getDir().getAbsolutePath() + "\\" + klasse + ".java");
+					fi.close();
+					// Alert alert = new Alert(AlertType.INFORMATION);
+					// alert.setTitle("Info");
+					// alert.setContentText("Klassendatei wurde angelegt");
+					// alert.showAndWait();
+				} catch (Exception e1) {
+					Alert alert = new Alert(AlertType.ERROR);
+					alert.setContentText("Fehler!" + e1.getMessage());
+					alert.showAndWait();
+					e1.printStackTrace();
+					return false;
+				}
+
+				// Alert alert = new Alert(AlertType.INFORMATION);
+				// alert.setContentText("Neue Klasse wird erzeugt");
+				// alert.showAndWait();
+				bpaket.newClass(klasse);
+				// alert = new Alert(AlertType.INFORMATION);
+				// alert.setContentText("Neue Klasse wurde erzeugt");
+				// alert.showAndWait();
+
+				this.schreibeInEditor(klasse, source);
+
+			} catch (PackageNotFoundException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setContentText(
+						"Klasse " + klasse + " wurde nicht angelegt: PackageNotFoundException" + e.getMessage());
+				alert.showAndWait();
+
+			} catch (MissingJavaFileException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setContentText(
+						"Klasse " + klasse + " wurde nicht angelegt: MissingJavaFileException" + e.getMessage());
+				alert.showAndWait();
+
 			}
-		} catch (ProjectNotOpenException e) {
+		} catch (ProjectNotOpenException e)	{
 			e.printStackTrace();
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setContentText(
@@ -188,11 +197,12 @@ public class BlueJExporter {
 		}
 
 		return false;
+
 	}
 
 	public boolean schreibeInEditor(String klasse, String source) {
 		try {
-			Alert alert;
+//			Alert alert;
 			BPackage bpaket = blueJProjekt.getPackage("");
 			// alert = new Alert(AlertType.INFORMATION);
 			// alert.setContentText("bpaket " + bpaket);
@@ -202,7 +212,7 @@ public class BlueJExporter {
 			// alert.setContentText("aktKlasse " + aktKlasse.getName());
 			// alert.showAndWait();
 			Editor aktuell = aktKlasse.getEditor();
-			// Ohne diese Verzögerungs dialog bleibt das System hängen es sei
+			
 			// denn man benutzt Runnable//
 			// alert = new Alert(AlertType.INFORMATION);
 			// alert.setContentText("Editor " + aktuell);
@@ -213,7 +223,7 @@ public class BlueJExporter {
 				// getLineColumnFromOffset(getTextLength())
 				@Override
 				public void run() {
-					// aktuell.setVisible(true);
+					aktuell.setVisible(false);
 					//
 					// Alert alert = new Alert(AlertType.ERROR);
 					// alert.setContentText(aktuell.getTextLength() + " lang");
@@ -265,32 +275,5 @@ public class BlueJExporter {
 		return true;
 	}
 
-	public boolean loescheUndSchreibeInEditor(String klasse, String source) {
-		try {
-			BPackage bpaket = blueJProjekt.getPackage("");
-			BClass aktKlasse = bpaket.getBClass(klasse);
-
-			Editor aktuell = aktKlasse.getEditor();
-			String text = (aktuell.getText(new TextLocation(0, 0),
-					new TextLocation(aktuell.getLineCount(), aktuell.getLineLength(aktuell.getLineCount()))));
-
-			// Alert alert = new Alert(AlertType.ERROR);
-			// alert.setContentText(text);
-			// alert.showAndWait();
-			// System.err.println(aktuell.getText(new TextLocation(0, 0), new
-			// TextLocation(aktuell.getLineCount(),
-			// aktuell.getLineLength(aktuell.getLineCount()))));
-			aktuell.setText(new TextLocation(0, 0),
-					new TextLocation(aktuell.getLineCount(), aktuell.getLineLength(aktuell.getLineCount())), "");
-			aktuell.setText(new TextLocation(0, 0), new TextLocation(0, 0), source);
-			aktuell.setVisible(true);
-		} catch (Exception e) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setContentText("Error exporting " + klasse);
-			alert.showAndWait();
-			return false;
-		}
-		return true;
-	}
-
+	
 }
