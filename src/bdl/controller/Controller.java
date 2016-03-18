@@ -1144,7 +1144,7 @@ public class Controller {
 		HashMap<String,String> radiobuttonsToggleGroupNames = new HashMap<>();
 		isOpeningFile = true;
 		Parent parent = null;
-		
+
 		if (file != null) {
 			openFileAsXML(file,radiobuttonsToggleGroupNames);
 			view.middleTabPane.viewPane.getChildren().clear();
@@ -1394,23 +1394,25 @@ public class Controller {
 
 	/** Generates the full Java code */
 	public String generateJavaCode(String className, boolean forPreview) {
-		HashMap<String, String> imports = new HashMap<>();
-		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
-			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
-			imports.put(componentSettings.getType(), componentSettings.getPackageName());
-			if (componentSettings.getListenerProperties() != null
-					&& componentSettings.getListenerProperties().size() > 0) {
-				for (ListenerProperty lh : componentSettings.getListenerProperties()) {
-					if (!imports.containsKey(lh.getListenerEvent())) {
-						imports.put(lh.getListenerEvent(), lh.getPackageName());
-					}
-				}
-			}
-		}
-		if (className != null && !className.isEmpty()) {
-			view.middleTabPane.viewPane.setClassName(className);
-		}
-		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, forPreview);
+	return	CodeGenerator.generateJavaCode(className,view.leftPanel.leftList,view.middleTabPane.viewPane,  forPreview);
+//		HashMap<String, String> imports = new HashMap<>();
+
+//		for (ComponentMenuItem componentMenuItem : view.leftPanel.leftList.getItems()) {
+//			ComponentSettings componentSettings = componentMenuItem.getComponentSettings();
+//			imports.put(componentSettings.getType(), componentSettings.getPackageName());
+//			if (componentSettings.getListenerProperties() != null
+//					&& componentSettings.getListenerProperties().size() > 0) {
+//				for (ListenerProperty lh : componentSettings.getListenerProperties()) {
+//					if (!imports.containsKey(lh.getListenerEvent())) {
+//						imports.put(lh.getListenerEvent(), lh.getPackageName());
+//					}
+//				}
+//			}
+//		}
+//		if (className != null && !className.isEmpty()) {
+//			view.middleTabPane.viewPane.setClassName(className);
+//		}
+//		return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, forPreview);
 	}
 
 	public HashMap<String, String> getFXMLImports() {
@@ -1530,7 +1532,7 @@ public class Controller {
 					((GRadioButton)newThing).setToggleGroupName(tgn);
 				}
 			}
-			
+
 		}
 		Node newNode = (Node) newThing;
 		destination.getChildren().add(newNode);
