@@ -160,6 +160,9 @@ public class ToggleGroupObservedProperty implements PanelProperty {
 
 	@Override
 	public String getFXMLCode() {
+		if (toggleGroupName.isEmpty()){
+			return "";
+		}
 		return fxml + "=\"$" + textField.getText().replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
 	}
 
