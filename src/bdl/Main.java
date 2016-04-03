@@ -64,10 +64,8 @@ public class Main extends Application implements Runnable {
         }
 
         Scene scene = new Scene(view, 1024, 600);
-
         stage.setTitle(LabelGrabber.getLabel("default.gui.title"));
         stage.setScene(scene);
-
         stage.show(); 
     }
 

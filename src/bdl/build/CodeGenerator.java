@@ -10,6 +10,7 @@ import bdl.build.javafx.scene.control.GComboBox;
 import bdl.build.javafx.scene.control.GListView;
 import bdl.build.javafx.scene.control.GMenuBar;
 import bdl.build.javafx.scene.control.GRadioButton;
+import bdl.build.javafx.scene.control.GToggleButton;
 import bdl.build.properties.ListenerEnabledProperty;
 import bdl.build.properties.PanelProperty;
 import bdl.controller.Controller;
@@ -31,6 +32,12 @@ public class CodeGenerator {
 		}
 		if ((node instanceof GRadioButton)) {
 			String name = ((GRadioButton) node).getToggleGroupName();
+			if (!name.isEmpty()) {
+				toggleGroups.add(name);
+			}
+		}
+		if ((node instanceof GToggleButton)) {
+			String name = ((GToggleButton) node).getToggleGroupName();
 			if (!name.isEmpty()) {
 				toggleGroups.add(name);
 			}
@@ -737,7 +744,26 @@ public class CodeGenerator {
 					code.append("/>\n");
 				}
 
-			} else if (node instanceof GSubScene) {
+			} else if (node instanceof GToggleButton) {
+				GToggleButton rb = (GToggleButton) node;
+				String toggleGroupName = rb.getToggleGroupName();
+				if (!toggleGroupName.isEmpty() && !usedTGNames.contains(toggleGroupName)) {
+					usedTGNames.add(toggleGroupName);
+					code.append("        <fx:define>\n");
+					code.append("           <ToggleGroup fx:id=\"" + toggleGroupName + "\"/>\n");
+					code.append("        </fx:define> \n");
+					code.append("        <ToggleButton");
+					code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
+					for (PanelProperty property : gObj.getPanelProperties()) {
+						String fxmlCode = property.getFXMLCode();
+						if (!fxmlCode.isEmpty()) {
+							code.append(fxmlCode).append(' ');
+						}
+					}
+					code.append("/>\n");
+				}
+
+			}else if (node instanceof GSubScene) {
 				code.append("        <").append(nodeClass);
 				code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
 				for (PanelProperty property : gObj.getPanelProperties()) {

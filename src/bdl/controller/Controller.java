@@ -44,10 +44,10 @@ import bdl.build.GObject;
 import bdl.build.GUIObject;
 import bdl.build.javafx.scene.control.GMenuBar;
 import bdl.build.javafx.scene.control.GRadioButton;
+import bdl.build.javafx.scene.control.GToggleButton;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
 import bdl.model.ComponentSettingsStore;
-import bdl.model.ListenerProperty;
 import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryListener;
 import bdl.model.history.HistoryManager;
@@ -526,7 +526,7 @@ public class Controller {
 						historyManager.pause();
 						try {
 							Class panelPropertyClass = Class.forName("bdl.build." + componentSettings.getPackageName()
-									+ ".G" + componentSettings.getType());
+									+ ".G" + componentSettings.getType());							
 							Constructor constructor = panelPropertyClass.getConstructor();
 							newThing = (GObject) constructor.newInstance();
 						} catch (Exception e) {
@@ -1123,8 +1123,18 @@ public class Controller {
 						rbTn.put(rbname, toggleName);
 					}
 				}
+			} else
+			if (nodename.equals("ToggleButton")) {
+				String rbname = e.getAttribute("fx:id");
+//				System.out.println(rbname);
+				String toggleName = e.getAttribute("toggleGroup");
+//				System.out.println(toggleName);
+				if (rbname!=null && !rbname.isEmpty()){
+					if (toggleName!=null && !toggleName.isEmpty()){
+						rbTn.put(rbname, toggleName);
+					}
+				}
 			}
-
 			NodeList childs = e.getChildNodes();
 			for (int k = 0; k < childs.getLength(); k++) {
 				if (childs.item(k) instanceof Element) {
@@ -1510,7 +1520,7 @@ public class Controller {
 		});
 	}
 
-	// x and y are initial layout positions. To be used only with drag and drop.
+	
 	private void addGObjectRec(GObject newThing, ComponentSettings componentSettings, View view,
 			ViewListeners viewListeners, Node settingsNode, Pane destination,HashMap<String,String> rbTn) {
 
@@ -1533,6 +1543,16 @@ public class Controller {
 				if (tgn.startsWith("$")){
 					tgn=tgn.substring(1);
 					((GRadioButton)newThing).setToggleGroupName(tgn);
+				}
+			}
+
+		}
+		if (newThing instanceof GToggleButton) {
+			String tgn = rbTn.get(newThing.getFieldName());
+			if (tgn!=null && !tgn.isEmpty()){
+				if (tgn.startsWith("$")){
+					tgn=tgn.substring(1);
+					((GToggleButton)newThing).setToggleGroupName(tgn);
 				}
 			}
 
@@ -1748,6 +1768,7 @@ public class Controller {
 					try {
 						Class panelPropertyClass = Class.forName(
 								"bdl.build." + componentSettings.getPackageName() + ".G" + componentSettings.getType());
+						
 						Constructor constructor = panelPropertyClass.getConstructor();
 						newnewThing = (GObject) constructor.newInstance();
 					} catch (Exception e) {
@@ -1775,7 +1796,7 @@ public class Controller {
 						@Override
 						public String getAppearance() {
 							return newThing.getClass().getSuperclass().getSimpleName() + " > "
-									+ newGObj.getClass().getSuperclass().getSimpleName() + " added!";
+									+ newGObj.getNodeClassName()+ " added!";
 						}
 					});
 				}
