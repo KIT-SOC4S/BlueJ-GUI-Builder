@@ -16,6 +16,7 @@ public class GLabel extends Label implements GObject {
 
     @Override
     public String getFieldName() {    	
+    	
         return fieldNameProperty.getValue();
     }
 

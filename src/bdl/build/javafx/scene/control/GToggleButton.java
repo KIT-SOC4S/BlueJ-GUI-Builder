@@ -68,6 +68,7 @@ public class GToggleButton extends ToggleButton implements GObject {
 		}
 		return "";
 	}
+	
 	public void setToggleGroupName(String value) {
 		for (PanelProperty pp:properties){
 			if (pp instanceof ToggleGroupObservedProperty){

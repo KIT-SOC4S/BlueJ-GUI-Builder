@@ -9,7 +9,6 @@ import bdl.build.GUIObject;
 import bdl.build.javafx.scene.control.GMenuBar;
 import bdl.build.properties.FieldName;
 import bdl.build.properties.GUISizeProperty;
-import bdl.build.properties.LayoutProperty;
 import bdl.build.properties.ListenerEnabledProperty;
 import bdl.build.properties.PanelProperty;
 import bdl.build.properties.PropertyListenerEnabledProperty;
@@ -113,9 +112,8 @@ public class PropertyEditPane extends GridPane {
 				if (!property.isGenerateJavaCode()) {
 					panelProperty.disableJavaCodeGeneration();
 				}
-				if (panelProperty instanceof LayoutProperty || panelProperty instanceof StrokeProperty
-				// || panelProperty instanceof CanvasSizeProperty
-				) {
+				if (panelProperty instanceof StrokeProperty)
+				 {
 					currentRow++;
 				}
 				panelPropertyList.add(panelProperty);

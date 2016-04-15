@@ -31,7 +31,7 @@ public class Fehlerausgabe {
 		content.add(textArea, 0, 1);
 		alert.getDialogPane().setContent(content);
 		PrintStream out = new PrintStream(new StringOutputStream(this));
-		System.setErr(out);
+//		System.setErr(out);
 		
 	}
 

@@ -27,6 +27,7 @@ public class GSlider extends Slider implements GObject {
     @Override
     public void setFieldName(String fieldName) {
         fieldNameProperty.setValue(fieldName);
+       
     }
 
     @Override

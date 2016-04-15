@@ -13,7 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import java.lang.reflect.Method;
 
-public class ColorProperty implements PanelProperty {
+public class FillObservedProperty implements PanelProperty {
 
     private GObject gObj;
     private String setter;
@@ -22,10 +22,14 @@ public class ColorProperty implements PanelProperty {
     private ColorPicker colorPicker;
     private final HistoryManager historyManager;
 
-    public ColorProperty(final GObject gObj, String name, final String observedProperty, String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public FillObservedProperty(final GObject gObj, String name, final String observedProperty, String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
-        this.setter = setter;
-        this.getter = getter;
+//        this.setter = setter;
+//        this.getter = getter;
+        String property = observedProperty;
+		property = property.replace("Property", "");	property = property.substring(0, 1).toUpperCase() + property.substring(1);
+		this.setter = "set" + property;
+		this.getter = "get" + property;
         this.fxml = fxml;
         this.historyManager = hm;
 
@@ -119,6 +123,6 @@ public class ColorProperty implements PanelProperty {
 
     @Override
     public String getFXMLCode() {
-        return fxml + "=\"" + colorPicker.getValue().toString() + "\"";
+        return fxml + "=\"" + colorPicker.getValue().toString().replace("0x","#") + "\"";
     }
 }

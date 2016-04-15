@@ -30,6 +30,13 @@ public interface GObject {
     
     public String getNodeClassName();
     
+    public  String getStyle();
+//    public default void setStyle(String style){
+//    	
+//    }
+//    public default void removeStyle(String style){
+//    	
+//    }
     public default String[] getAdditionalImports(){
     	return null;
     }
@@ -46,4 +53,6 @@ public interface GObject {
 	public default StringBuilder getAdditionalMethodInvokations(){
 		return null;
 	}
+
+	public void setStyle(String newStyle);
 }

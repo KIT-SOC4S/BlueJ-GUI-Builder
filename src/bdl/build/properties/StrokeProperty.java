@@ -186,6 +186,7 @@ public class StrokeProperty implements PanelProperty {
             return "";
         }
     }
+    
     private boolean istZahl(String s) {
 		try {
 			Double.valueOf(s).doubleValue();

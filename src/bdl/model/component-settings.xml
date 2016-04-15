@@ -245,7 +245,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -279,6 +280,16 @@
 				<setter>setMinHeight</setter>
 				<getter>getMinHeight</getter>
 				<fxml>minHeight</fxml>
+			</property>
+			<property>
+				<name>Background</name>
+				<enabled>true</enabled>
+				<pseudotype>StyleBackgroundObserved</pseudotype>
+				<observedProperty>styleProperty</observedProperty>
+				<default>-1</default>
+				<setter>setStyle</setter>
+				<getter>getStyle</getter>
+				<fxml>style</fxml>
 			</property>
 		</properties>
 		<listeners>
@@ -337,7 +348,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -508,7 +520,8 @@
 			<property>
 				<name>prefWidth</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>prefWidthProperty</observedProperty>
 				<default>1.0</default>
 				<setter>setPrefWidth</setter>
 				<getter>getPrefWidth</getter>
@@ -517,7 +530,8 @@
 			<property>
 				<name>prefHeight</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>prefWidthProperty</observedProperty>
 				<default>1.0</default>
 				<setter>setPrefHeight</setter>
 				<getter>getPrefHeight</getter>
@@ -580,7 +594,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -672,7 +687,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -774,7 +790,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -925,7 +942,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -1018,7 +1036,8 @@
 			<property>
 				<name>Min</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>minProperty</observedProperty>
 				<default>0</default>
 				<setter>setMin</setter>
 				<getter>getMin</getter>
@@ -1027,7 +1046,8 @@
 			<property>
 				<name>Max</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>maxProperty</observedProperty>
 				<default>100</default>
 				<setter>setMax</setter>
 				<getter>getMax</getter>
@@ -1036,7 +1056,8 @@
 			<property>
 				<name>Value</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>valueProperty</observedProperty>
 				<default>10</default>
 				<setter>setValue</setter>
 				<getter>getValue</getter>
@@ -1045,7 +1066,8 @@
 			<property>
 				<name>Show Tick Marks</name>
 				<enabled>true</enabled>
-				<pseudotype>StandardBoolean</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>showTickMarksProperty</observedProperty>
 				<default>false</default>
 				<setter>setShowTickMarks</setter>
 				<getter>isShowTickMarks</getter>				
@@ -1054,7 +1076,8 @@
 			<property>
 				<name>Show Tick Label</name>
 				<enabled>true</enabled>
-				<pseudotype>StandardBoolean</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>showTickLabelsProperty</observedProperty>
 				<default>false</default>
 				<setter>setShowTickLabels</setter>
 				<getter>isShowTickLabels</getter>
@@ -1083,7 +1106,8 @@
 			<property>
 				<name>Snap To Ticks</name>
 				<enabled>true</enabled>
-				<pseudotype>StandardBoolean</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>snapToTicksProperty</observedProperty>
 				<default>false</default>
 				<setter>setSnapToTicks</setter>
 				<getter>isSnapToTicks</getter>
@@ -1112,7 +1136,8 @@
 			<property>
 				<name>prefWidth</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>prefWidthProperty</observedProperty>
 				<default>-1</default>
 				<setter>setPrefWidth</setter>
 				<getter>getPrefWidth</getter>
@@ -1121,7 +1146,8 @@
 			<property>
 				<name>prefHeight</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>prefHeightProperty</observedProperty>
 				<default>-1</default>
 				<setter>setPrefHeight</setter>
 				<getter>getPrefHeight</getter>
@@ -1130,7 +1156,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -1194,7 +1221,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -1278,7 +1306,8 @@
 			<property>
 				<name>Disabled</name>
 				<enabled>true</enabled>
-				<pseudotype>Disabled</pseudotype>
+				<pseudotype>BooleanObserved</pseudotype>
+				<observedProperty>disableProperty</observedProperty>
 				<default>false</default>
 				<setter></setter>
 				<getter></getter>
@@ -1526,10 +1555,11 @@
 			<property>
 				<name>Fill</name>
 				<enabled>true</enabled>
-				<pseudotype>Color</pseudotype>
+				<pseudotype>FillObserved</pseudotype>
+				<observedProperty>fillProperty</observedProperty>
 				<default>#FF0000</default>
-				<setter>setFill</setter>
-				<getter>getFill</getter>
+				<setter></setter>
+				<getter></getter>
 				<fxml>fill</fxml>
 			</property>
 			<property>
@@ -1612,7 +1642,8 @@
 			<property>
 				<name>Radius</name>
 				<enabled>true</enabled>
-				<pseudotype>Double1DP</pseudotype>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>radiusProperty</observedProperty>
 				<default>10</default>
 				<setter>setRadius</setter>
 				<getter>getRadius</getter>

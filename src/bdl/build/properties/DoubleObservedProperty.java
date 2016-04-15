@@ -34,8 +34,12 @@ public class DoubleObservedProperty implements PanelProperty {
 
     public DoubleObservedProperty(final GObject gObj, String name, final String observedProperty, final String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
-        this.setter = setter;
-        this.getter = getter;
+//        this.setter = setter;
+//        this.getter = getter;
+        String property=observedProperty.replace("Property","");
+        property=property.substring(0,1).toUpperCase()+property.substring(1);
+        this.setter = "set"+property;
+        this.getter = "get"+property;
         this.fxml = fxml;
         this.historyManager = hm;
         gp.add(new Label(name + ":"), 0, row);        
@@ -60,8 +64,7 @@ public class DoubleObservedProperty implements PanelProperty {
 			((ObservableValue<Number>) getPropMethod.invoke(gObj)).addListener(new ChangeListener<Number>() {    
 					@Override
 		            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number newValue) {						
-						textField.setText(format.format(newValue));
-					
+						textField.setText(format.format(newValue));					
 		            }
 		        });
 		} catch (NoSuchMethodException | SecurityException e) {

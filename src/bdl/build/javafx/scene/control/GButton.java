@@ -5,6 +5,7 @@ import bdl.view.right.PropertyEditPane;
 import bdl.build.properties.PanelProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 
 import java.util.List;
@@ -15,6 +16,10 @@ public class GButton extends Button implements GObject {
     private StringProperty fieldNameProperty = new SimpleStringProperty();
 
     
+
+	
+
+	
 
 	@Override
     public String getFieldName() {
