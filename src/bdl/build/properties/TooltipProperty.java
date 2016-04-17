@@ -18,7 +18,7 @@ public class TooltipProperty implements PanelProperty {
     private TextField textField;
     private Control control;
 
-    public TooltipProperty(final GObject gObj, String name, final String observedProperty, String getter, String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public TooltipProperty(final GObject gObj, String name, final String observedProperty, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
 
         gp.add(new Label(name + ":"), 0, row);
@@ -72,6 +72,8 @@ public class TooltipProperty implements PanelProperty {
     private void setValue() {
         if (!textField.getText().isEmpty()) {
             control.setTooltip(new Tooltip(textField.getText()));
+        } else {
+        	control.setTooltip(null);
         }
     }
 

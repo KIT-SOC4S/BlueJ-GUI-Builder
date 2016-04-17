@@ -86,16 +86,21 @@ public class ComponentSettings {
      * @param setter
      * @param javaCodeGeneration 
      */
-    public void addProperty(String name, String enabled, String type, String defaultValue, String observedProperty, String getter, String setter, String fxml, String javaCodeGeneration) {
+    public void addProperty(String name, String enabled, String pseudotype, String defaultValue, String observedProperty,  String fxml, String javaCodeGeneration) {
 //       for (Property p: properties){
 //    	  System.out.println( p.getName());
 //       }
-       properties.add(new Property(name, enabled, type, defaultValue, observedProperty,getter, setter, fxml, javaCodeGeneration));
+       properties.add(new Property(name, enabled, pseudotype, defaultValue, observedProperty, fxml, javaCodeGeneration));
     }
 
     public void addListenerProperty(String name, String method, String event,String defaultValue, String packageName,String listenerType, String propertyName, String propertyType) {
         listenerProperties.add(new ListenerProperty(name, method, event,defaultValue,packageName,listenerType, propertyName, propertyType));
     }
+
+	public void addStyleProperty(String name, String enabled, String pseudotype, String defaultValue, String styleProperty) {
+		properties.add(new Property(name, enabled, pseudotype, defaultValue, styleProperty));
+		
+	}
     
 
 }

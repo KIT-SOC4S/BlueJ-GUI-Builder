@@ -44,7 +44,7 @@ public class PropertyEditPane extends GridPane {
 				propertiesHeading.getFont().getSize() + 0.5));
 		add(propertiesHeading, 0, currentRow++);
 		GUISizeProperty guisp = new GUISizeProperty(guiObj, guiObj.getGUITitle(), this, currentRow);
-		currentRow+=3;
+		currentRow += 3;
 		List<PanelProperty> panelPropertyList = new ArrayList<>();
 		if (componentSettings.getListenerProperties().size() > 0) {
 			Label eventsHeading = new Label(LabelGrabber.getLabel("events.text") + ":");
@@ -63,10 +63,10 @@ public class PropertyEditPane extends GridPane {
 					panelProperty = new ListenerEnabledProperty(guiObj, lprop.getListenerMethod(), lprop.getName(),
 							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
 							currentRow++);
-				} 	else if (lprop.getListenertype().equals("propertyChange")) {
-					panelProperty = new PropertyListenerEnabledProperty(guiObj, lprop.getPropertyname(), lprop.getPropertytype(),
-							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
-							currentRow++);
+				} else if (lprop.getListenertype().equals("propertyChange")) {
+					panelProperty = new PropertyListenerEnabledProperty(guiObj, lprop.getPropertyname(),
+							lprop.getPropertytype(), lprop.getListenerEvent(), lprop.getDefaultValue(),
+							lprop.getPackageName(), this, currentRow++);
 				}
 				if (panelProperty != null) {
 					panelPropertyList.add(panelProperty);
@@ -100,26 +100,41 @@ public class PropertyEditPane extends GridPane {
 
 		List<PanelProperty> panelPropertyList = new ArrayList<>();
 		for (Property property : componentSettings.getProperties()) {
-			String type = property.getType();
-			try {
-				Class panelPropertyClass = Class.forName("bdl.build.properties." + type + "Property");
-				Constructor constructor = panelPropertyClass.getConstructor(GObject.class, String.class, String.class,
-						String.class, String.class, String.class, String.class, GridPane.class, int.class, Node.class,
-						HistoryManager.class);
-				PanelProperty panelProperty = (PanelProperty) constructor.newInstance(gObj, property.getName(),
-						property.getObservedProperty(), property.getGetter(), property.getSetter(), property.getFxml(),
-						property.getDefaultValue(), this, currentRow++, settingsNode, historyManager);
-				if (!property.isGenerateJavaCode()) {
-					panelProperty.disableJavaCodeGeneration();
+			String type = property.getPseudotype();
+			if (property.isStyleProperty()) {
+				try {
+					Class panelPropertyClass = Class.forName("bdl.build.properties." + type + "Property");
+					Constructor constructor = panelPropertyClass.getConstructor(GObject.class, String.class,
+							String.class, String.class, GridPane.class, int.class, Node.class,
+							HistoryManager.class);
+					PanelProperty panelProperty = (PanelProperty) constructor.newInstance(gObj, property.getName(),
+							property.getProperty(),  property.getDefaultValue(), this, currentRow++,
+							settingsNode, historyManager);
+					panelPropertyList.add(panelProperty);
+				} catch (Exception e) {
+					System.out.println(type + "StyleProperty failed.");
+					e.printStackTrace();
 				}
-				if (panelProperty instanceof StrokeProperty)
-				 {
-					currentRow++;
+			} else {
+				try {
+					Class panelPropertyClass = Class.forName("bdl.build.properties." + type + "Property");
+					Constructor constructor = panelPropertyClass.getConstructor(GObject.class, String.class,
+							String.class, String.class, String.class, GridPane.class, int.class, Node.class,
+							HistoryManager.class);
+					PanelProperty panelProperty = (PanelProperty) constructor.newInstance(gObj, property.getName(),
+							property.getProperty(), property.getFxml(), property.getDefaultValue(), this, currentRow++,
+							settingsNode, historyManager);
+					if (!property.isGenerateJavaCode()) {
+						panelProperty.disableJavaCodeGeneration();
+					}
+					if (panelProperty instanceof StrokeProperty) {
+						currentRow++;
+					}
+					panelPropertyList.add(panelProperty);
+				} catch (Exception e) {
+					System.out.println(type + "Property failed.");
+					e.printStackTrace();
 				}
-				panelPropertyList.add(panelProperty);
-			} catch (Exception e) {
-				System.out.println(type + "Property failed.");
-				e.printStackTrace();
 			}
 		}
 		if (componentSettings.getListenerProperties().size() > 0) {
@@ -139,10 +154,10 @@ public class PropertyEditPane extends GridPane {
 					panelProperty = new ListenerEnabledProperty(gObj, lprop.getListenerMethod(), lprop.getName(),
 							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
 							currentRow++);
-				} 	else if (lprop.getListenertype().equals("propertyChange")) {
-					panelProperty = new PropertyListenerEnabledProperty(gObj, lprop.getPropertyname(), lprop.getPropertytype(),
-							lprop.getListenerEvent(), lprop.getDefaultValue(), lprop.getPackageName(), this,
-							currentRow++);
+				} else if (lprop.getListenertype().equals("propertyChange")) {
+					panelProperty = new PropertyListenerEnabledProperty(gObj, lprop.getPropertyname(),
+							lprop.getPropertytype(), lprop.getListenerEvent(), lprop.getDefaultValue(),
+							lprop.getPackageName(), this, currentRow++);
 				}
 				if (panelProperty != null) {
 					panelPropertyList.add(panelProperty);

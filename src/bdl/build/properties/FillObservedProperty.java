@@ -22,7 +22,7 @@ public class FillObservedProperty implements PanelProperty {
     private ColorPicker colorPicker;
     private final HistoryManager historyManager;
 
-    public FillObservedProperty(final GObject gObj, String name, final String observedProperty, String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public FillObservedProperty(final GObject gObj, String name, final String observedProperty,  String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
 //        this.setter = setter;
 //        this.getter = getter;

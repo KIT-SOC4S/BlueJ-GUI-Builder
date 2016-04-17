@@ -2,6 +2,7 @@ package bdl.build.properties;
 
 import bdl.build.GObject;
 import bdl.build.GUIObject;
+import bdl.controller.Controller;
 import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import javafx.event.ActionEvent;
@@ -25,9 +26,14 @@ public class PropertyListenerEnabledProperty extends ListenerEnabledProperty {
  
     @Override
     public String getJavaCode() {
+    	
         if (isToImplement()) {
+        	if (Controller.createSimpleCode){
+        		 return getgObj().getFieldName() + "." + propertyName+"().addListener("
+                 		+ "(oV,oldV,v)-> handle" +firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"(v));";
+        	}
             return getgObj().getFieldName() + "." + propertyName+"().addListener("
-            		+ "(ov,oldV,newV)-> handle" +firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"(ov,oldV,newV));";
+            		+ "(oV,oldV,newV)-> handle" +firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"(ov,oldV,newV));";
         } else {
             return "";
         }
@@ -35,6 +41,10 @@ public class PropertyListenerEnabledProperty extends ListenerEnabledProperty {
     
     @Override
     public String getJavaCodeHandler() {
+    	if (Controller.createSimpleCode){
+    		return "public void handle" + firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"("+ propertyType+" value) {\n        //TODO\n" + "  }\n" ;
+    		    
+    	}
         if (isToImplement()) {
             return "public void handle" + firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"(ObservableValue<? extends "+ propertyType+"> value, "+ propertyType+" oldValue, "+ propertyType+" newValue) {\n        //TODO\n" + "  }\n" ;
         } else {

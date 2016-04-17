@@ -24,7 +24,7 @@ public class OrientationObservedProperty implements PanelProperty {
     private final HistoryManager historyManager;
     private String getter;
 
-    public OrientationObservedProperty(final GObject gObj, String name,  final String observedProperty,String getter, final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
+    public OrientationObservedProperty(final GObject gObj, String name,  final String observedProperty,String fxml, String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
         this.gObj = gObj;
 //      this.setter = setter;
 //      this.getter = getter;

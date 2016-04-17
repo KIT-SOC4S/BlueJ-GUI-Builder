@@ -23,17 +23,14 @@ public class GButton extends Button implements GObject {
 
 	@Override
     public String getFieldName() {
-//		setStyle("-fx-text-fill: rgba(100%,0%,0%,1); -fx-background-color: blue");
-//   			setStyle("-fx-border-color:green;-fx-border-width:4; -fx-font-size: 11pt;"
-//   					+ "  -fx-text-fill: white;    -fx-opacity: 0.6;");
+
 		
         return fieldNameProperty.getValue();
         
     }
 
     @Override
-    public void setFieldName(String fieldName) {
-//   	     setStyle("-fx-text-fill: red");    	
+    public void setFieldName(String fieldName) {	
         fieldNameProperty.setValue(fieldName);
     }
 

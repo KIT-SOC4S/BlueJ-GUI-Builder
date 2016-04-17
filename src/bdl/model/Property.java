@@ -6,42 +6,52 @@ package bdl.model;
 public class Property {
     private String name;
     private boolean enabled;
-    private String type;
+    private String pseudotype;
     private String defaultValue;
-    private String getter;
-    private String setter;
     private String fxml;
-    private String observedProperty;
+    private String property;
+    
     private boolean generateJavaCode = true;
 
+    private boolean isStyleProperty;
     
 
-	public Property(String name, String enabled, String type, String defaultValue, String observedProperty, String getter, String setter, String fxml, String javaCodeGeneration) {
+	public boolean isStyleProperty() {
+		return isStyleProperty;
+	}
+
+	public Property(String name, String enabled, String pseudotype, String defaultValue, String observedProperty,  String fxml, String javaCodeGeneration) {
         this.name = name;
         this.enabled = Boolean.parseBoolean(enabled);
-        this.type = type;
+        this.pseudotype = pseudotype;
         this.defaultValue = defaultValue;
-        this.getter = getter;
-        this.setter = setter;
         this.fxml = fxml;
-        this.observedProperty =  observedProperty;
+        this.property =  observedProperty;
         if (javaCodeGeneration!=null && javaCodeGeneration.toLowerCase().equals("false")){
         	generateJavaCode=false;
         }
+        isStyleProperty=false;
     }
 
-    public String getName() {
+    public Property(String name, String enabled, String pseudotype, String defaultValue, String styleProperty) {
+    	this.name = name;
+        this.enabled = Boolean.parseBoolean(enabled);
+        this.pseudotype = pseudotype;
+        this.defaultValue = defaultValue;
+        this.property = styleProperty;
+        isStyleProperty=true; 
+        
+	}
+
+	public String getName() {
         return name;
     }
 
-    public String getType() {
-        return type;
+    public String getPseudotype() {
+        return pseudotype;
     }
 
-    public String getSetter() {
-        return setter;
-    }
-
+   
     public String getFxml() {
         return fxml;
     }
@@ -54,14 +64,12 @@ public class Property {
         return defaultValue;
     }
 
-    public String getGetter() {
-        return getter;
-    }
+   
     public boolean isGenerateJavaCode() {
 		return generateJavaCode;
 	}
 
-	public String getObservedProperty() {
-		return observedProperty;
+	public String getProperty() {
+		return property;
 	}
 }

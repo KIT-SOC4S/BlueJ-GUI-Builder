@@ -169,6 +169,7 @@ public class Controller {
 	MenuItem[] bjpitemFXMLExport;
 	MenuItem[] bjpitemJAVAExport;
 	MenuItem[] bjpitemFXMLImport;
+	public static boolean createSimpleCode=true;
 
 	private MenuItem[] generateMenuItemsForOpenBluejProjects(final Menu oben) {
 		MenuItem[] bjpitem = null;
@@ -488,7 +489,11 @@ public class Controller {
 				stage.show();
 			}
 		});
+		view.topPanel.mItmSimpleCode.setOnAction((e)->setSimpleCode(view.topPanel.mItmSimpleCode.isSelected()));
+	}
 
+	private void setSimpleCode(boolean selected) {
+		Controller.createSimpleCode = selected;
 	}
 
 	private void showErrorlog() {

@@ -17,19 +17,19 @@ import java.lang.reflect.Method;
 public class BooleanObservedProperty implements PanelProperty {
 
 	private GObject gObj;
+	private String getter;
 	private String setter;
 	private String fxml;
 	private CheckBox checkBox;
 	private final HistoryManager historyManager;
-	private String getter;
+	
+	private String defaultValue;
 
-	public BooleanObservedProperty(final GObject gObj, String name, final String observedProperty, String getter,
-			final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode,
-			HistoryManager hm) {
+	public BooleanObservedProperty(final GObject gObj, String name, final String observedProperty, String fxml,
+			String defaultValue, GridPane gp, int row, Node settingsNode, HistoryManager hm) {
 		this.gObj = gObj;
-		// this.setter = setter;
-		// this.getter = getter;
-		String property=observedProperty.replace("Property","");
+		this.defaultValue = defaultValue;
+		String property = observedProperty.replace("Property", "");
 		property = property.substring(0, 1).toUpperCase() + property.substring(1);
 		this.setter = "set" + property;
 		this.getter = "is" + property;
@@ -68,7 +68,7 @@ public class BooleanObservedProperty implements PanelProperty {
 			}
 		}
 		try {
-			
+
 			final Method getPropMethod = gObj.getClass().getMethod(observedProperty);
 			((ObservableValue<Boolean>) getPropMethod.invoke(gObj)).addListener(new ChangeListener<Boolean>() {
 				@Override
@@ -85,7 +85,7 @@ public class BooleanObservedProperty implements PanelProperty {
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
 		}
-		
+
 		checkBox.setSelected(Boolean.parseBoolean(defaultValue));
 		try {
 			setValue();
@@ -146,12 +146,20 @@ public class BooleanObservedProperty implements PanelProperty {
 	}
 
 	@Override
-	public String getJavaCode() {		
-		return gObj.getFieldName() + "." + setter + "(" + checkBox.isSelected() + ");";
+	public String getJavaCode() {
+		if (defaultValue == null || defaultValue.isEmpty()
+				|| checkBox.isSelected() != Boolean.parseBoolean(defaultValue)) {
+			return gObj.getFieldName() + "." + setter + "(" + checkBox.isSelected() + ");";
+		}
+		return "";
 	}
 
 	@Override
 	public String getFXMLCode() {
-		return fxml + "=\"" + checkBox.isSelected() + "\"";
+		if (defaultValue == null || defaultValue.isEmpty()
+				|| checkBox.isSelected() != Boolean.parseBoolean(defaultValue)) {
+			return fxml + "=\"" + checkBox.isSelected() + "\"";
+		}
+		return "";
 	}
 }

@@ -13,6 +13,7 @@ import bdl.build.javafx.scene.control.GRadioButton;
 import bdl.build.javafx.scene.control.GToggleButton;
 import bdl.build.properties.ListenerEnabledProperty;
 import bdl.build.properties.PanelProperty;
+import bdl.build.properties.StyleProperty;
 import bdl.controller.Controller;
 import bdl.model.ComponentSettings;
 import bdl.model.ListenerProperty;
@@ -514,11 +515,18 @@ public class CodeGenerator {
 		if (gObj.getPanelProperties() != null) {
 			for (PanelProperty property : gObj.getPanelProperties()) {
 				String javaCode = property.getJavaCode();
+				
 				if (!javaCode.isEmpty()) {
 					code.append("        ").append(javaCode.replace("\n", "\n        ")).append("\n");
 				}
+				
 			}
 //			code.append('\n');
+		}
+		String styleString =getStyleString(gObj);
+		if (!styleString.equals("")){		
+			styleString = gObj.getFieldName()+"."+"setStyle(\""+styleString+"\");";
+			code.append("        ").append(styleString.replace("\n", "\n        ")).append("\n");
 		}
 		if (node instanceof Pane) {
 			for (Node node2 : ((Pane) node).getChildren()) {
@@ -539,6 +547,25 @@ public class CodeGenerator {
 		return code;
 	}
 
+	private static String getStyleString(GObject gObj){
+		String styleString ="";
+		if (gObj.getPanelProperties() != null) {
+			for (PanelProperty property : gObj.getPanelProperties()) {
+				System.out.println(property.toString());
+				if (property instanceof StyleProperty){
+					StyleProperty sp =	(StyleProperty)property;
+					String sd=sp.getStyleDescription();
+					if (sd!=null && !sd.isEmpty()){
+						styleString+=sd;
+					}
+				}
+				
+			}
+			
+		}
+		return styleString;
+	}
+	
 	private static StringBuilder additionalMethodInvokations(Node node) {
 		StringBuilder addMet = new StringBuilder();
 		if (!(node instanceof GObject)) {
@@ -704,6 +731,10 @@ public class CodeGenerator {
 		String nodeClass = node.getClass().getSuperclass().getSimpleName();
 		if (node instanceof GObject) {
 			GObject gObj = (GObject) node;
+			String styleFXML = getStyleString(gObj);
+			if (!styleFXML.equals("")){
+				styleFXML=  "style =\""+styleFXML+"\"";
+			}
 			if (node instanceof Pane) {
 				code.append("        <").append(nodeClass);
 				code.append(" fx:id=\"").append(gObj.getFieldName()).append("\" ");
@@ -713,6 +744,7 @@ public class CodeGenerator {
 						code.append(fxmlCode).append(' ');
 					}
 				}
+				code.append(styleFXML);				
 				code.append(">\n");
 				code.append("<children>\n");
 				for (Node node2 : ((Pane) node).getChildren()) {
@@ -740,6 +772,7 @@ public class CodeGenerator {
 						code.append(fxmlCode).append(' ');
 					}
 				}
+				code.append(styleFXML);			
 				code.append("/>\n");
 
 			} else if (node instanceof GToggleButton) {
@@ -759,6 +792,7 @@ public class CodeGenerator {
 						code.append(fxmlCode).append(' ');
 					}
 				}
+				code.append(styleFXML);			
 				code.append("/>\n");
 
 			} else if (node instanceof GSubScene) {
@@ -770,6 +804,7 @@ public class CodeGenerator {
 						code.append(fxmlCode).append(' ');
 					}
 				}
+				code.append(styleFXML);			
 				code.append(">\n");
 				code.append("          <root> <Region /> </root>\n");
 				code.append("</SubScene>\n");
@@ -785,6 +820,7 @@ public class CodeGenerator {
 						code.append(fxmlCode).append(' ');
 					}
 				}
+				code.append(styleFXML);			
 				code.append("/>\n");
 
 			}

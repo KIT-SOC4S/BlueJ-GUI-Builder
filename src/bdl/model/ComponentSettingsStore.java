@@ -253,15 +253,19 @@ public class ComponentSettingsStore {
 				Element property = (Element) properties.item(i);
 				String name = getString(property, "name", "");
 				String enabled = getString(property, "enabled", "true");
-				String type = getString(property, "pseudotype", "");
+				String pseudotype = getString(property, "pseudotype", "");
 				String defaultValue = getString(property, "default", "");
-				String getter = getString(property, "getter", "");
-				String setter = getString(property, "setter", "");
 				String fxml = getString(property, "fxml", "");
 				String observedProperty = getString(property, "observedProperty", "");
 				String javaCodeGeneration = getString(property, "javaCodeGeneration", "");
-				componentSettings.addProperty(name, enabled, type, defaultValue, observedProperty, getter, setter, fxml,
-						javaCodeGeneration);
+				String styleProperty = getString(property, "styleProperty", "");
+				if (styleProperty.equals("")){
+					componentSettings.addProperty(name, enabled, pseudotype, defaultValue, observedProperty, fxml,javaCodeGeneration);
+				} else {
+				 componentSettings.addStyleProperty(name, enabled, pseudotype, defaultValue, styleProperty);
+				}
+				
+				
 			}
 		}
 	}

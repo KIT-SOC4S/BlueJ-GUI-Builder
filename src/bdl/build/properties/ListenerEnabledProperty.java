@@ -2,6 +2,7 @@ package bdl.build.properties;
 
 import bdl.build.GObject;
 import bdl.build.GUIObject;
+import bdl.controller.Controller;
 import bdl.model.history.HistoryItem;
 import bdl.model.history.HistoryManager;
 import javafx.event.ActionEvent;
@@ -57,6 +58,10 @@ public class ListenerEnabledProperty implements PanelProperty {
     @Override
     public String getJavaCode() {
         if (isToImplement()) {
+        	if (Controller.createSimpleCode){
+        		 return getgObj().getFieldName() + "." + getListenerMethod()+"("
+                 		+ "e-> handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"());";
+        	} 
             return getgObj().getFieldName() + "." + getListenerMethod()+"("
             		+ "e-> handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"(e));";
         } else {
@@ -66,6 +71,9 @@ public class ListenerEnabledProperty implements PanelProperty {
     
     public String getJavaCodeHandler() {
         if (isToImplement()) {
+        	if (Controller.createSimpleCode){
+        		return "public void handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"() {\n        //TODO\n" + "  }\n" ;
+        	}
             return "public void handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"("
             		+ eventtype +" event) {\n        //TODO\n" + "  }\n" ;
         } else {
@@ -74,7 +82,7 @@ public class ListenerEnabledProperty implements PanelProperty {
     }
     @Override
     public   String getPackageName() {
-    	 if (isToImplement()) {
+    	 if (isToImplement()&&!Controller.createSimpleCode) {
     		 return packageName;
     	 } else {
     		 return "";

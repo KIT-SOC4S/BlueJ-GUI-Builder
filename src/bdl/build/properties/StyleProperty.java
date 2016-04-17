@@ -1,5 +1,8 @@
 package bdl.build.properties;
 
-public interface StyleProperty {
+import bdl.build.GObject;
+
+public interface StyleProperty extends PanelProperty{
 	public String getStyleDescription();
+	
 }

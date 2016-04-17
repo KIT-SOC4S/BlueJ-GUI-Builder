@@ -38,6 +38,8 @@ public class TopPanel extends MenuBar {
 	public Menu mnClassInProjekt;
 	public Menu mnModellAusProjekt;
 	public Menu mnModellInProjekt;
+	public Menu menuSettings;
+	public CheckMenuItem mItmSimpleCode;
 
 	public TopPanel(boolean isBlueJAttached) {
 		menuFile = new Menu(LabelGrabber.getLabel("menu.file"));
@@ -59,7 +61,7 @@ public class TopPanel extends MenuBar {
 		mItmDelete.setAccelerator(new KeyCodeCombination(KeyCode.DELETE));
 		mItmClearAll = new MenuItem(LabelGrabber.getLabel("menu.edit.clearall"));
 		mItmClearAll.setDisable(true);
-		mItmLanguage = new MenuItem(LabelGrabber.getLabel("menu.edit.language"));
+		
 
 		menuView = new Menu(LabelGrabber.getLabel("menu.view"));
 		mItmHistory = new CheckMenuItem(LabelGrabber.getLabel("menu.view.history"));
@@ -67,7 +69,10 @@ public class TopPanel extends MenuBar {
 		mItmHierarchy = new CheckMenuItem(LabelGrabber.getLabel("menu.view.hierarchy"));
 		mItmHierarchy.setSelected(true);
 		mItmErrorlog = new MenuItem(LabelGrabber.getLabel("menu.view.errorlog"));
-
+		menuSettings = new Menu(LabelGrabber.getLabel("menu.settings"));
+		mItmLanguage = new MenuItem(LabelGrabber.getLabel("menu.settings.language"));
+		mItmSimpleCode = new CheckMenuItem(LabelGrabber.getLabel("menu.settings.simplecode"));
+		mItmSimpleCode.setSelected(true);
 		menuHelp = new Menu(LabelGrabber.getLabel("menu.help"));
 		mItmAbout = new MenuItem(LabelGrabber.getLabel("menu.help.about"));
 
@@ -84,11 +89,12 @@ public class TopPanel extends MenuBar {
 		}
 		menuFile.getItems().addAll(mItmLoadFile, mItmSaveFXMLFile, mItmSaveJAVAFile, mItmFullScreen, mItmClose);
 
-		menuEdit.getItems().addAll(mItmUndo, mItmRedo, mItmDelete, mItmClearAll, mItmLanguage);
+		menuEdit.getItems().addAll(mItmUndo, mItmRedo, mItmDelete, mItmClearAll);
+		menuSettings.getItems().addAll(mItmLanguage,mItmSimpleCode);
 		menuView.getItems().addAll(mItmHierarchy, mItmHistory, mItmErrorlog);
 		menuHelp.getItems().addAll(mItmAbout);
 
-		getMenus().addAll(menuFile, menuEdit, menuView);
+		getMenus().addAll(menuFile, menuEdit, menuView,menuSettings);
 		if (isBlueJAttached) {
 			getMenus().addAll(menuBluej);
 		}

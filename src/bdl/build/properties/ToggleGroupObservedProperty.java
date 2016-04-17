@@ -27,8 +27,7 @@ public class ToggleGroupObservedProperty implements PanelProperty {
 	private final HistoryManager historyManager;
 	private String toggleGroupName = "";
 
-	public ToggleGroupObservedProperty(final GObject gObj, String name, final String observedProperty, String getter,
-			final String setter, String fxml, String defaultValue, GridPane gp, int row, Node settingsNode,
+	public ToggleGroupObservedProperty(final GObject gObj, String name, final String observedProperty,  String fxml, String defaultValue, GridPane gp, int row, Node settingsNode,
 			HistoryManager hm) {
 		this.gObj = gObj;
 		this.fxml = fxml;
