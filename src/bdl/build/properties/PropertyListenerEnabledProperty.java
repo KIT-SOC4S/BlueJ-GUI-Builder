@@ -42,8 +42,7 @@ public class PropertyListenerEnabledProperty extends ListenerEnabledProperty {
     @Override
     public String getJavaCodeHandler() {
     	if (Controller.createSimpleCode){
-    		return "public void handle" + firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"("+ propertyType+" value) {\n        //TODO\n" + "  }\n" ;
-    		    
+    		return "public void handle" + firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"("+ propertyType+" value) {\n        //TODO\n" + "  }\n" ;		    
     	}
         if (isToImplement()) {
             return "public void handle" + firstLetterUpcase(getgObj().getFieldName())+ firstLetterUpcase(getEventname())+"(ObservableValue<? extends "+ propertyType+"> value, "+ propertyType+" oldValue, "+ propertyType+" newValue) {\n        //TODO\n" + "  }\n" ;
