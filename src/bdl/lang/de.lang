@@ -37,6 +37,7 @@ bluejexport.button.replace=Ersetzen
 bluejexport.button.modify=Erg\u00e4nzen
 bluejexport.button.cancel=Abbruch
 output.fileexists.question=Die Datei ist bereits vorhanden. Soll sie \u00fberschrieben werden
+output.fileexists.copystring=kopie_
 javaexport.directory=Legen Sie den Zielordner für den Java-Export fest
 field.name.text=Variablenname
 menu.text=Beschriftung

@@ -1,7 +1,7 @@
 /**
  * @author Georg Dick
  */
- 
+
 package di.blueJLink;
 
 import java.io.File;
@@ -28,18 +28,15 @@ import javafx.scene.control.ButtonType;
 
 public class Dateipfade {
 
-
 	private String quelltextBasis;
 	private File basisDirectory;
 
-	public boolean kopiere(String srcAbsPath, String targetAbsPath,
-			boolean ueberschreiben) {
+	public boolean kopiere(String srcAbsPath, String targetAbsPath, boolean ueberschreiben) {
 		Path srcPath = Paths.get(srcAbsPath);
 		Path targetPath = Paths.get(targetAbsPath);
 		try {
 			if (ueberschreiben) {
-				Files.copy(srcPath, targetPath,
-						StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(srcPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
 			} else {
 				Files.copy(srcPath, targetPath);
 			}
@@ -51,7 +48,6 @@ public class Dateipfade {
 	}
 
 	public boolean erzeugeDatei(String absPath, String inhalt) {
-
 
 		Path path = Paths.get(absPath);
 		Charset cs = StandardCharsets.UTF_8;
@@ -109,8 +105,6 @@ public class Dateipfade {
 		this.basisDirectory = basisDirectory;
 	}
 
-
-
 	public void erzeugePaket(String basisDirectory, String paketname) {
 		if (paketname == null || paketname.equals("")) {
 			return;
@@ -129,11 +123,8 @@ public class Dateipfade {
 		}
 	}
 
-	
-
-	public void erzeugeKlassendatei(String basisDirectory, String paketname,
-			String klassenbezeichner, String klassenquelltext,
-			boolean fallsDaUeberschreiben, boolean fallsDaKopieren) {
+	public void erzeugeKlassendatei(String basisDirectory, String paketname, String klassenbezeichner,
+			String klassenquelltext, boolean fallsDaUeberschreiben, boolean fallsDaKopieren) {
 
 		this.erzeugePaket(basisDirectory, paketname);
 		String pfad = basisDirectory;
@@ -151,7 +142,7 @@ public class Dateipfade {
 		pfad += "\\";
 		pfad += klassenbezeichner + ".java";
 		if (existiert(pfad)) {
-		//	System.out.println(pfad + " existiert");
+			// System.out.println(pfad + " existiert");
 			if (fallsDaKopieren) {
 				int i = 1;
 				String targetAbsPath = pfad + ".kopie_" + i;
@@ -170,10 +161,9 @@ public class Dateipfade {
 		}
 
 	}
-	
-	public void erzeugeKlassendatei(String basisDirectory, String paketname,
-			String klassenbezeichner, String klassenquelltext,
-			boolean fallsDaKopieren ) {
+
+	public void erzeugeKlassendatei(String basisDirectory, String paketname, String klassenbezeichner,
+			String klassenquelltext, boolean fallsDaKopieren) {
 
 		this.erzeugePaket(basisDirectory, paketname);
 		String pfad = basisDirectory;
@@ -191,53 +181,49 @@ public class Dateipfade {
 		pfad += "\\";
 		pfad += klassenbezeichner + ".java";
 		if (existiert(pfad)) {
-		//	System.out.println(pfad + " existiert");
-//			Localisation.setUebersetzung("Die Datei ist bereits vorhanden. Soll sie überschrieben werden?","File exists. Overwrite?","englisch");
+			// System.out.println(pfad + " existiert");
+			// Localisation.setUebersetzung("Die Datei ist bereits vorhanden.
+			// Soll sie überschrieben werden?","File exists.
+			// Overwrite?","englisch");
 			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setContentText(LabelGrabber.getLabel("output.fileexists.question")+"?");
-
+			alert.setContentText(LabelGrabber.getLabel("output.fileexists.question") + "?");
 			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() != ButtonType.OK){
+			if (result.get() != ButtonType.OK) {
 				return;
 			}
-			
 			if (fallsDaKopieren) {
 				int i = 1;
-				String targetAbsPath = pfad + ".kopie_" + i;
+				String targetAbsPath = pfad + LabelGrabber.getLabel("output.fileexists.copystring") + i;
 				while (this.existiert(targetAbsPath)) {
 					i++;
-					targetAbsPath = pfad + ".kopie_" + i;
+					targetAbsPath = pfad + LabelGrabber.getLabel("output.fileexists.copystring") + i;
 				}
 				this.kopiere(pfad, targetAbsPath, false);
 			}
-			
 
-		} else {
-			this.erzeugeDatei(pfad, klassenquelltext);
 		}
+		this.erzeugeDatei(pfad, klassenquelltext);
 
 	}
-	
 
 	public void erzeugeSicherungskopie(String pfad) {
-
 		if (existiert(pfad)) {
 			int i = 1;
-			String targetAbsPath = pfad + ".kopie_" + i;
+			String targetAbsPath = pfad + LabelGrabber.getLabel("output.fileexists.copystring") + i;
 			while (this.existiert(targetAbsPath)) {
 				i++;
-				targetAbsPath = pfad + ".kopie_" + i;
+				targetAbsPath = pfad + LabelGrabber.getLabel("output.fileexists.copystring") + i;
 			}
 			this.kopiere(pfad, targetAbsPath, false);
 		}
 	}
 
 	public static void main(String[] s) {
-//		String basis = ExportzielWaehlenDialog.getExportielDurchDialog(null,
-//				10, 10);
-//		Dateipfade d = new Dateipfade();
-//		// d.erzeugePaket(basis, "otto.fritz.src.marga");
-//		d.erzeugeKlassendatei(basis, "otto.fritz2", "Klasse",
-//				"Das ist ein noch Test", true, true);
+		// String basis = ExportzielWaehlenDialog.getExportielDurchDialog(null,
+		// 10, 10);
+		// Dateipfade d = new Dateipfade();
+		// // d.erzeugePaket(basis, "otto.fritz.src.marga");
+		// d.erzeugeKlassendatei(basis, "otto.fritz2", "Klasse",
+		// "Das ist ein noch Test", true, true);
 	}
 }

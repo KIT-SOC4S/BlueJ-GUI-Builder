@@ -58,7 +58,7 @@ public class ListenerEnabledProperty implements PanelProperty {
     @Override
     public String getJavaCode() {
         if (isToImplement()) {
-        	if (Controller.createSimpleCode){
+        	if (Controller.createSimpleCode && !listenerMethod.contains("Key")){
         		 return getgObj().getFieldName() + "." + getListenerMethod()+"("
                  		+ "e-> handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"());";
         	} 
@@ -71,7 +71,7 @@ public class ListenerEnabledProperty implements PanelProperty {
     
     public String getJavaCodeHandler() {
         if (isToImplement()) {
-        	if (Controller.createSimpleCode){
+        	if (Controller.createSimpleCode&&!listenerMethod.contains("Key")){
         		return "public void handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"() {\n        //TODO\n" + "  }\n" ;
         	}
             return "public void handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"("
@@ -82,7 +82,7 @@ public class ListenerEnabledProperty implements PanelProperty {
     }
     @Override
     public   String getPackageName() {
-    	 if (isToImplement()&&!Controller.createSimpleCode) {
+    	 if (isToImplement()&&!(Controller.createSimpleCode&&!listenerMethod.contains("Key"))) {
     		 return packageName;
     	 } else {
     		 return "";

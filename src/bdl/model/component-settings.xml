@@ -1370,6 +1370,48 @@
 		</listeners>
 	</component>
 	<component>
+		<type>ImageView</type>
+		<enabled>true</enabled>
+		<package>javafx.scene.image</package>
+		<icon>ImageView.png</icon>
+		<properties>
+			 <property>
+				<name>X</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>xProperty</observedProperty>
+				<default>-1</default>
+				<fxml>x</fxml>
+			</property>	
+			<property>
+				<name>Y</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>yProperty</observedProperty>
+				<default>-1</default>
+				<fxml>y</fxml>
+			</property>	
+			<property>
+				<name>FitWidth</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>fitWidthProperty</observedProperty>
+				<default>100</default>
+				<fxml>fitWidth</fxml>
+			</property>
+			<property>
+				<name>FitHeight</name>
+				<enabled>true</enabled>
+				<pseudotype>DoubleObserved</pseudotype>
+				<observedProperty>fitHeightProperty</observedProperty>
+				<default>100</default>
+				<fxml>fitHeight</fxml>
+			</property>
+		</properties>
+		<listeners>
+		</listeners>
+	</component>
+	<component>
 		<type>ColorPicker</type>
 		<enabled>true</enabled>
 		<package>javafx.scene.control</package>
@@ -1433,6 +1475,7 @@
 			</listener>
 		</listeners>
 	</component>
+	
 	<component>
 		<type>Hyperlink</type>
 		<enabled>true</enabled>

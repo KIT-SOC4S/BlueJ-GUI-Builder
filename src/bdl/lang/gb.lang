@@ -37,6 +37,7 @@ bluejexport.button.replace=Replace
 bluejexport.button.modify=Modify
 bluejexport.button.cancel=Cancel
 output.fileexists.question=File exists. Replace existing
+output.fileexists.copystring=copy_
 javaexport.directory=Please choose Directory for Java-Export
 field.name.text=Field Name
 menu.text=Text

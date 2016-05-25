@@ -112,7 +112,7 @@ public class PropertyEditPane extends GridPane {
 							settingsNode, historyManager);
 					panelPropertyList.add(panelProperty);
 				} catch (Exception e) {
-					System.out.println(type + "StyleProperty failed.");
+					System.err.println(type + "StyleProperty failed.");
 					e.printStackTrace();
 				}
 			} else {

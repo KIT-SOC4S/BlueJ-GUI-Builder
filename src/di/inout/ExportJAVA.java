@@ -48,7 +48,7 @@ public class ExportJAVA {
 				alert.showAndWait();
 			} else {
 				inputOK = true;
-				controller.generateJavaCode(classname,false);
+				//controller.generateJavaCode(classname,false);
 			}
 		}
 		

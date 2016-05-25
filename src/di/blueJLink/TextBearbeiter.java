@@ -10,10 +10,10 @@ public class TextBearbeiter {
 		if (istart<0 || iende <0 || istart >=iende){
 			return text;
 		}
-		String prefix = text.substring(0,istart);
-		String postfix = text.substring(iende+endsequenz.length());
+		String pre = text.substring(0,istart);
+		String post = text.substring(iende+endsequenz.length());
 		
-		return prefix+ersatztext+postfix;
+		return pre+ersatztext+post;
 	}
 	
 public static String ersetzeText(String suchtext, String text, String ersatztext ){				
