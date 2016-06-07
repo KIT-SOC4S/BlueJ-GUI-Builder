@@ -58,7 +58,7 @@ public class ListenerEnabledProperty implements PanelProperty {
     @Override
     public String getJavaCode() {
         if (isToImplement()) {
-        	if (Controller.createSimpleCode && !listenerMethod.contains("Key")){
+        	if (Controller.createSimpleCode && !(listenerMethod.contains("Key")||listenerMethod.toLowerCase().contains("mouse"))){
         		 return getgObj().getFieldName() + "." + getListenerMethod()+"("
                  		+ "e-> handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"());";
         	} 
@@ -71,7 +71,7 @@ public class ListenerEnabledProperty implements PanelProperty {
     
     public String getJavaCodeHandler() {
         if (isToImplement()) {
-        	if (Controller.createSimpleCode&&!listenerMethod.contains("Key")){
+        	if (Controller.createSimpleCode&&!(listenerMethod.contains("Key")||listenerMethod.toLowerCase().contains("mouse"))){
         		return "public void handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"() {\n        //TODO\n" + "  }\n" ;
         	}
             return "public void handle" + firstLetterUpcase(getEventname())+firstLetterUpcase(getgObj().getFieldName())+"("
@@ -82,7 +82,7 @@ public class ListenerEnabledProperty implements PanelProperty {
     }
     @Override
     public   String getPackageName() {
-    	 if (isToImplement()&&!(Controller.createSimpleCode&&!listenerMethod.contains("Key"))) {
+    	 if (isToImplement()&&!(Controller.createSimpleCode&&!(listenerMethod.contains("Key")||listenerMethod.toLowerCase().contains("mouse")))) {
     		 return packageName;
     	 } else {
     		 return "";

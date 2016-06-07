@@ -53,7 +53,7 @@ public class ExportJAVA {
 		}
 		
 		
-		new Dateipfade().erzeugeKlassendatei(basisDirectory.getAbsolutePath(), "", classname, controller.generateJavaCode(classname,false), true);
+		new Dateipfade().erzeugeKlassendatei(basisDirectory.getAbsolutePath(), "", classname, controller.generateJavaCode(classname,false), true, controller);
 		
 		
 	}
