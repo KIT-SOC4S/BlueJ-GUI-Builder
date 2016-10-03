@@ -1871,14 +1871,15 @@
 				<observedProperty>layoutYProperty</observedProperty>
 				<default>-1</default>
 				<fxml>layoutY</fxml>
-			</property>	
+			</property>		
 			<property>
 				<name>Fill</name>
 				<enabled>true</enabled>
-				<pseudotype>Color</pseudotype>
-				<default>#FF0000</default>
+				<pseudotype>FillObserved</pseudotype>
+				<observedProperty>fillProperty</observedProperty>
+				<default>#0000FF</default>
 				<fxml>fill</fxml>
-			</property>
+			</property>					
 			<property>
 				<name>Stroke</name>
 				<enabled>true</enabled>
