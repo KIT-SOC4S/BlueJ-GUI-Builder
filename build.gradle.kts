@@ -4,6 +4,7 @@ plugins {
     application
     id("org.openjfx.javafxplugin") version "0.0.8"
     id("org.beryx.jlink") version "2.12.0"
+    id("com.gradle.build-scan") version "2.1"
 }
 
 group = "edu.kit.ipd.soc4s"
@@ -35,6 +36,15 @@ configure<JavaFXOptions> {
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_11
 }
+
+
+
+buildScan {
+    termsOfServiceUrl = "https://gradle.com/terms-of-service"
+    termsOfServiceAgree = "yes"
+}
+
+
 
 dependencies {
     testImplementation("junit", "junit", "4.12")
