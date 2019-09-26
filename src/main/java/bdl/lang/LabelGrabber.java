@@ -20,6 +20,7 @@
 package bdl.lang;
 
 import java.io.*;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -30,6 +31,7 @@ public class LabelGrabber {
     
     private static Properties lang;
     private File languageFile;
+    private static Locale locale = Locale.getDefault();
     
     public LabelGrabber() {
         lang = new Properties();
@@ -45,7 +47,7 @@ public class LabelGrabber {
 //            e.printStackTrace();
 //        }
         try {
-            lang.load(getClass().getResourceAsStream("/lang/gb.lang"));
+            lang.load(getClass().getResourceAsStream("/lang/lang_en.properties"));
         } catch (Exception e) {
             e.printStackTrace();
         }

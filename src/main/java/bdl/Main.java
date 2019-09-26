@@ -81,16 +81,12 @@ public class Main extends Application implements Runnable {
         stage.setScene(scene);
 
         // Don't show() if using BlueJ, we'll show when we want it with blueJInterface.show().
-        if (blueJInterface == null) {
+        //if (blueJInterface == null) {
             stage.show();
-        }
+        //}
     }
 
     public void setInterface(Interface blueJInterface) {
         this.blueJInterface = blueJInterface;
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }

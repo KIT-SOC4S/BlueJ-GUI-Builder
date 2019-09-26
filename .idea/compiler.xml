@@ -2,8 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="gui-builder.main" target="11" />
-      <module name="gui-builder.test" target="11" />
+      <module name="untitled.main" target="11" />
+      <module name="untitled.test" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
