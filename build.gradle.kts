@@ -66,3 +66,9 @@ tasks.withType<Jar> {
         attributes["Author"] = author
     }
 }
+
+tasks.build {
+    doLast {
+        exec { executable = "C:\\Program Files\\BlueJ\\BlueJ.exe" }
+    }
+}

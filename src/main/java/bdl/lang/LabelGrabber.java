@@ -28,11 +28,11 @@ import java.util.Properties;
  * @author Ben Goodwin
  */
 public class LabelGrabber {
-    
+
     private static Properties lang;
     private File languageFile;
     private static Locale locale = Locale.getDefault();
-    
+
     public LabelGrabber() {
         lang = new Properties();
 //        languageFile = new File("lang/gb.lang"); //TODO update later with more languages
@@ -51,10 +51,10 @@ public class LabelGrabber {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
-    
-    
+
+
     public static String getLabel(String key) {
         String string = lang.getProperty(key);
         if(string == null) {
