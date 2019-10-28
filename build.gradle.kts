@@ -69,6 +69,6 @@ tasks.withType<Jar> {
 
 tasks.build {
     doLast {
-        exec { executable = "C:\\Program Files\\BlueJ\\BlueJ.exe" }
+        //exec { executable = "C:\\Program Files\\BlueJ\\BlueJ.exe" }
     }
 }
