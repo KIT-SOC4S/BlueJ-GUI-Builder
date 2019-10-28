@@ -33,21 +33,12 @@ import bdl.model.history.update.HistoryItemDescription;
 import bdl.model.history.update.HistoryUpdate;
 import bdl.model.selection.SelectionListener;
 import bdl.model.selection.SelectionManager;
+import bdl.view.LogWindow;
 import bdl.view.View;
 import bdl.view.left.ComponentMenuItem;
 import bdl.view.left.hierarchy.HierarchyTreeItem;
 import bdl.view.right.PropertyEditPane;
 import bdl.view.right.history.HistoryPanelItem;
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -69,7 +60,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
@@ -79,10 +69,18 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardJavaFileManager;
-import javax.tools.ToolProvider;
+
+import javax.tools.*;
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureClassLoader;
+import java.util.*;
 
 public class Controller {
 
@@ -94,6 +92,7 @@ public class Controller {
     private SelectionManager selectionManager;
     private Interface blueJInterface;
     private boolean isOpeningFile = false;
+    private LogWindow logWindow;
 
     public Controller(View view, ComponentSettingsStore componentSettingsStore, Interface blueJInterface) {
         this.view = view;
@@ -104,11 +103,20 @@ public class Controller {
         selectionManager = new SelectionManager();
         viewListeners = new ViewListeners(historyManager, selectionManager);
 
+
+        logWindow = new LogWindow(LabelGrabber.getLabel("logwindow.title"));
+        System.setErr(new PrintStream(logWindow.getOutputErrStream()));
+        System.setOut(new PrintStream(logWindow.getOutputStream()));
+
+        System.out.println("Controller initializing");
+
         setupLeftPanel();
         setupMiddlePanel();
         setupRightPanel();
         setupTopPanel();
         setupAutoSave();
+
+        System.out.println("Controller initialized");
     }
 
     private void setupTopPanel() {
@@ -118,7 +126,9 @@ public class Controller {
             @Override
             public void handle(ActionEvent actionEvent) {
                 FileChooser fileChooser = new FileChooser();
-                if (blueJInterface != null) { fileChooser.setInitialDirectory(blueJInterface.getWorkingDirectory()); }
+                if (blueJInterface != null) {
+                    fileChooser.setInitialDirectory(blueJInterface.getWorkingDirectory());
+                }
                 FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("FXML files (*.fxml)", "*.fxml");
                 fileChooser.getExtensionFilters().add(filter);
 
@@ -262,47 +272,51 @@ public class Controller {
         // View > Show Hierarchy
         view.topPanel.mItmHierarchy.setOnAction(
                 new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent t) {
-                if (view.topPanel.mItmHierarchy.isSelected()) {
-                    view.leftPanel.getItems().add(view.leftPanel.hierarchyTitledPane);
-                    view.leftPanel.setDividerPosition(0, 0.6);
-                } else {
-                    view.leftPanel.getItems().remove(view.leftPanel.hierarchyTitledPane);
-                }
-            }
-        });
+                    @Override
+                    public void handle(ActionEvent t) {
+                        if (view.topPanel.mItmHierarchy.isSelected()) {
+                            view.leftPanel.getItems().add(view.leftPanel.hierarchyTitledPane);
+                            view.leftPanel.setDividerPosition(0, 0.6);
+                        } else {
+                            view.leftPanel.getItems().remove(view.leftPanel.hierarchyTitledPane);
+                        }
+                    }
+                });
         // View > Show History
         view.topPanel.mItmHistory.setOnAction(
                 new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent t) {
-                toggleHistory();
-            }
+                    @Override
+                    public void handle(ActionEvent t) {
+                        toggleHistory();
+                    }
+                });
+        // View > Show History
+        view.topPanel.mItemShowLog.setOnAction(t -> {
+            logWindow.show();
         });
-        
+
         view.topPanel.mItmAbout.setOnAction(
                 new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent t) {
-                Stage stage = new Stage();
-                GridPane pane = new GridPane();
-                Label label = new Label(LabelGrabber.getLabel("about.text"));
-                label.setMaxWidth(300);
-                label.setWrapText(true);
-                label.setFont(new Font(18));
-                label.setTextAlignment(TextAlignment.CENTER);
-                ImageView imageview = new ImageView(new Image(getClass().getResourceAsStream("/bdl/icons/BlueJ_Orange_64.png")));
-                pane.add(imageview, 1, 1);
-                pane.add(label, 1, 2);
-                GridPane.setHalignment(imageview, HPos.CENTER);
-                stage.setScene(new Scene(pane));
-                stage.show();
-            }
-        });
-        
+                    @Override
+                    public void handle(ActionEvent t) {
+                        Stage stage = new Stage();
+                        GridPane pane = new GridPane();
+                        Label label = new Label(LabelGrabber.getLabel("about.text"));
+                        label.setMaxWidth(300);
+                        label.setWrapText(true);
+                        label.setFont(new Font(18));
+                        label.setTextAlignment(TextAlignment.CENTER);
+                        ImageView imageview = new ImageView(new Image(getClass().getResourceAsStream("/bdl/icons/BlueJ_Orange_64.png")));
+                        pane.add(imageview, 1, 1);
+                        pane.add(label, 1, 2);
+                        GridPane.setHalignment(imageview, HPos.CENTER);
+                        stage.setScene(new Scene(pane));
+                        stage.show();
+                    }
+                });
+
     }
-    
+
     private void setupLeftPanel() {
         view.leftPanel.leftList.setCellFactory(new Callback<ListView<ComponentMenuItem>, ListCell<ComponentMenuItem>>() {
             @Override
@@ -457,77 +471,19 @@ public class Controller {
         view.middleTabPane.previewTab.setOnSelectionChanged(new EventHandler<Event>() {
             @Override
             public void handle(Event event) {
-                if (view.middleTabPane.previewTab.isSelected()) {
-
-                    //Write .java file
-                    // Make temporary space in BlueJ user dir for compilation.
-                    File fileJava;
-                    File fileClass;
-                    if (blueJInterface != null) {
-                        File tempDir = new File(blueJInterface.getUserPrefDir(), "guibuilder");
-                        if (tempDir.isDirectory() == false) { tempDir.mkdirs(); }
-                        fileJava = new File(tempDir, blueJInterface.getOpenGUIName() + ".java");
-                        fileClass = new File(tempDir, blueJInterface.getOpenGUIName() + ".class");
-                    } else {
-                        fileJava = new File(view.middleTabPane.viewPane.getClassName() + ".java");
-                        fileClass = new File(view.middleTabPane.viewPane.getClassName() + ".class");
-                    }
-                    try {
-                        BufferedOutputStream cssOutput = new BufferedOutputStream(new FileOutputStream(fileJava));
-                        cssOutput.write(generateJavaCode().getBytes());
-                        cssOutput.flush();
-                        cssOutput.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    //Compile class
-                    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                    if (compiler == null) {
-                        throw new RuntimeException("Jar could not be created as Java version requires javac.");
-                    }
-                    StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-
-                    Iterable<? extends JavaFileObject> compilationUnits1 =
-                            fileManager.getJavaFileObjectsFromFiles(Arrays.asList(fileJava));
-
-                    // Compiler options
-//                    List<String> optionsList = new ArrayList<String>();
-//                    File fileJfxrt = new File(System.getProperty("java.home"), "lib\\jfxrt.jar");
-//                    optionsList.add("-classpath "+fileJfxrt.getAbsolutePath()+":.");
-                    
-                    compiler.getTask(null, fileManager, null, null, null, compilationUnits1).call();
-
-                    try {
-                        fileManager.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    //Load & run class
-                    try {
-                        Class guiClass;
-                        if (blueJInterface == null) {
-                            URL[] urls = new URL[]{new File(".").toURI().toURL()};
-                            URLClassLoader ucl = new URLClassLoader(urls);
-                            guiClass = Class.forName(view.middleTabPane.viewPane.getClassName(), false, ucl);
-                        } else {
-                            URL[] urls = new URL[]{new File(blueJInterface.getUserPrefDir(), "guibuilder").toURI().toURL()};
-                            URLClassLoader ucl = new URLClassLoader(urls);
-                            guiClass = Class.forName(blueJInterface.getOpenGUIName(), false, ucl);
-                        }
-                        Method main = guiClass.getMethod("start", Stage.class);
-                        Object obj = guiClass.newInstance();
-                        main.invoke(obj, new Stage());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    //Delete created files
-                    fileJava.delete();
-                    fileClass.delete();
-
-                    view.middleTabPane.getSelectionModel().select(0);
+                //previewCompile();
+                try {
+                    generateInMemoryPreview();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -562,6 +518,148 @@ public class Controller {
                 view.leftPanel.leftList.getSelectionModel().select(-1);
             }
         });
+    }
+
+    private void previewCompile() {
+        if (view.middleTabPane.previewTab.isSelected()) {
+
+            //Write .java file
+            // Make temporary space in BlueJ user dir for compilation.
+            File fileJava;
+            File fileClass;
+            if (blueJInterface != null) {
+                File tempDir = new File(blueJInterface.getUserPrefDir(), "guibuilder");
+                if (tempDir.isDirectory() == false) {
+                    tempDir.mkdirs();
+                }
+                fileJava = new File(tempDir, blueJInterface.getOpenGUIName() + ".java");
+                fileClass = new File(tempDir, blueJInterface.getOpenGUIName() + ".class");
+            } else {
+                fileJava = new File(view.middleTabPane.viewPane.getClassName() + ".java");
+                fileClass = new File(view.middleTabPane.viewPane.getClassName() + ".class");
+            }
+            try {
+                BufferedOutputStream cssOutput = new BufferedOutputStream(new FileOutputStream(fileJava));
+                cssOutput.write(generateJavaCode().getBytes());
+                cssOutput.flush();
+                cssOutput.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //Compile class
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (compiler == null) {
+                throw new RuntimeException("Jar could not be created as Java version requires javac.");
+            }
+            StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+
+            Iterable<? extends JavaFileObject> compilationUnits1 =
+                    fileManager.getJavaFileObjectsFromFiles(Arrays.asList(fileJava));
+
+            // Compiler options
+//                    List<String> optionsList = new ArrayList<String>();
+//                    File fileJfxrt = new File(System.getProperty("java.home"), "lib\\jfxrt.jar");
+//                    optionsList.add("-classpath "+fileJfxrt.getAbsolutePath()+":.");
+
+            compiler.getTask(null, fileManager, null, null, null, compilationUnits1).call();
+
+            try {
+                fileManager.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //Load & run class
+            try {
+                Class guiClass;
+                if (blueJInterface == null) {
+                    URL[] urls = new URL[]{new File(".").toURI().toURL()};
+                    URLClassLoader ucl = new URLClassLoader(urls);
+                    guiClass = Class.forName(view.middleTabPane.viewPane.getClassName(), false, ucl);
+                } else {
+                    URL[] urls = new URL[]{new File(blueJInterface.getUserPrefDir(), "guibuilder").toURI().toURL()};
+                    URLClassLoader ucl = new URLClassLoader(urls);
+                    guiClass = Class.forName(blueJInterface.getOpenGUIName(), false, ucl);
+                }
+                Method main = guiClass.getMethod("start", Stage.class);
+                Object obj = guiClass.newInstance();
+                main.invoke(obj, new Stage());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            //Delete created files
+            fileJava.delete();
+            fileClass.delete();
+
+            view.middleTabPane.getSelectionModel().select(0);
+        }
+    }
+
+    private void generateInMemoryPreview() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (view.middleTabPane.previewTab.isSelected()) {
+            String cname = view.middleTabPane.viewPane.getClassName();
+            String code = generateJavaCode();
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (compiler == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("Keinen Compiler gefunden!");
+                alert.showAndWait();
+                throw new RuntimeException("No Compiler found");
+            }
+            URI uri = URI.create("string:////" + cname.replace('.', '/') + JavaFileObject.Kind.SOURCE.extension);
+
+            SimpleJavaFileObject fileObject = new SimpleJavaFileObject(uri, JavaFileObject.Kind.SOURCE) {
+                @Override
+                public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+                    return code;
+                }
+            };
+            Iterable<? extends JavaFileObject> compilationUnits = Arrays.asList(fileObject);
+            JavaFileManager fileManager = new ForwardingJavaFileManager<JavaFileManager>(compiler.getStandardFileManager(null, Locale.getDefault(), StandardCharsets.UTF_8)) {
+                HashMap<String, ByteArrayOutputStream> byteStreams = new HashMap<>();
+
+                @Override
+                public ClassLoader getClassLoader(Location location) {
+                    return new SecureClassLoader() {
+                        @Override
+                        protected Class<?> findClass(String name) throws ClassNotFoundException {
+                            ByteArrayOutputStream outputStream = byteStreams.get(name);
+                            if (outputStream == null)
+                                return null;
+                            byte[] b = outputStream.toByteArray();
+                            return super.defineClass(name, b, 0, b.length);
+                        }
+                    };
+                }
+
+                @Override
+                public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
+                    return new SimpleJavaFileObject(URI.create("string:////" + className.replace('.', '/') + kind.extension), kind) {
+                        @Override
+                        public OutputStream openOutputStream() throws IOException {
+                            ByteArrayOutputStream outputStream = byteStreams.get(className);
+                            if (outputStream == null) {
+                                outputStream = new ByteArrayOutputStream();
+                                byteStreams.put(className, outputStream);
+                            }
+                            return outputStream;
+                        }
+                    };
+                }
+            };
+
+            JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, null, null, null, compilationUnits);
+            if (compilationTask.call()) {
+                ClassLoader classLoader = fileManager.getClassLoader(null);
+                Class<?> guiClass = classLoader.loadClass(cname);
+                Method main = guiClass.getMethod("start", Stage.class);
+                Constructor constructor = guiClass.getConstructor((Class<?>) null);
+                main.invoke(constructor.newInstance(), new Stage());
+            }
+        }
+        view.middleTabPane.getSelectionModel().select(0);
     }
 
     private void setupRightPanel() {
@@ -619,8 +717,9 @@ public class Controller {
         });
 
     }
-    
-    /** Adds a HistoryListener and saves whenever a change is made.
+
+    /**
+     * Adds a HistoryListener and saves whenever a change is made.
      * Only effective when running with BlueJ.
      */
     private void setupAutoSave() {
@@ -633,8 +732,10 @@ public class Controller {
             });
         }
     }
-    
-    /** Open the specified FXML file.
+
+    /**
+     * Open the specified FXML file.
+     *
      * @param file the File referencing the FXML file.
      */
     public void openFile(File file) {
@@ -681,8 +782,9 @@ public class Controller {
         }
         isOpeningFile = false;
     }
-    
-    /** Reset the workspace.
+
+    /**
+     * Reset the workspace.
      */
     public void newFile() {
         isOpeningFile = true;
@@ -691,7 +793,10 @@ public class Controller {
         historyManager.clearHistory();
         isOpeningFile = false;
     }
-    /** Reset the workspace and set the new GUI's name to className.
+
+    /**
+     * Reset the workspace and set the new GUI's name to className.
+     *
      * @param className the desired name of the new GUI
      */
     public void newFile(String className) {
@@ -699,11 +804,14 @@ public class Controller {
         view.middleTabPane.viewPane.setClassName(className);
         view.middleTabPane.viewPane.setGUITitle(className);
     }
-    
-    /** Save file to FXML. If running with BlueJ, output Java code to file.
+
+    /**
+     * Save file to FXML. If running with BlueJ, output Java code to file.
      */
     private void saveFile() {
-        if (isOpeningFile) { return; }
+        if (isOpeningFile) {
+            return;
+        }
         File file;
         if (blueJInterface == null) {
             FileChooser fileChooser = new FileChooser();
@@ -711,8 +819,7 @@ public class Controller {
             fileChooser.getExtensionFilters().add(filter);
 
             file = fileChooser.showSaveDialog(view.getStage());
-        }
-        else {
+        } else {
             file = new File(blueJInterface.getWorkingDirectory(), blueJInterface.getOpenGUIName() + ".fxml");
         }
 
@@ -729,9 +836,9 @@ public class Controller {
                 e.printStackTrace();
             }
         }
-        
+
         // Update BlueJ Java code
-        if ( (blueJInterface != null) && (blueJInterface.isEditingGUI()) ) {
+        if ((blueJInterface != null) && (blueJInterface.isEditingGUI())) {
             // Write java code to GUI java file.
             try {
                 FileWriter fileWriter = new FileWriter(blueJInterface.getOpenGUIFile());
@@ -745,8 +852,9 @@ public class Controller {
             blueJInterface.markAsDirty();
         }
     }
-    
-    /** Toggle the history panel's visibility.
+
+    /**
+     * Toggle the history panel's visibility.
      */
     public void toggleHistory() {
         if (!view.rightPanel.getItems().contains(view.rightPanel.historyPanel)) {
@@ -758,25 +866,31 @@ public class Controller {
             view.rightPanel.getItems().remove(view.rightPanel.historyPanel);
         }
     }
-    
-    /** Set the name of the GUI class. (BlueJ interface functionality.)
+
+    /**
+     * Set the name of the GUI class. (BlueJ interface functionality.)
      */
     public void setClassName(String className) {
         view.middleTabPane.viewPane.setClassName(className);
     }
-    /** Make the stage visible. (BlueJ interface functionality.)
+
+    /**
+     * Make the stage visible. (BlueJ interface functionality.)
      */
     public void showStage() {
         view.getStage().show();
         view.getStage().toFront();
     }
-    /** Make the stage invisible. (BlueJ interface functionality.)
+
+    /**
+     * Make the stage invisible. (BlueJ interface functionality.)
      */
     public void hideStage() {
         view.getStage().hide();
     }
-    
-    /** Generates the full Java code.
+
+    /**
+     * Generates the full Java code.
      */
     private String generateJavaCode() {
         HashMap<String, String> imports = new HashMap<>();
@@ -786,7 +900,7 @@ public class Controller {
         }
         return CodeGenerator.generateJavaCode(view.middleTabPane.viewPane, imports, blueJInterface);
     }
-    
+
     //x and y are initial layout positions. To be used only with drag and drop.
     private void addGObject(final GObject newThing, ComponentSettings componentSettings, final View view, final ViewListeners viewListeners, Node settingsNode, int x, int y, final Pane destination) {
 

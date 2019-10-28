@@ -14,12 +14,15 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 public class BlueJConnector extends Extension implements PackageListener, Interface {
     private static BlueJConnector instance;
     private Controller controller;
     private BlueJ blueJ;
     private Main main;
+    private BClass target;
+    private ActionEvent targetEvent;
 
     public static BlueJConnector getInstance() {
         if (instance == null) {
@@ -49,7 +52,7 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
         blueJ.setMenuGenerator(new MenuGenerator() {
 
             @Override
-            public JMenuItem getToolsMenuItem(BPackage bp) {
+            public JMenuItem getClassMenuItem(BClass bc) {
                 return new JMenuItem(new AbstractAction() {
                     {
                         putValue(AbstractAction.NAME, "Open GUI Builder");
@@ -57,18 +60,33 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        target = bc;
+                        targetEvent = e;
                         EventQueue.invokeLater(() -> {
                             new JFXPanel();
                             Platform.setImplicitExit(false);
                             Platform.runLater(() -> {
                                 try {
                                     main.start(new Stage());
+                                    System.out.println("BC START");
+                                    System.out.println(bc.getClassFile());
+                                    System.out.println(bc.getClass());
+                                    System.out.println(Arrays.toString(bc.getConstructors()));
+                                    System.out.println(Arrays.toString(bc.getDeclaredMethods()));
+                                    System.out.println(bc.getEditor());
+                                    System.out.println(bc.getJavaFile());
+                                    System.out.println(Arrays.toString(bc.getFields()));
+                                    System.out.println(bc.getSourceType());
+                                    System.out.println(bc.getPackage());
+                                    System.out.println(bc.getName());
+                                    System.out.println("BC END");
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
                             });
                         });
                     }
+
                 });
             }
         });
@@ -152,16 +170,23 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
 
     @Override
     public boolean isEditingGUI() {
-        return false;
+        return true;
     }
 
     @Override
     public String getOpenGUIName() {
-        return null;
+        return target.getName();
     }
 
     @Override
     public File getOpenGUIFile() {
+        try {
+            return target.getJavaFile();
+        } catch (ProjectNotOpenException e) {
+            e.printStackTrace();
+        } catch (PackageNotFoundException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -177,7 +202,15 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
 
     @Override
     public void recompileOpenGUI() {
-
+        try {
+            target.compile(true);
+        } catch (ProjectNotOpenException e) {
+            e.printStackTrace();
+        } catch (PackageNotFoundException e) {
+            e.printStackTrace();
+        } catch (CompilationNotStartedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -198,6 +231,14 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
     @Override
     public void show() {
         controller.showStage();
+        try {
+            target.getEditor().setVisible(false);
+            target.getEditor().setReadOnly(true);
+        } catch (ProjectNotOpenException e) {
+            e.printStackTrace();
+        } catch (PackageNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

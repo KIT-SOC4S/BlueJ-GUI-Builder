@@ -48,6 +48,7 @@ public class TopPanel extends MenuBar {
     public Menu menuHelp;
     public MenuItem mItmAbout;
     public MenuItem mItmClearAll;
+    public MenuItem mItemShowLog;
 
     public TopPanel(boolean isBlueJAttached) {
         menuFile = new Menu(LabelGrabber.getLabel("menu.file"));
@@ -77,6 +78,7 @@ public class TopPanel extends MenuBar {
 
         menuHelp = new Menu(LabelGrabber.getLabel("menu.help"));
         mItmAbout = new MenuItem(LabelGrabber.getLabel("menu.help.about"));
+        mItemShowLog = new MenuItem(LabelGrabber.getLabel("menu.help.showlog"));
 
         if (isBlueJAttached) {
             menuFile.getItems().addAll(mItmSaveFile, mItmFullScreen, mItmClose);
@@ -85,7 +87,7 @@ public class TopPanel extends MenuBar {
         }
         menuEdit.getItems().addAll(mItmUndo, mItmRedo, mItmDelete, mItmClearAll);
         menuView.getItems().addAll(mItmHierarchy, mItmHistory);
-        menuHelp.getItems().addAll(mItmAbout);
+        menuHelp.getItems().addAll(mItmAbout, mItemShowLog);
 
         getMenus().addAll(menuFile, menuEdit, menuView);
         getMenus().addAll(menuHelp);
