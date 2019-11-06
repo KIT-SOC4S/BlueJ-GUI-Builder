@@ -81,10 +81,7 @@ public class Main extends Application implements Runnable {
         stage.setTitle(LabelGrabber.getLabel("default.gui.title"));
         stage.setScene(scene);
 
-        // Don't show() if using BlueJ, we'll show when we want it with blueJInterface.show().
-        //if (blueJInterface == null) {
-            stage.show();
-        //}
+        blueJInterface.show();
     }
 
     public void setInterface(Interface blueJInterface) {
