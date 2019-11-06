@@ -20,6 +20,8 @@
 package bdl;
 
 import bdl.controller.Controller;
+import bluej.extensions.BClass;
+
 import java.io.File;
 
 public interface Interface {
@@ -82,5 +84,10 @@ public interface Interface {
     /** Makes the GUI Builder invisible.
      */
     public void hide();
+
+    /**
+     * @return the target {@link BClass}
+     */
+    public BClass getTarget();
 
 }
