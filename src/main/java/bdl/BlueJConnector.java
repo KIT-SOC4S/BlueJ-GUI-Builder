@@ -244,5 +244,15 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
     @Override
     public void hide() {
 
+    public BClass getTarget() {
+        return target;
+    }
+
+    public BlueJ getBlueJ() {
+        return blueJ;
+    }
+
+    public Controller getController() {
+        return controller;
     }
 }
