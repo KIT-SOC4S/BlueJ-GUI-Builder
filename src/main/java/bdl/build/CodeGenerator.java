@@ -37,7 +37,7 @@ public class CodeGenerator {
         code.append(getJavaImports(guiObject, allImports)).append('\n');//Add imports
 
         String clName = (blueJInterface != null ? blueJInterface.getOpenGUIName() : guiObject.getClassName());
-        String clExtends = (blueJInterface != null ? "guibuilder.GUI" : "Application");
+        String clExtends = "Application";
         code.append("public class ").append(clName).append(" extends ").append(clExtends).append(" {\n\n");//Open class tag
 
         //Add declarations
