@@ -37,14 +37,10 @@ import javafx.scene.shape.Rectangle;
 public class MiddlePanel extends TabPane {
 
     public Tab viewTab;
-    public Tab codeTab;
-    public Tab previewTab;
 
     public GUIObject viewPane;
     public AnchorPane viewPaneDecorator;
-    public TextArea codePane;
     public ScrollPane scroll;
-    private StackPane blankPane;
 
     public Rectangle outline;
     public Rectangle highlight;
@@ -53,12 +49,10 @@ public class MiddlePanel extends TabPane {
         setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         viewTab = new Tab("    " + LabelGrabber.getLabel("editor.view.tab") + "    ");
-        codeTab = new Tab("    " + LabelGrabber.getLabel("code.view.tab") + "    ");
-        previewTab = new Tab("    " + LabelGrabber.getLabel("preview.gui.tab") + "    ");
 
-        getTabs().addAll(viewTab, codeTab, previewTab);
+        getTabs().add(viewTab);
 
-        blankPane = new StackPane();
+        StackPane blankPane = new StackPane();
         blankPane.setStyle("-fx-background-color:#94B2E0;");
         
         viewPane = new GUIObject();
@@ -103,11 +97,7 @@ public class MiddlePanel extends TabPane {
 
         //viewPane.setStyle("-fx-opacity: 1;");//TODO - We could use this to prevent Node interactions
 
-        codePane = new TextArea();
-        codePane.setEditable(false);
-
         viewTab.setContent(scroll);
-        codeTab.setContent(codePane);
     }
 
 }
