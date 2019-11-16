@@ -44,6 +44,8 @@ configure<JavaPluginConvention> {
 dependencies {
     testImplementation("junit", "junit", "4.12")
     testCompile("junit", "junit", "4.12")
+    implementation("io.github.java-diff-utils:java-diff-utils:4.5")
+    implementation("io.github.java-diff-utils:java-diff-utils-jgit:4.5")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 }
 
