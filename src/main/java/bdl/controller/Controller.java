@@ -40,6 +40,10 @@ import bdl.view.right.history.HistoryPanelItem;
 import bluej.extensions.BClass;
 import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.patch.Patch;
+import com.github.difflib.patch.PatchFailedException;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -74,6 +78,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureClassLoader;
 import java.util.*;
@@ -89,6 +94,9 @@ public class Controller {
     private Interface blueJInterface;
     private boolean isOpeningFile = false;
     private LogWindow logWindow;
+    private List<String> oldCode;
+    private List<String> moddedCode;
+    private Patch<String> modsOnOldCode;
 
     public Controller(View view, ComponentSettingsStore componentSettingsStore, Interface blueJInterface) {
         this.view = view;
@@ -619,6 +627,13 @@ public class Controller {
         view.middleTabPane.viewPane.getChildren().clear();
         selectionManager.clearSelection();
         historyManager.clearHistory();
+        oldCode = Arrays.asList(generateJavaCode().split("\\R"));
+        try {
+            moddedCode = Files.readAllLines(blueJInterface.getOpenGUIFile().toPath());
+            modsOnOldCode = DiffUtils.diff(oldCode, moddedCode);
+        } catch (IOException | DiffException e) {
+            e.printStackTrace();
+        }
         isOpeningFile = false;
     }
 
@@ -670,7 +685,7 @@ public class Controller {
             // Write java code to GUI java file.
             try {
                 FileWriter fileWriter = new FileWriter(blueJInterface.getOpenGUIFile());
-                fileWriter.write(generateJavaCode());
+                fileWriter.write(patchOutput(generateJavaCode());
                 fileWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -679,6 +694,26 @@ public class Controller {
             // Mark the file as dirty in BlueJ
             blueJInterface.markAsDirty();
         }
+    }
+
+
+    private String patchOutput(String newCode) {
+        List<String> newCodeList = Arrays.asList(newCode.split("\\R"));
+        List<String> patchedText = new LinkedList<>();
+        try {
+            patchedText = DiffUtils.patch(newCodeList, modsOnOldCode);
+        } catch (PatchFailedException e) {
+            System.out.println("Too much changes detected, Trying Variant B");
+            e.printStackTrace();
+            try {
+                Patch<String> rawcodediff = DiffUtils.diff(oldCode, newCodeList);
+                patchedText = DiffUtils.patch(moddedCode, rawcodediff);
+            } catch (DiffException | PatchFailedException ex) {
+                System.out.println("Variant B Failed");
+                ex.printStackTrace();
+            }
+        }
+        return String.join(System.lineSeparator(), patchedText);
     }
 
     /**
