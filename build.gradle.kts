@@ -7,7 +7,6 @@ plugins {
     idea
     id("org.openjfx.javafxplugin") version "0.0.8"
     id("org.beryx.jlink") version "2.12.0"
-    id("com.gradle.build-scan") version "2.1"
 }
 
 
@@ -40,11 +39,6 @@ configure<JavaFXOptions> {
 configure<JavaPluginConvention> {
     sourceCompatibility = javaVersion
     targetCompatibility = javaVersion
-}
-
-buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
 }
 
 dependencies {
