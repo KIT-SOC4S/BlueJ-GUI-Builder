@@ -686,7 +686,7 @@ public class Controller {
             // Write java code to GUI java file.
             try {
                 FileWriter fileWriter = new FileWriter(blueJInterface.getOpenGUIFile());
-                fileWriter.write(patchOutput(generateJavaCode());
+                fileWriter.write(patchOutput(generateJavaCode()));
                 fileWriter.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -712,6 +712,7 @@ public class Controller {
             } catch (DiffException | PatchFailedException ex) {
                 System.out.println("Variant B Failed");
                 ex.printStackTrace();
+                return generateJavaCode();
             }
         }
         return String.join(System.lineSeparator(), patchedText);
