@@ -42,6 +42,7 @@ import bluej.extensions.PackageNotFoundException;
 import bluej.extensions.ProjectNotOpenException;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.algorithm.DiffException;
+import com.github.difflib.algorithm.jgit.HistogramDiff;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
 import javafx.application.Platform;
@@ -630,7 +631,7 @@ public class Controller {
         oldCode = Arrays.asList(generateJavaCode().split("\\R"));
         try {
             moddedCode = Files.readAllLines(blueJInterface.getOpenGUIFile().toPath());
-            modsOnOldCode = DiffUtils.diff(oldCode, moddedCode);
+            modsOnOldCode = DiffUtils.diff(oldCode, moddedCode, new HistogramDiff<>());
         } catch (IOException | DiffException e) {
             e.printStackTrace();
         }
@@ -706,7 +707,7 @@ public class Controller {
             System.out.println("Too much changes detected, Trying Variant B");
             e.printStackTrace();
             try {
-                Patch<String> rawcodediff = DiffUtils.diff(oldCode, newCodeList);
+                Patch<String> rawcodediff = DiffUtils.diff(oldCode, newCodeList, new HistogramDiff<>());
                 patchedText = DiffUtils.patch(moddedCode, rawcodediff);
             } catch (DiffException | PatchFailedException ex) {
                 System.out.println("Variant B Failed");
