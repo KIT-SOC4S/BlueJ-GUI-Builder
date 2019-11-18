@@ -72,16 +72,13 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import javax.tools.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.SecureClassLoader;
 import java.util.*;
 
 public class Controller {
@@ -418,21 +415,6 @@ public class Controller {
             mouseEvent.consume();
         });
 
-        view.middleTabPane.codeTab.setOnSelectionChanged(event -> {
-            if (view.middleTabPane.codeTab.isSelected()) {
-                selectionManager.clearSelection();
-                view.middleTabPane.codePane.setText(generateJavaCode());
-            }
-        });
-        view.middleTabPane.previewTab.setOnSelectionChanged(event -> {
-            //previewCompile();
-            try {
-                generateInMemoryPreview();
-            } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                e.printStackTrace();
-            }
-        });
-
         view.middleTabPane.viewPane.setOnDragOver(t -> t.acceptTransferModes(TransferMode.ANY));
 
         view.middleTabPane.viewPane.setOnDragDropped(t -> {
@@ -446,71 +428,6 @@ public class Controller {
             }
             view.leftPanel.leftList.getSelectionModel().select(-1);
         });
-    }
-
-    private void generateInMemoryPreview() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        if (view.middleTabPane.previewTab.isSelected()) {
-            String cname = view.middleTabPane.viewPane.getClassName();
-            String code = generateJavaCode();
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            if (compiler == null) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setContentText("Keinen Compiler gefunden!");
-                alert.showAndWait();
-                throw new RuntimeException("No Compiler found");
-            }
-            URI uri = URI.create("string:////" + cname.replace('.', '/') + JavaFileObject.Kind.SOURCE.extension);
-
-            SimpleJavaFileObject fileObject = new SimpleJavaFileObject(uri, JavaFileObject.Kind.SOURCE) {
-                @Override
-                public CharSequence getCharContent(boolean ignoreEncodingErrors) {
-                    return code;
-                }
-            };
-            Iterable<? extends JavaFileObject> compilationUnits = Collections.singletonList(fileObject);
-            JavaFileManager fileManager = new ForwardingJavaFileManager<JavaFileManager>(compiler.getStandardFileManager(null, Locale.getDefault(), StandardCharsets.UTF_8)) {
-                HashMap<String, ByteArrayOutputStream> byteStreams = new HashMap<>();
-
-                @Override
-                public ClassLoader getClassLoader(Location location) {
-                    return new SecureClassLoader() {
-                        @Override
-                        protected Class<?> findClass(String name) {
-                            ByteArrayOutputStream outputStream = byteStreams.get(name);
-                            if (outputStream == null)
-                                return null;
-                            byte[] b = outputStream.toByteArray();
-                            return super.defineClass(name, b, 0, b.length);
-                        }
-                    };
-                }
-
-                @Override
-                public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind, FileObject sibling) {
-                    return new SimpleJavaFileObject(URI.create("string:////" + className.replace('.', '/') + kind.extension), kind) {
-                        @Override
-                        public OutputStream openOutputStream() {
-                            ByteArrayOutputStream outputStream = byteStreams.get(className);
-                            if (outputStream == null) {
-                                outputStream = new ByteArrayOutputStream();
-                                byteStreams.put(className, outputStream);
-                            }
-                            return outputStream;
-                        }
-                    };
-                }
-            };
-
-            JavaCompiler.CompilationTask compilationTask = compiler.getTask(null, fileManager, null, null, null, compilationUnits);
-            if (compilationTask.call()) {
-                ClassLoader classLoader = fileManager.getClassLoader(null);
-                Class<?> guiClass = classLoader.loadClass(cname);
-                Method main = guiClass.getMethod("start", Stage.class);
-                Constructor<?> constructor = guiClass.getConstructor((Class<?>) null);
-                main.invoke(constructor.newInstance(), new Stage());
-            }
-        }
-        view.middleTabPane.getSelectionModel().select(0);
     }
 
     private void setupRightPanel() {
