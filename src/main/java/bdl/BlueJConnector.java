@@ -73,18 +73,6 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
                             Platform.runLater(() -> {
                                 try {
                                     main.start(new Stage());
-                                    System.out.println("BC START");
-                                    System.out.println(bc.getClassFile());
-                                    System.out.println(bc.getClass());
-                                    System.out.println(Arrays.toString(bc.getConstructors()));
-                                    System.out.println(Arrays.toString(bc.getDeclaredMethods()));
-                                    System.out.println(bc.getEditor());
-                                    System.out.println(bc.getJavaFile());
-                                    System.out.println(Arrays.toString(bc.getFields()));
-                                    System.out.println(bc.getSourceType());
-                                    System.out.println(bc.getPackage());
-                                    System.out.println(bc.getName());
-                                    System.out.println("BC END");
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
