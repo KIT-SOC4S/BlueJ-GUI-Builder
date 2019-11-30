@@ -37,6 +37,9 @@ import bdl.view.left.ComponentMenuItem;
 import bdl.view.left.hierarchy.HierarchyTreeItem;
 import bdl.view.right.PropertyEditPane;
 import bdl.view.right.history.HistoryPanelItem;
+import bluej.extensions.BClass;
+import bluej.extensions.PackageNotFoundException;
+import bluej.extensions.ProjectNotOpenException;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ListChangeListener;
@@ -71,6 +74,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.SecureClassLoader;
 import java.util.*;
 
@@ -107,6 +111,16 @@ public class Controller {
         setupRightPanel();
         setupTopPanel();
         setupAutoSave();
+
+        BClass target = blueJInterface.getTarget();
+        try {
+            File classFile = target.getClassFile();
+            String fileName = classFile.getName();
+            Path fxmlpath = classFile.toPath().resolveSibling(fileName.substring(0, fileName.lastIndexOf(".")) + ".fxml");
+            openFile(fxmlpath.toFile());
+        } catch (ProjectNotOpenException | PackageNotFoundException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("Controller initialized");
     }
