@@ -197,7 +197,12 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
 
     @Override
     public void markAsDirty() {
-
+        try {
+            getTarget().getClassFile().delete();
+            getBlueJ().getCurrentPackage().reload();
+        } catch (ProjectNotOpenException | PackageNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
