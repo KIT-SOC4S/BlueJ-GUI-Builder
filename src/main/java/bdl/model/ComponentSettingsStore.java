@@ -25,7 +25,6 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -157,7 +156,7 @@ public class ComponentSettingsStore {
             String method = listener.getElementsByTagName("method").item(0).getTextContent();
             String event = listener.getElementsByTagName("event").item(0).getTextContent();
 
-            componentSettings.addListenerHint(name, method, event);
+            componentSettings.addListenerProperty(name, method, event);
         }
     }
 }

@@ -20,38 +20,45 @@
 package bdl.build.properties;
 
 import bdl.build.GObject;
-import bdl.build.GUIObject;
-import bdl.lang.LabelGrabber;
-import bdl.view.right.hints.ListenerHintWindow;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
-public class ListenerHintProperty implements PanelProperty {
+public class ListenerProperty implements PanelProperty {
+    private GObject gObj;
+    private CheckBox checkBox;
+    private String code;
+    private boolean implemented;
 
-    private Button button = new Button(LabelGrabber.getLabel("hint.button.text"));
-
-    public ListenerHintProperty (final GObject gObj, final GUIObject guiObject, String name, final String text, GridPane gp, int row) {
+    public ListenerProperty(final GObject gObj, String name, String code, GridPane gp, int row) {
+        this.gObj = gObj;
+        this.code = code;
+        //this.implemented = implemented;
         gp.add(new Label(name + ":"), 0, row);
-        gp.add(button, 1, row);
-
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent t) {
-                new ListenerHintWindow(guiObject.getClassName() + '.' + gObj.getFieldName() + text);
-            }
+        checkBox = new CheckBox();
+        checkBox.setSelected(implemented);
+        checkBox.setOnAction(event -> {
+            setImplemented(checkBox.isSelected());
         });
+        gp.add(checkBox, 1, row);
     }
 
     @Override
     public String getJavaCode() {
-        return "";
+        if (implemented) {
+            return gObj.getFieldName() + code;
+        } else {
+            return "";
+        }
     }
 
     @Override
     public String getFXMLCode() {
+        // Currently not implemented, as proper Controller would be needed
         return "";
+    }
+
+    public void setImplemented(boolean implemented) {
+        this.implemented = implemented;
     }
 }

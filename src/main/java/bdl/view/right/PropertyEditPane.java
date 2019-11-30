@@ -23,7 +23,6 @@ import bdl.build.GObject;
 import bdl.build.GUIObject;
 import bdl.lang.LabelGrabber;
 import bdl.model.ComponentSettings;
-import bdl.model.ListenerHint;
 import bdl.model.Property;
 import bdl.model.history.HistoryManager;
 import bdl.build.properties.*;
@@ -91,11 +90,11 @@ public class PropertyEditPane extends GridPane {
                 e.printStackTrace();
             }
         }
-        for (ListenerHint lhint : componentSettings.getListenerHints()) {
-            String name = lhint.getName();
-            String text = lhint.getText();
+        for (bdl.model.ListenerProperty listenerProperty : componentSettings.getListenerProperties()) {
+            String name = listenerProperty.getName();
+            String text = listenerProperty.getText();
             try {
-                PanelProperty panelProperty = new ListenerHintProperty(gObj, guiObject, name, text, this, currentRow++);
+                PanelProperty panelProperty = new ListenerProperty(gObj, name, text, this, currentRow++);
                 panelPropertyList.add(panelProperty);
             } catch (Exception e) {
                 System.out.println(name + "Listener failed.");
