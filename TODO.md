@@ -41,16 +41,4 @@ At first I thought I'd like to start on the codebase of [gediwes](https://github
 - [ ] if you did those two above, you probably should search some better paid work
 
 ## Bugs to fix
-1. See Bugtracker
-2. Listenerdeletion (currently WIP)
-3. File-Unpatchable-Handling-Dialog
-4. Resizing of Nodes
-
-### 2. Listenerdeletion
-It is currently not quite well implemented, it basically deletes the whole listener block as soon as you tick the button. There should be some safeguard.
-
-### 3. File-Unpatchable Handling Dialog
-This is quite similar to #2, this time if a file cannot be patched, it tries the other patching method and afterwards it just overwrites the complete file with generated code - which is necessary for creating new BlueJ-GUIs
-
-### 4. Resizing of Nodes
-Currently the Nodes are fixed size or scale dynamically based on their content. The `master` branch contains the scale feature, needs to be backported.
+See [Bugtracker](https://github.com/KIT-SOC4S/BlueJ-GUI-Builder/issues)
