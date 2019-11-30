@@ -2,6 +2,7 @@ package bdl;
 
 import bdl.controller.Controller;
 import bluej.extensions.*;
+import bluej.extensions.editor.TextLocation;
 import bluej.extensions.event.PackageEvent;
 import bluej.extensions.event.PackageListener;
 import javafx.application.Platform;
@@ -12,9 +13,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 public class BlueJConnector extends Extension implements PackageListener, Interface {
     private static BlueJConnector instance;
@@ -68,18 +73,6 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
                             Platform.runLater(() -> {
                                 try {
                                     main.start(new Stage());
-                                    System.out.println("BC START");
-                                    System.out.println(bc.getClassFile());
-                                    System.out.println(bc.getClass());
-                                    System.out.println(Arrays.toString(bc.getConstructors()));
-                                    System.out.println(Arrays.toString(bc.getDeclaredMethods()));
-                                    System.out.println(bc.getEditor());
-                                    System.out.println(bc.getJavaFile());
-                                    System.out.println(Arrays.toString(bc.getFields()));
-                                    System.out.println(bc.getSourceType());
-                                    System.out.println(bc.getPackage());
-                                    System.out.println(bc.getName());
-                                    System.out.println("BC END");
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
@@ -261,5 +254,23 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
 
     public Controller getController() {
         return controller;
+    }
+
+    public void goToCode(String fragment) throws ProjectNotOpenException, PackageNotFoundException, IOException {
+        List<String> strings = Files.readAllLines(target.getJavaFile().toPath());
+        int dest = -1;
+        fragment = fragment.split("\\R")[0];
+        for (int i = 0; i < strings.size(); i++) {
+            if (strings.get(i).lastIndexOf(fragment) != -1) {
+                dest = i;
+                break;
+            }
+        }
+        if(dest == -1)
+            return;
+        TextLocation start = new TextLocation(dest, 0);
+        TextLocation end = new TextLocation(dest + 1, 0);
+        target.getEditor().setVisible(true);
+        target.getEditor().setSelection(start, end);
     }
 }
