@@ -19,14 +19,22 @@
 
 package bdl.build.properties;
 
+import bdl.BlueJConnector;
 import bdl.build.GObject;
+import bdl.lang.LabelGrabber;
+import bluej.extensions.PackageNotFoundException;
+import bluej.extensions.ProjectNotOpenException;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 
+import java.io.IOException;
+
 public class ListenerProperty implements PanelProperty {
     private GObject gObj;
     private CheckBox checkBox;
+    private Button jumpbutton;
     private String code;
     private boolean implemented;
 
@@ -35,12 +43,32 @@ public class ListenerProperty implements PanelProperty {
         this.code = code;
         //this.implemented = implemented;
         gp.add(new Label(name + ":"), 0, row);
+
+        jumpbutton = new Button();
+        jumpbutton.setText(LabelGrabber.getLabel("listenerproperty.jump"));
+        jumpbutton.setOnAction(event -> {
+            try {
+                BlueJConnector.getInstance().goToCode(getJavaCode());
+            } catch (ProjectNotOpenException e) {
+                e.printStackTrace();
+            } catch (PackageNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
         checkBox = new CheckBox();
         checkBox.setSelected(implemented);
         checkBox.setOnAction(event -> {
             setImplemented(checkBox.isSelected());
+            if (checkBox.isSelected()) {
+                jumpbutton.setDisable(false);
+            } else {
+                jumpbutton.setDisable(true);
+            }
         });
         gp.add(checkBox, 1, row);
+        gp.add(jumpbutton, 2, row);
     }
 
     @Override
