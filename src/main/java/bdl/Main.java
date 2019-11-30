@@ -40,7 +40,7 @@ public class Main extends Application implements Runnable {
 //        if (__instance == null) { __instance = new Main(); }
 //        return __instance;
 //    }
-
+    public static Main instance;
     public Interface blueJInterface;
 
     public void run() {
@@ -49,6 +49,7 @@ public class Main extends Application implements Runnable {
 
     @Override
     public void start(final Stage stage) throws Exception {
+        instance = this;
         stage.setMinWidth(800);
         stage.setMinHeight(500);
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/icons/BlueJ_Orange_64.png")));
