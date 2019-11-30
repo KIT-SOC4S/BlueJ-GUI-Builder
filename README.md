@@ -10,6 +10,7 @@ Build using
 This will produce a ``BlueJ-GUI-Builder-fat-1.0-SNAPSHOT.jar`` which you can find in ``build/libs/``. 
 
 This file has to be copied to one of the following locations:
+
 | OS      | Folder                                                                                                                   | Scope                         |
 | ------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
 | Unix    | `<BLUEJ_HOME>/lib/extensions`                                                                                            | For all users in all projects |
