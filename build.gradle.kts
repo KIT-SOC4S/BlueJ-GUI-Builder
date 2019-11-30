@@ -7,7 +7,7 @@ plugins {
     idea
     id("org.openjfx.javafxplugin") version "0.0.8"
     id("org.beryx.jlink") version "2.12.0"
-    id("com.gradle.build-scan") version "2.1"
+    id ("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 
@@ -42,14 +42,11 @@ configure<JavaPluginConvention> {
     targetCompatibility = javaVersion
 }
 
-buildScan {
-    termsOfServiceUrl = "https://gradle.com/terms-of-service"
-    termsOfServiceAgree = "yes"
-}
-
 dependencies {
     testImplementation("junit", "junit", "4.12")
     testCompile("junit", "junit", "4.12")
+    implementation("io.github.java-diff-utils:java-diff-utils:4.5")
+    implementation("io.github.java-diff-utils:java-diff-utils-jgit:4.5")
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 }
 
