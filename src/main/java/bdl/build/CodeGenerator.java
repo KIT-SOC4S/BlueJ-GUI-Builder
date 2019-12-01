@@ -186,7 +186,7 @@ public class CodeGenerator {
     private static void declaration(Node node, StringBuilder code) {
         GObject gObj = (GObject) node;
         String nodeType = node.getClass().getSimpleName().substring(1);
-        code.append("    public static ")
+        code.append("    public ")
                 .append(nodeType)
                 .append(" ")
                 .append(gObj.getFieldName())
