@@ -72,13 +72,16 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
+import javax.tools.*;
+import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.SecureClassLoader;
 import java.util.*;
 
 public class Controller {
@@ -117,7 +120,6 @@ public class Controller {
         setupRightPanel();
         setupTopPanel();
         setupAutoSave();
-
         BClass target = blueJInterface.getTarget();
         try {
             File classFile = target.getClassFile();
@@ -534,6 +536,13 @@ public class Controller {
                 e.printStackTrace();
             }
         }
+        oldCode = Arrays.asList(generateJavaCode().split("\\R"));
+        try {
+            moddedCode = Files.readAllLines(blueJInterface.getOpenGUIFile().toPath());
+            modsOnOldCode = DiffUtils.diff(oldCode, moddedCode, new HistogramDiff<>());
+        } catch (IOException | DiffException e) {
+            e.printStackTrace();
+        }
         isOpeningFile = false;
     }
 
@@ -545,13 +554,6 @@ public class Controller {
         view.middleTabPane.viewPane.getChildren().clear();
         selectionManager.clearSelection();
         historyManager.clearHistory();
-        oldCode = Arrays.asList(generateJavaCode().split("\\R"));
-        try {
-            moddedCode = Files.readAllLines(blueJInterface.getOpenGUIFile().toPath());
-            modsOnOldCode = DiffUtils.diff(oldCode, moddedCode, new HistogramDiff<>());
-        } catch (IOException | DiffException e) {
-            e.printStackTrace();
-        }
         isOpeningFile = false;
     }
 
