@@ -231,10 +231,8 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
         controller.showStage();
         try {
             target.getEditor().setVisible(false);
-            target.getEditor().setReadOnly(true);
-        } catch (ProjectNotOpenException e) {
-            e.printStackTrace();
-        } catch (PackageNotFoundException e) {
+            //target.getEditor().setReadOnly(true);
+        } catch (ProjectNotOpenException | PackageNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -242,6 +240,7 @@ public class BlueJConnector extends Extension implements PackageListener, Interf
     @Override
     public void hide() {
         controller.hideStage();
+        //target.getEditor().setReadOnly(true);
     }
 
     public BClass getTarget() {
