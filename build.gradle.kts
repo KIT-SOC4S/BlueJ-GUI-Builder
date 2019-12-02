@@ -12,7 +12,7 @@ plugins {
 
 
 group = "jfxgui"
-version = "1.0-SNAPSHOT"
+version = "0.5-SNAPSHOT"
 val javaVersion: JavaVersion by extra { JavaVersion.VERSION_11 }
 val author = "Fabian Jackl"
 

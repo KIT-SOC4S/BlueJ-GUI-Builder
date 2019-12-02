@@ -6,4 +6,17 @@ dist: bionic
 jdk: openjdk11
 
 script:
-  - ./gradlew build
+- "./gradlew build"
+
+deploy:
+  provider: releases
+  token:
+    secure: Zc0Sok5scaxiW2eustU7RasJv+xXTFzlHf7Cj37hOPdg49Y7/GdQbXdZaYre/L8+BX8gDaRyJdyW/t7y7f+soKvvjYryo/FQ4tPbc5U/cbPyprn+zZQIYiVQaSQ0PpIxkbW5ejtHFzSLxOWnDO02FZMINw87PzkCv/3leaRw9iUv6iKVJhsC/c5D7ii8P5kr+haIVXUmvzhybIt1Ua9f3hhZP7LNvOyZ5PGzu5dmJYlmGKt8U8PiHVUKsDUFjV14iYl+jzRYjRF0rY3ccaEEyCD4X/Px0DZjmhBlC15XsLSnYzvWfzD2ICH5qiCjFp2O9YA+6hF6fvjZGkF5TOvITgmDyG7EuaoMI2xbAeZOi2Si0tcWWMsf+/CJ9fXj3FEGcgRakMxByblAlyxPcgxX4cksvaVQxRtae6yjpzI/Nc+PFVyQL+jGpen9mWjF3q1aAjbucRYwkZtQ7BT6Y0gr+ji3raiobjjLdCTLFEhsQ1ZRLrWSjIhBb5Z2NNyO8BHdOnNLvMDEBl+Dchkh2wBuHy9d+T+T7o2rPkiE/MVVI4HsAaI6+n/7gbPR55irNBf8/Q3MNVJwkMBOCTE7ndA3CWEKDx6smw3UpJaMeUH41lpXAnS1RG6ix/wGutxftuJYLD5VZmx6mVnNFqNMNFjuL7BMeQE2fJRCv3+3/ehLqI8=
+  file:
+  - build/libs/*all.jar
+  file_glob: true
+  prerelease: true
+  edge: true
+  on:
+    branch: original_project
+    tags: true
